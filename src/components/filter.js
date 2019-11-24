@@ -12,4 +12,4 @@ const createFilter = (filterNames, checkedIndex = 0) => {
             </form>`;
 };
 
-export { createFilter }
+export {createFilter};

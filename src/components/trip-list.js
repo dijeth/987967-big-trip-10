@@ -1,4 +1,4 @@
-import { createForm } from './form.js'
+import {createForm} from './form.js';
 
 const createTripDays = (dayList) => `
           <ul class="trip-days">
@@ -56,4 +56,4 @@ const createEventList = (eventList, date) => `
 `;
 
 
-export { createTripDays }
+export {createTripDays};
