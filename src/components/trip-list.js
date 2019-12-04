@@ -7,6 +7,7 @@ const createTripList = (eventList, formHtml = ``) => {
   let dayCounter = 1;
   let dayDate = eventList[0].start;
   let dayEvents = [eventList[0]];
+  const formEvent = eventList[0];
 
   for (let i = 1; i < eventList.length; i++) {
     const daysCount = getDaysCount(dayDate, eventList[i].start);
@@ -16,7 +17,7 @@ const createTripList = (eventList, formHtml = ``) => {
       continue;
     };
 
-    days.push(createTripDay(dayDate, dayCounter, createEventListHtml(dayEvents)));
+    days.push(createTripDay(dayDate, dayCounter, createEventListHtml(dayEvents, formEvent)));
     dayCounter += daysCount;
     dayDate = eventList[i].start;
     dayEvents = [eventList[i]];
@@ -45,7 +46,7 @@ const createTripDay = (date, dayCounter, eventsHtml) => {
 }
 
 const createOffersHtml = (offerData) => {
-  const selected = offerData.filter((item) => item.checked).slice(0, 2);
+  const selected = offerData.filter((item) => item.checked).slice(0, 3);
   if (!selected.length) {
   	return ``
   };
@@ -104,10 +105,10 @@ const createEventHtml = (eventData, isForm = false) => {
                 </li>`
 };
 
-const createEventListHtml = (eventList) => {
+const createEventListHtml = (eventList, formEvent) => {
   return `
 	              <ul class="trip-events__list">
-	              	${eventList.map((item) => createEventHtml(item)).join(`\n`)}
+	              	${eventList.map((item) => createEventHtml(item, item === formEvent)).join(`\n`)}
 	              </ul>`
 };
 

@@ -1,4 +1,5 @@
-/*import { EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, Destinations } from '../const.js';
+import { generatePhotoList, generateDescription } from '../mock/destination-data.js';
+import { EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions } from '../const.js';
 import * as util from '../util.js';
 
 const createEventTypeItem = (eventType) => {
@@ -29,19 +30,24 @@ const createEventTypeList = () => {
 }
 
 const createEventOffer = (offer) => {
+  const offerOptions = OfferTypeOptions[offer.type];
   return `
                           <div class="event__offer-selector">
-                            <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${checked}>
-                            <label class="event__offer-label" for="event-offer-luggage-1">
-                              <span class="event__offer-title">Add luggage</span>
+                            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.checked ? `checked` : ``}>
+                            <label class="event__offer-label" for="event-offer-${offer.type}-1">
+                              <span class="event__offer-title">${offerOptions.name}</span>
                               &plus;
-                              &euro;&nbsp;<span class="event__offer-price">30</span>
+                              &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
                             </label>
                           </div>`
 }
 
 const createEventOffers = (offers) => {
-  const eventOffersHtml = 
+  if (!offers.length) {
+    return ``
+  };
+
+  const eventOffersHtml = offers.map((item) => createEventOffer(item)).join(`\n`);
 
   return `
                       <section class="event__section  event__section--offers">
@@ -52,6 +58,28 @@ const createEventOffers = (offers) => {
                         </div>
                       </section>`
 }
+
+const createDestinationHtml = (destination) => {
+  if (!destination) {
+    return ``
+  };
+
+  const photoList = generatePhotoList().map((item) => `
+                                <img class="event__photo" src="${item}" alt="Event photo">`).join(`\n`)
+
+  return `
+                      <section class="event__section  event__section--destination">
+                        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+                        <p class="event__destination-description">${generateDescription()}</p>
+
+                        <div class="event__photos-container">
+                          <div class="event__photos-tape">
+                            ${photoList}
+                          </div>
+                        </div>
+                      </section>
+`
+};
 
 const createForm = (eventItem = EVENT_DEFAULT) => {
   const isEditForm = eventItem !== EVENT_DEFAULT;
@@ -129,25 +157,10 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                     <section class="event__details">
 
                       ${createEventOffers(eventItem.offers)}
+                      ${createDestinationHtml(eventItem.destination)}
 
-
-                      <section class="event__section  event__section--destination">
-                        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                        <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
-
-                        <div class="event__photos-container">
-                          <div class="event__photos-tape">
-                            <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-                            <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-                            <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-                            <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-                            <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
-                          </div>
-                        </div>
-                      </section>
                     </section>
                   </form>`
 }
 
 export default createForm;
-*/
