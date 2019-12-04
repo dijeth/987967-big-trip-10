@@ -1,15 +1,16 @@
-const createFilterItem = (name, checked = false) => `
+const createFilterItem = (filterItem) => `
               <div class="trip-filters__filter">
-                <input id="filter-${name.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name.toLowerCase()}" ${checked ? `checked` : ``}>
-                <label class="trip-filters__filter-label" for="filter-${name.toLowerCase()}">${name}</label>
+                <input id="filter-${filterItem.name.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name.toLowerCase()}" ${filterItem.checked ? `checked` : ``}>
+                <label class="trip-filters__filter-label" for="filter-${filterItem.name.toLowerCase()}">${filterItem.name}</label>
               </div>`;
 
-const createFilter = (filterNames, checkedIndex = 0) => {
+const createFilter = (filterItems) => {
+  const filterItemsHtml = filterItems.map((item) => createFilterItem(item)).join(`\n`);
   return `
 	        <form class="trip-filters" action="#" method="get">
-	          ${ filterNames.map((item, index) => createFilterItem(item, index === checkedIndex)).join(`\n`) }
+	          ${filterItemsHtml}
               <button class="visually-hidden" type="submit">Accept filter</button>
             </form>`;
 };
 
-export {createFilter};
+export default createFilter;
