@@ -1,5 +1,5 @@
-import { generatePhotoList, generateDescription } from '../mock/destination-data.js';
-import { EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions } from '../const.js';
+import {generatePhotoList, generateDescription} from '../mock/destination-data.js';
+import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions} from '../const.js';
 import * as util from '../util.js';
 
 const createEventTypeItem = (eventType) => {
@@ -8,7 +8,7 @@ const createEventTypeItem = (eventType) => {
                             <div class="event__type-item">
                               <input id="event-type-${eventTypeCode}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventTypeCode}">
                               <label class="event__type-label  event__type-label--${eventTypeCode}" for="event-type-${eventTypeCode}-1">${eventType}</label>
-                            </div>`
+                            </div>`;
 };
 
 const createEventTypeList = () => {
@@ -26,8 +26,8 @@ const createEventTypeList = () => {
                             <legend class="visually-hidden">Activity</legend>
                             ${activityEvents}
                           </fieldset>
-                        </div>`
-}
+                        </div>`;
+};
 
 const createEventOffer = (offer) => {
   const offerOptions = OfferTypeOptions[offer.type];
@@ -39,13 +39,13 @@ const createEventOffer = (offer) => {
                               &plus;
                               &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
                             </label>
-                          </div>`
-}
+                          </div>`;
+};
 
 const createEventOffers = (offers) => {
   if (!offers.length) {
-    return ``
-  };
+    return ``;
+  }
 
   const eventOffersHtml = offers.map((item) => createEventOffer(item)).join(`\n`);
 
@@ -56,16 +56,16 @@ const createEventOffers = (offers) => {
                         <div class="event__available-offers">
                           ${eventOffersHtml}
                         </div>
-                      </section>`
-}
+                      </section>`;
+};
 
 const createDestinationHtml = (destination) => {
   if (!destination) {
-    return ``
-  };
+    return ``;
+  }
 
   const photoList = generatePhotoList().map((item) => `
-                                <img class="event__photo" src="${item}" alt="Event photo">`).join(`\n`)
+                                <img class="event__photo" src="${item}" alt="Event photo">`).join(`\n`);
 
   return `
                       <section class="event__section  event__section--destination">
@@ -78,7 +78,7 @@ const createDestinationHtml = (destination) => {
                           </div>
                         </div>
                       </section>
-`
+`;
 };
 
 const createForm = (eventItem = EVENT_DEFAULT) => {
@@ -89,8 +89,8 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination;
   const destinationList = Destinations.map((item) => `<option value="${item}"></option>`).join(`\n`);
-  const startDateTime = `${util.getDate(eventItem.start, '/')} ${util.getTime(eventItem.start)}`;
-  const finishDateTime = `${util.getDate(eventItem.finish, '/')} ${util.getTime(eventItem.finish)}`;
+  const startDateTime = `${util.getDate(eventItem.start, `/`)} ${util.getTime(eventItem.start)}`;
+  const finishDateTime = `${util.getDate(eventItem.finish, `/`)} ${util.getTime(eventItem.finish)}`;
 
   const editFormButtons = `
                       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${eventItem.isFavorite ? `checked` : ``}>
@@ -104,7 +104,7 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                       <button class="event__rollup-btn" type="button">
                         <span class="visually-hidden">Open event</span>
                       </button>
-`
+`;
 
   return `
                   <form class="event  event--edit" action="#" method="post">
@@ -160,7 +160,7 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                       ${createDestinationHtml(eventItem.destination)}
 
                     </section>
-                  </form>`
-}
+                  </form>`;
+};
 
 export default createForm;

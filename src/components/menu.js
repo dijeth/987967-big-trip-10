@@ -4,7 +4,7 @@ const createMenuItem = (menuItem) => `
 const createMenu = (menuItems) => {
   const menuItemList = menuItems.map((item) => createMenuItem(item)).join(`\n`);
   return `
-              <nav class="trip-controls__trip-tabs  trip-tabs">${menuItemList}</nav>`
+              <nav class="trip-controls__trip-tabs  trip-tabs">${menuItemList}</nav>`;
 };
 
 export default createMenu;

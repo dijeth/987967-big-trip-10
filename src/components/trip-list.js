@@ -1,8 +1,8 @@
 import createForm from './form.js';
-import { MONTHS, EventType, Destinations, EventTypeProperties, PlaceholderParticle, OfferTypeOptions } from '../const.js';
-import { getDaysCount, formatDate, getDateTime, getTime, getDate, getShortDate } from '../util.js';
+import {EventTypeProperties, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import {getDaysCount, formatDate, getDateTime, getTime, getShortDate} from '../util.js';
 
-const createTripList = (eventList, formHtml = ``) => {
+const createTripList = (eventList) => {
   const days = [];
   let dayCounter = 1;
   let dayDate = eventList[0].start;
@@ -15,41 +15,41 @@ const createTripList = (eventList, formHtml = ``) => {
     if (daysCount === 0) {
       dayEvents.push(eventList[i]);
       continue;
-    };
+    }
 
     days.push(createTripDay(dayDate, dayCounter, createEventListHtml(dayEvents, formEvent)));
     dayCounter += daysCount;
     dayDate = eventList[i].start;
     dayEvents = [eventList[i]];
-  };
+  }
 
   if (dayEvents.length) {
     days.push(createTripDay(dayDate, dayCounter, createEventListHtml(dayEvents)));
-  };
+  }
 
   return `<ul class="trip-days">${days.join(`\n`)}</ul>`;
-}
+};
 
 const createTripDay = (date, dayCounter, eventsHtml) => {
   const dateText = getShortDate(date);
   const dateTime = getDateTime(date);
 
   return `
-	        <li class="trip-days__item  day">
+          <li class="trip-days__item  day">
               <div class="day__info">
                 <span class="day__counter">${dayCounter}</span>
                 <time class="day__date" datetime="${dateTime}">${dateText}</time>
               </div>
               ${eventsHtml}
-            </li>`
+            </li>`;
 
-}
+};
 
 const createOffersHtml = (offerData) => {
   const selected = offerData.filter((item) => item.checked).slice(0, 3);
   if (!selected.length) {
-  	return ``
-  };
+    return ``;
+  }
 
   const offers = selected.map((item) => `
                       <li class="event__offer">
@@ -61,14 +61,14 @@ const createOffersHtml = (offerData) => {
   return `
                     <h4 class="visually-hidden">Offers:</h4>
                     <ul class="event__selected-offers">
-          						${offers.join(`\n`)}
-          					</ul>`;
-}
+                      ${offers.join(`\n`)}
+                    </ul>`;
+};
 
 const createEventHtml = (eventData, isForm = false) => {
   if (isForm) {
     return createForm(eventData);
-  };
+  }
 
   const eventProperty = EventTypeProperties[eventData.type];
   const icon = eventProperty.icon;
@@ -76,7 +76,7 @@ const createEventHtml = (eventData, isForm = false) => {
   const offersHtml = createOffersHtml(eventData.offers);
 
   return `
-				        <li class="trip-events__item">
+                <li class="trip-events__item">
                   <div class="event">
                     <div class="event__type">
                       <img class="event__type-icon" width="42" height="42" src="img/icons/${icon}" alt="Event type icon">
@@ -102,14 +102,14 @@ const createEventHtml = (eventData, isForm = false) => {
                       <span class="visually-hidden">Open event</span>
                     </button>
                   </div>
-                </li>`
+                </li>`;
 };
 
 const createEventListHtml = (eventList, formEvent) => {
   return `
-	              <ul class="trip-events__list">
-	              	${eventList.map((item) => createEventHtml(item, item === formEvent)).join(`\n`)}
-	              </ul>`
+                <ul class="trip-events__list">
+                  ${eventList.map((item) => createEventHtml(item, item === formEvent)).join(`\n`)}
+                </ul>`;
 };
 
 export default createTripList;

@@ -12,8 +12,8 @@ const createSortItem = (sortItem) => {
                 ${sortItem.name}
                 ${direction}
               </label>
-            </div>`
-}
+            </div>`;
+};
 
 const createSort = (sortItems) => {
 
@@ -24,7 +24,7 @@ const createSort = (sortItems) => {
             ${sortItems.map((item) => createSortItem(item)).join(`\n`)}
 
             <span class="trip-sort__item  trip-sort__item--offers">Offers</span>
-          </form>`
-}
+          </form>`;
+};
 
 export default createSort;

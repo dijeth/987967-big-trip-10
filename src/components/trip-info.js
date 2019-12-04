@@ -1,7 +1,7 @@
 import {getShortDate} from '../util.js';
 
 const getDateTitle = (eventList) => {
-  return `${getShortDate(eventList[0].start)}&nbsp;&mdash;&nbsp;${getShortDate(eventList[eventList.length - 1].finish)}`
+  return `${getShortDate(eventList[0].start)}&nbsp;&mdash;&nbsp;${getShortDate(eventList[eventList.length - 1].finish)}`;
 };
 
 const createTripInfo = (eventList) => {

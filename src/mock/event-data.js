@@ -1,6 +1,6 @@
-import { getRandomElement, getRandomWeek, getRandomTwoDays, getRandomNumber, getRandomBoolean } from '../util.js';
-import { EventType, Destinations, EVENT_DEFAULT, Offers } from '../const.js';
-import { generateOfferList } from './offer-data.js';
+import {getRandomElement, getRandomWeek, getRandomTwoDays, getRandomNumber, getRandomBoolean} from '../util.js';
+import {EventType, Destinations, EVENT_DEFAULT} from '../const.js';
+import {generateOfferList} from './offer-data.js';
 
 const generateEventData = (startData) => {
   const event = {};
@@ -18,7 +18,7 @@ const generateEventData = (startData) => {
   event.offers = generateOfferList();
 
   return event;
-}
+};
 
 const generateEventList = () => {
   const eventCount = getRandomNumber(10, 5);
@@ -26,13 +26,13 @@ const generateEventList = () => {
   let startData = getRandomWeek(new Date());
 
   for (let i = 0; i < eventCount; i++) {
-  	const eventData = generateEventData(startData);
-  	startData = eventData.finish;
+    const eventData = generateEventData(startData);
+    startData = eventData.finish;
 
     eventList.push(eventData);
-  };
+  }
 
-  return eventList
-}
+  return eventList;
+};
 
 export default generateEventList;
