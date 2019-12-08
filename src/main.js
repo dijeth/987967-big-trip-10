@@ -4,6 +4,7 @@ import MenuComponent from './components/menu.js';
 import FilterComponent from './components/filter.js';
 import createSort from './components/sort.js';
 import DayListComponent from './components/day-list.js';
+import SortComponent from './components/sort.js';
 import generateEventList from './mock/event-data.js';
 
 const eventList = generateEventList();
@@ -19,7 +20,7 @@ const filterList = [
   { name: `Past`, checked: false }
 ];
 
-const sortItemList = [
+const sortList = [
   { name: `Event`, checked: true, direction: false },
   { name: `Time`, checked: false, direction: true },
   { name: `Price`, checked: false, direction: true }
@@ -39,8 +40,8 @@ const renderIndex = () => {
   renderElement(tripInfoElement, RenderElementPosition.AFTER_BEGIN, new TripInfoComponent(eventList).getElement());
   renderElement(tripControlElements[0], RenderElementPosition.AFTER_END, new MenuComponent(menuList).getElement());
   renderElement(tripControlElements[1], RenderElementPosition.AFTER_END, new FilterComponent(filterList).getElement());
-  // renderElement(tripEventsElement, `${createSort(sortItemList)}\n${createTripList(eventList)}`, `afterend`);
   renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new DayListComponent(eventList).getElement());
+  renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new SortComponent(sortList).getElement());
 };
 
 renderIndex();

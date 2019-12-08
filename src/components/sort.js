@@ -1,3 +1,5 @@
+import { createElement } from '../util.js';
+
 const createSortItem = (sortItem) => {
   const name = sortItem.name.toLowerCase();
   const direction = sortItem.direction ? `
@@ -15,11 +17,11 @@ const createSortItem = (sortItem) => {
             </div>`;
 };
 
-const createSort = (sortItems) => {
+const createSortHtml = (sortItems) => {
 
   return `
           <form class="trip-events__trip-sort  trip-sort" action="#" method="get">
-            <span class="trip-sort__item  trip-sort__item--day">Day</span>
+            <span class="trip-sort__item  trip-sort__item--day">Sort</span>
 
             ${sortItems.map((item) => createSortItem(item)).join(`\n`)}
 
@@ -27,4 +29,27 @@ const createSort = (sortItems) => {
           </form>`;
 };
 
-export default createSort;
+class SortComponent {
+  constructor(sortItems) {
+    this._element = null;
+    this._sortItems = sortItems;
+  }
+
+  getTemplate() {
+    return createSortHtml(this._sortItems)
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default SortComponent;
