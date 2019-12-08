@@ -1,10 +1,11 @@
-import {RenderElementPosition, renderElement} from './util.js';
+import { RenderElementPosition, renderElement } from './util.js';
 import TripInfoComponent from './components/trip-info.js';
 import MenuComponent from './components/menu.js';
 import FilterComponent from './components/filter.js';
 import createSort from './components/sort.js';
 import DayListComponent from './components/day-list.js';
 import SortComponent from './components/sort.js';
+import NoPointsComponent from './components/no-points.js';
 import generateEventList from './mock/event-data.js';
 
 const eventList = generateEventList();
@@ -37,11 +38,23 @@ const renderIndex = () => {
   const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
   const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 
-  renderElement(tripInfoElement, RenderElementPosition.AFTER_BEGIN, new TripInfoComponent(eventList).getElement());
+  if (eventList.length) {
+    renderElement(tripInfoElement, RenderElementPosition.AFTER_BEGIN, new TripInfoComponent(eventList).getElement());
+  };
+
   renderElement(tripControlElements[0], RenderElementPosition.AFTER_END, new MenuComponent(menuList).getElement());
   renderElement(tripControlElements[1], RenderElementPosition.AFTER_END, new FilterComponent(filterList).getElement());
-  renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new DayListComponent(eventList).getElement());
-  renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new SortComponent(sortList).getElement());
+
+  if (eventList.length) {
+    renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new DayListComponent(eventList).getElement());
+  } else {
+    renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new NoPointsComponent(`Click New Event to create your first point`).getElement());
+  };
+
+  if (eventList.length) {
+    renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new SortComponent(sortList).getElement());
+  };
+
 };
 
 renderIndex();
