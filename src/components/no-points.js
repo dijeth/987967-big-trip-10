@@ -1,4 +1,4 @@
-import { createElement } from '../util.js';
+import {createElement} from '../util.js';
 
 class NoPointsComponent {
   constructor(text) {
