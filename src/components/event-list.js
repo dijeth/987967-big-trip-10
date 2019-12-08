@@ -1,4 +1,4 @@
-import { createElement, RenderElementPosition, renderElement } from '../util.js';
+import {createElement, RenderElementPosition, renderElement} from '../util.js';
 import EventComponent from './event.js';
 import EventEditComponent from './event-edit.js';
 
@@ -9,7 +9,7 @@ class EventListComponent {
   }
 
   getTemplate() {
-    return `<ul class="trip-events__list"></ul>`
+    return `<ul class="trip-events__list"></ul>`;
   }
 
   getElement() {
@@ -24,9 +24,9 @@ class EventListComponent {
 
           if (isEscKey) {
             editToEvent();
-            document.removeEventListener(`keydown`, documentKeyDownHandler  )
+            document.removeEventListener(`keydown`, documentKeyDownHandler);
           }
-        }
+        };
 
         const eventElement = new EventComponent(item).getElement();
         const eventEditElement = new EventEditComponent(item).getElement();
@@ -35,7 +35,7 @@ class EventListComponent {
 
         eventRollupButton.addEventListener(`click`, () => {
           eventToEdit();
-          document.addEventListener(`keydown`, documentKeyDownHandler)
+          document.addEventListener(`keydown`, documentKeyDownHandler);
         });
 
         eventEditRollupButton.addEventListener(`click`, () => {
@@ -47,10 +47,10 @@ class EventListComponent {
           evt.preventDefault();
           editToEvent();
           document.removeEventListener(`keydown`, documentKeyDownHandler);
-        })
+        });
 
-        renderElement(this._element, RenderElementPosition.BEFORE_END, eventElement)
-      })
+        renderElement(this._element, RenderElementPosition.BEFORE_END, eventElement);
+      });
     }
 
     return this._element;

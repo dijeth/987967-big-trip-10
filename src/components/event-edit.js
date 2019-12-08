@@ -1,4 +1,4 @@
-import { createElement, RenderElementPosition } from '../util.js';
+import {createElement} from '../util.js';
 import {generatePhotoList, generateDescription} from '../mock/destination-data.js';
 import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions} from '../const.js';
 import * as util from '../util.js';

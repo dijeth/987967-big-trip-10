@@ -1,4 +1,4 @@
-import { createElement, RenderElementPosition, renderElement, getShortDate, getDateTime } from '../util.js';
+import {createElement, RenderElementPosition, renderElement, getShortDate, getDateTime} from '../util.js';
 import EventListComponent from './event-list.js';
 
 class DayComponent {
@@ -24,7 +24,7 @@ class DayComponent {
     if (!this._element) {
       this._element = createElement(this.getTemplate());
 
-      renderElement(this._element, RenderElementPosition.BEFORE_END, new EventListComponent(this._dayItem.dayEvents).getElement())
+      renderElement(this._element, RenderElementPosition.BEFORE_END, new EventListComponent(this._dayItem.dayEvents).getElement());
     }
 
     return this._element;

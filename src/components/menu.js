@@ -1,4 +1,4 @@
-import { getShortDate, createElement } from '../util.js';
+import {createElement} from '../util.js';
 
 const createMenuItemHtml = (menuItem) => `              
 <a class="trip-tabs__btn${menuItem.active ? `  trip-tabs__btn--active` : ``}" href="${menuItem.href}">${menuItem.name}</a>`;

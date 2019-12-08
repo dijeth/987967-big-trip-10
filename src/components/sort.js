@@ -1,4 +1,4 @@
-import { createElement } from '../util.js';
+import {createElement} from '../util.js';
 
 const createSortItem = (sortItem) => {
   const name = sortItem.name.toLowerCase();
@@ -36,7 +36,7 @@ class SortComponent {
   }
 
   getTemplate() {
-    return createSortHtml(this._sortItems)
+    return createSortHtml(this._sortItems);
   }
 
   getElement() {
