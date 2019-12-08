@@ -1,6 +1,6 @@
 import {RenderElementPosition, renderElement} from './util.js';
 import TripInfoComponent from './components/trip-info.js';
-import createMenu from './components/menu.js';
+import MenuComponent from './components/menu.js';
 import createFilter from './components/filter.js';
 import createSort from './components/sort.js';
 import createTripList from './components/trip-list.js';
@@ -8,7 +8,7 @@ import generateEventList from './mock/event-data.js';
 
 const eventList = generateEventList();
 
-const menuItemList = [
+const menuList = [
   { name: `Table`, href: `#`, active: true },
   { name: `Stats`, href: `#`, active: false }
 ];
@@ -37,9 +37,9 @@ const renderIndex = () => {
   const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 
   renderElement(tripInfoElement, RenderElementPosition.AFTER_BEGIN, new TripInfoComponent(eventList).getElement());
-  // render(tripControlElements[0], createMenu(menuItemList), `afterend`);
-  // render(tripControlElements[1], createFilter(filterItemList), `afterend`);
-  // render(tripEventsElement, `${createSort(sortItemList)}\n${createTripList(eventList)}`, `afterend`);
+  renderElement(tripControlElements[0], RenderElementPosition.AFTER_END, new MenuComponent(menuList).getElement());
+  // renderElement(tripControlElements[1], createFilter(filterItemList), `afterend`);
+  // renderElement(tripEventsElement, `${createSort(sortItemList)}\n${createTripList(eventList)}`, `afterend`);
 };
 
 renderIndex();
