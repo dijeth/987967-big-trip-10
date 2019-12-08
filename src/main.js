@@ -1,7 +1,7 @@
 import {RenderElementPosition, renderElement} from './util.js';
 import TripInfoComponent from './components/trip-info.js';
 import MenuComponent from './components/menu.js';
-import createFilter from './components/filter.js';
+import FilterComponent from './components/filter.js';
 import createSort from './components/sort.js';
 import createTripList from './components/trip-list.js';
 import generateEventList from './mock/event-data.js';
@@ -13,7 +13,7 @@ const menuList = [
   { name: `Stats`, href: `#`, active: false }
 ];
 
-const filterItemList = [
+const filterList = [
   { name: `Everything`, checked: true },
   { name: `Future`, checked: false },
   { name: `Past`, checked: false }
@@ -38,7 +38,7 @@ const renderIndex = () => {
 
   renderElement(tripInfoElement, RenderElementPosition.AFTER_BEGIN, new TripInfoComponent(eventList).getElement());
   renderElement(tripControlElements[0], RenderElementPosition.AFTER_END, new MenuComponent(menuList).getElement());
-  // renderElement(tripControlElements[1], createFilter(filterItemList), `afterend`);
+  renderElement(tripControlElements[1], RenderElementPosition.AFTER_END, new FilterComponent(filterList).getElement());
   // renderElement(tripEventsElement, `${createSort(sortItemList)}\n${createTripList(eventList)}`, `afterend`);
 };
 

@@ -1,3 +1,5 @@
+import {createElement} from '../util.js';
+
 const createFilterItem = (filterItem) => `
               <div class="trip-filters__filter">
                 <input id="filter-${filterItem.name.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name.toLowerCase()}" ${filterItem.checked ? `checked` : ``}>
@@ -13,4 +15,27 @@ const createFilter = (filterItems) => {
             </form>`;
 };
 
-export default createFilter;
+class FilterComponent {
+  constructor(filterItems) {
+    this._element = null;
+    this._filterItems = filterItems;
+  }
+
+  getTemplate() {
+    return createFilter(this._filterItems);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default FilterComponent;
