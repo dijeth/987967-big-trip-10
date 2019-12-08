@@ -58,3 +58,36 @@ export const formatDate = (date1, date2) => {
 }
 
 export const getShortDate = (date) => `${date.getDate()} ${Months[date.getMonth()]}`;
+
+export const RenderElementPosition = {
+  BEFORE_BEGIN: `beforebegin`,
+  AFTER_BEGIN: `afterbegin`,
+  BEFORE_END: `beforeend`,
+  AFTER_END: `afterend`
+};
+
+export const renderElement = (container, position, ...elements) => {
+  switch (position) {
+    case RenderElementPosition.BEFORE_BEGIN:
+      container.before(...elements);
+      break;
+
+    case RenderElementPosition.AFTER_BEGIN:
+      container.prepend(...elements);
+      break;
+
+    case RenderElementPosition.BEFORE_END:
+      container.append(...elements);
+      break;
+
+    case RenderElementPosition.AFTER_END:
+      container.after(...elements);
+      break;
+  }
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstElementChild;
+};
