@@ -1,4 +1,5 @@
-import createTripInfo from './components/trip-info.js';
+import {RenderElementPosition, renderElement} from './util.js';
+import TripInfoComponent from './components/trip-info.js';
 import createMenu from './components/menu.js';
 import createFilter from './components/filter.js';
 import createSort from './components/sort.js';
@@ -26,10 +27,6 @@ const sortItemList = [
 
 console.log(eventList);
 
-const render = (container, html, position = `beforeend`) => {
-  container.insertAdjacentHTML(position, html);
-};
-
 const sumOffers = (offerList) => offerList.reduce((accum, current) => accum + current.checked * current.cost, 0);
 const sumEvents = (events) => events.reduce((accum, current) => accum + current.cost + sumOffers(current.offers), 0);
 
@@ -39,10 +36,10 @@ const renderIndex = () => {
   const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
   const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 
-  render(tripInfoElement, createTripInfo(eventList), `afterbegin`);
-  render(tripControlElements[0], createMenu(menuItemList), `afterend`);
-  render(tripControlElements[1], createFilter(filterItemList), `afterend`);
-  render(tripEventsElement, `${createSort(sortItemList)}\n${createTripList(eventList)}`, `afterend`);
+  renderElement(tripInfoElement, RenderElementPosition.AFTER_BEGIN, new TripInfoComponent(eventList).getElement());
+  // render(tripControlElements[0], createMenu(menuItemList), `afterend`);
+  // render(tripControlElements[1], createFilter(filterItemList), `afterend`);
+  // render(tripEventsElement, `${createSort(sortItemList)}\n${createTripList(eventList)}`, `afterend`);
 };
 
 renderIndex();
