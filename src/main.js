@@ -3,7 +3,7 @@ import TripInfoComponent from './components/trip-info.js';
 import MenuComponent from './components/menu.js';
 import FilterComponent from './components/filter.js';
 import createSort from './components/sort.js';
-import createTripList from './components/trip-list.js';
+import DayListComponent from './components/day-list.js';
 import generateEventList from './mock/event-data.js';
 
 const eventList = generateEventList();
@@ -40,6 +40,7 @@ const renderIndex = () => {
   renderElement(tripControlElements[0], RenderElementPosition.AFTER_END, new MenuComponent(menuList).getElement());
   renderElement(tripControlElements[1], RenderElementPosition.AFTER_END, new FilterComponent(filterList).getElement());
   // renderElement(tripEventsElement, `${createSort(sortItemList)}\n${createTripList(eventList)}`, `afterend`);
+  renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new DayListComponent(eventList).getElement());
 };
 
 renderIndex();
