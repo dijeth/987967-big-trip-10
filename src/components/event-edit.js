@@ -1,3 +1,4 @@
+import {createElement} from '../util.js';
 import {generatePhotoList, generateDescription} from '../mock/destination-data.js';
 import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions} from '../const.js';
 import * as util from '../util.js';
@@ -163,4 +164,28 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                   </form>`;
 };
 
-export default createForm;
+
+class EventEditComponent {
+  constructor(eventItem) {
+    this._element = null;
+    this._eventItem = eventItem;
+  }
+
+  getTemplate() {
+    return createForm(this._eventItem);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default EventEditComponent;

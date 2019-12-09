@@ -1,10 +1,10 @@
-import {getShortDate} from '../util.js';
+import {getShortDate, createElement} from '../util.js';
 
 const getDateTitle = (eventList) => {
   return `${getShortDate(eventList[0].start)}&nbsp;&mdash;&nbsp;${getShortDate(eventList[eventList.length - 1].finish)}`;
 };
 
-const createTripInfo = (eventList) => {
+const createTripInfoHtml = (eventList) => {
   const shortTrip = eventList.length > 2 ? [eventList[0].destination, `...`, eventList[eventList.length - 1].destination] : [eventList[0].destination, eventList[1].destination];
 
   return `
@@ -15,4 +15,27 @@ const createTripInfo = (eventList) => {
             </div>`;
 };
 
-export default createTripInfo;
+class TripInfoComponent {
+  constructor(eventList) {
+    this._element = null;
+    this._eventList = eventList;
+  }
+
+  getTemplate() {
+    return createTripInfoHtml(this._eventList);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default TripInfoComponent;

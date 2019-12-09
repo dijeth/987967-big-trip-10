@@ -1,34 +1,33 @@
-import createTripInfo from './components/trip-info.js';
-import createMenu from './components/menu.js';
-import createFilter from './components/filter.js';
+import { RenderElementPosition, renderElement } from './util.js';
+import TripInfoComponent from './components/trip-info.js';
+import MenuComponent from './components/menu.js';
+import FilterComponent from './components/filter.js';
 import createSort from './components/sort.js';
-import createTripList from './components/trip-list.js';
+import DayListComponent from './components/day-list.js';
+import SortComponent from './components/sort.js';
+import NoPointsComponent from './components/no-points.js';
 import generateEventList from './mock/event-data.js';
 
 const eventList = generateEventList();
 
-const menuItemList = [
+const menuList = [
   { name: `Table`, href: `#`, active: true },
   { name: `Stats`, href: `#`, active: false }
 ];
 
-const filterItemList = [
+const filterList = [
   { name: `Everything`, checked: true },
   { name: `Future`, checked: false },
   { name: `Past`, checked: false }
 ];
 
-const sortItemList = [
+const sortList = [
   { name: `Event`, checked: true, direction: false },
   { name: `Time`, checked: false, direction: true },
   { name: `Price`, checked: false, direction: true }
 ];
 
 console.log(eventList);
-
-const render = (container, html, position = `beforeend`) => {
-  container.insertAdjacentHTML(position, html);
-};
 
 const sumOffers = (offerList) => offerList.reduce((accum, current) => accum + current.checked * current.cost, 0);
 const sumEvents = (events) => events.reduce((accum, current) => accum + current.cost + sumOffers(current.offers), 0);
@@ -39,10 +38,23 @@ const renderIndex = () => {
   const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
   const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 
-  render(tripInfoElement, createTripInfo(eventList), `afterbegin`);
-  render(tripControlElements[0], createMenu(menuItemList), `afterend`);
-  render(tripControlElements[1], createFilter(filterItemList), `afterend`);
-  render(tripEventsElement, `${createSort(sortItemList)}\n${createTripList(eventList)}`, `afterend`);
+  if (eventList.length) {
+    renderElement(tripInfoElement, RenderElementPosition.AFTER_BEGIN, new TripInfoComponent(eventList).getElement());
+  };
+
+  renderElement(tripControlElements[0], RenderElementPosition.AFTER_END, new MenuComponent(menuList).getElement());
+  renderElement(tripControlElements[1], RenderElementPosition.AFTER_END, new FilterComponent(filterList).getElement());
+
+  if (eventList.length) {
+    renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new DayListComponent(eventList).getElement());
+  } else {
+    renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new NoPointsComponent(`Click New Event to create your first point`).getElement());
+  };
+
+  if (eventList.length) {
+    renderElement(tripEventsElement, RenderElementPosition.AFTER_END, new SortComponent(sortList).getElement());
+  };
+
 };
 
 renderIndex();

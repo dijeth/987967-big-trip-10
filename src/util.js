@@ -1,4 +1,4 @@
-import {Months, TimeValue} from './const.js'
+import { Months, TimeValue } from './const.js'
 
 export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
 
@@ -58,3 +58,63 @@ export const formatDate = (date1, date2) => {
 }
 
 export const getShortDate = (date) => `${date.getDate()} ${Months[date.getMonth()]}`;
+
+export const RenderElementPosition = {
+  BEFORE_BEGIN: `beforebegin`,
+  AFTER_BEGIN: `afterbegin`,
+  BEFORE_END: `beforeend`,
+  AFTER_END: `afterend`
+};
+
+export const renderElement = (container, position, ...elements) => {
+  switch (position) {
+    case RenderElementPosition.BEFORE_BEGIN:
+      container.before(...elements);
+      break;
+
+    case RenderElementPosition.AFTER_BEGIN:
+      container.prepend(...elements);
+      break;
+
+    case RenderElementPosition.BEFORE_END:
+      container.append(...elements);
+      break;
+
+    case RenderElementPosition.AFTER_END:
+      container.after(...elements);
+      break;
+  }
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstElementChild;
+};
+
+export const splitEventsByDay = (eventList) => {
+  const days = [];
+  let dayCounter = 1;
+  let dayDate = eventList[0].start;
+  let dayEvents = [eventList[0]];
+
+  for (let i = 1; i < eventList.length; i++) {
+    const daysCount = getDaysCount(dayDate, eventList[i].start);
+
+    if (daysCount === 0) {
+      dayEvents.push(eventList[i]);
+      continue;
+    }
+
+    days.push({ dayDate: dayDate, dayCounter: dayCounter, dayEvents: dayEvents });
+    dayCounter += daysCount;
+    dayDate = eventList[i].start;
+    dayEvents = [eventList[i]];
+  }
+
+  if (dayEvents.length) {
+    days.push({ dayDate: dayDate, dayCounter: dayCounter, dayEvents: dayEvents });
+  }
+
+  return days;
+};
