@@ -1,4 +1,5 @@
-import {createElement, getDateTime, getTime, formatDate} from '../util.js';
+import {createElement} from '../utils/render.js';
+import {getDateTime, getTime, formatDate} from '../utils/common.js';
 import {EventTypeProperties, PlaceholderParticle, OfferTypeOptions} from '../const.js';
 
 const createOffersHtml = (offerData) => {

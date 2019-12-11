@@ -1,4 +1,4 @@
-import {createElement} from '../util.js';
+import {createElement} from '../utils/render.js';
 
 export const NO_POINTS_TEXT = `Click New Event to create your first point`;
 

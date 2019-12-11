@@ -1,5 +1,5 @@
-import { RenderElementPosition, renderElement, getDaysCount } from '../util.js';
-import { replaceComponent } from '../utils/render.js';
+import { getDaysCount } from '../utils/common.js';
+import { RenderPosition, renderComponent, replaceComponent } from '../utils/render.js';
 import DayListComponent from '../components/day-list.js';
 import SortComponent, { sortList } from '../components/sort.js';
 import NoPointsComponent, { NO_POINTS_TEXT } from '../components/no-points.js';
@@ -74,8 +74,8 @@ const renderEvent = (eventData) => {
 };
 
 const renderEvents = (container, eventList) => {
-  const eventElements = eventList.map((it) => renderEvent(it).getElement());
-  renderElement(container.getElement(), RenderElementPosition.BEFORE_END, ...eventElements);
+  const eventComponents = eventList.map((it) => renderEvent(it));
+  renderComponent(container.getElement(), RenderPosition.BEFORE_END, ...eventComponents);
 }
 
 export default class TripController {
@@ -94,16 +94,16 @@ export default class TripController {
         const dayComponent = new DayComponent(it);
         const dayEventListComponent = new EventListComponent();
 
-        renderElement(this._dayListComponent.getElement(), RenderElementPosition.BEFORE_END, dayComponent.getElement());
-        renderElement(dayComponent.getElement(), RenderElementPosition.BEFORE_END, dayEventListComponent.getElement());
+        renderComponent(this._dayListComponent.getElement(), RenderPosition.BEFORE_END, dayComponent);
+        renderComponent(dayComponent.getElement(), RenderPosition.BEFORE_END, dayEventListComponent);
 
         renderEvents(dayEventListComponent, it.dayEvents);
       });
 
-      renderElement(this._container, RenderElementPosition.BEFORE_END, this._sortComponent.getElement());
-      renderElement(this._container, RenderElementPosition.BEFORE_END, this._dayListComponent.getElement());
+      renderComponent(this._container, RenderPosition.BEFORE_END, this._sortComponent);
+      renderComponent(this._container, RenderPosition.BEFORE_END, this._dayListComponent);
     } else {
-      renderElement(this._container, RenderElementPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT).getElement());
+      renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
     };
   }
 }

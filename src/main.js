@@ -1,4 +1,4 @@
-import { RenderElementPosition, renderElement } from './util.js';
+import { RenderPosition, renderComponent } from './utils/render.js';
 import TripInfoComponent from './components/trip-info.js';
 import MenuComponent, {menuList} from './components/menu.js';
 import FilterComponent, {filterList} from './components/filter.js';
@@ -21,11 +21,11 @@ const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`
 const tripController = new TripController(tripEventsElement, eventList);
 
 if (eventList.length) {
-  renderElement(tripInfoElement, RenderElementPosition.AFTER_BEGIN, new TripInfoComponent(eventList).getElement());
+  renderComponent(tripInfoElement, RenderPosition.AFTER_BEGIN, new TripInfoComponent(eventList));
 };
 
-renderElement(tripControlElements[0], RenderElementPosition.AFTER_END, new MenuComponent(menuList).getElement());
-renderElement(tripControlElements[1], RenderElementPosition.AFTER_END, new FilterComponent(filterList).getElement());
+renderComponent(tripControlElements[0], RenderPosition.AFTER_END, new MenuComponent(menuList));
+renderComponent(tripControlElements[1], RenderPosition.AFTER_END, new FilterComponent(filterList));
 
 tripController.render();
 

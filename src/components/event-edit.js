@@ -1,7 +1,7 @@
-import {createElement} from '../util.js';
+import {createElement} from '../utils/render.js';
 import {generatePhotoList, generateDescription} from '../mock/destination-data.js';
 import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions} from '../const.js';
-import * as util from '../util.js';
+import * as util from '../utils/common.js';
 
 const createEventTypeItem = (eventType) => {
   const eventTypeCode = eventType.toLowerCase();

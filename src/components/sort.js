@@ -1,4 +1,4 @@
-import {createElement} from '../util.js';
+import {createElement} from '../utils/render.js';
 
 export const sortList = [
   { name: `Event`, checked: true, direction: false },

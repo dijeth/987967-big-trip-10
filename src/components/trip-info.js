@@ -1,4 +1,5 @@
-import {getShortDate, createElement} from '../util.js';
+import {createElement} from '../utils/render.js';
+import {getShortDate} from '../utils/common.js';
 
 const getDateTitle = (eventList) => {
   return `${getShortDate(eventList[0].start)}&nbsp;&mdash;&nbsp;${getShortDate(eventList[eventList.length - 1].finish)}`;

@@ -1,4 +1,4 @@
-import {createElement} from '../util.js';
+import {createElement} from '../utils/render.js';
 
 export const menuList = [
   { name: `Table`, href: `#`, active: true },

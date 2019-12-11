@@ -1,4 +1,5 @@
-import {createElement, getShortDate, getDateTime} from '../util.js';
+import {createElement} from '../utils/render.js';
+import {getShortDate, getDateTime} from '../utils/common.js';
 
 class DayComponent {
   constructor(dayItem) {
