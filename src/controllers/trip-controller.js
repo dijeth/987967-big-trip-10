@@ -37,8 +37,8 @@ const splitEventsByDay = (eventList) => {
 };
 
 const renderEvent = (eventData) => {
-  const eventToEdit = () => replaceComponent(eventEditElement, eventElement);
-  const editToEvent = () => replaceComponent(eventElement, eventEditElement);
+  const eventToEdit = () => replaceComponent(eventEditComponent, eventComponent);
+  const editToEvent = () => replaceComponent(eventComponent, eventEditComponent);
   const documentKeyDownHandler = (evt) => {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
@@ -54,20 +54,17 @@ const renderEvent = (eventData) => {
   const eventEditComponent = new EventEditComponent(eventData);
   const eventEditElement = eventEditComponent.getElement();
 
-  const eventRollupButton = eventElement.querySelector(`.event__rollup-btn`);
-  const eventEditRollupButton = eventEditElement.querySelector(`.event__rollup-btn`);
-
-  eventRollupButton.addEventListener(`click`, () => {
+  eventComponent.setRollupButtonClickHandler(() => {
     eventToEdit();
     document.addEventListener(`keydown`, documentKeyDownHandler);
   });
 
-  eventEditRollupButton.addEventListener(`click`, () => {
+  eventEditComponent.setRollupButtonClickHandler(() => {
     editToEvent();
     document.removeEventListener(`keydown`, documentKeyDownHandler);
   });
 
-  eventEditElement.addEventListener(`submit`, (evt) => {
+  eventEditComponent.setSubmitHandler((evt) => {
     evt.preventDefault();
     editToEvent();
     document.removeEventListener(`keydown`, documentKeyDownHandler);
@@ -100,8 +97,7 @@ export default class TripController {
         renderElement(this._dayListComponent.getElement(), RenderElementPosition.BEFORE_END, dayComponent.getElement());
         renderElement(dayComponent.getElement(), RenderElementPosition.BEFORE_END, dayEventListComponent.getElement());
 
-        renderEvents(dayEventListComponent, it.dayEvents)
-
+        renderEvents(dayEventListComponent, it.dayEvents);
       });
 
       renderElement(this._container, RenderElementPosition.BEFORE_END, this._sortComponent.getElement());

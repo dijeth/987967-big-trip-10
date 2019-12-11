@@ -57,7 +57,7 @@ const createEventHtml = (eventItem) => {
                 </li>`;
 };
 
-class EventComponent {
+export default class EventComponent {
   constructor(eventItem) {
     this._element = null;
     this._eventItem = eventItem;
@@ -78,6 +78,9 @@ class EventComponent {
   removeElement() {
     this._element = null;
   }
-}
 
-export default EventComponent;
+  setRollupButtonClickHandler(handler) {
+    const rollupButton = this.getElement().querySelector(`.event__rollup-btn`);
+    rollupButton.addEventListener(`click`, handler);
+  }
+}

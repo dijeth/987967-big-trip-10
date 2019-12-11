@@ -165,7 +165,7 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
 };
 
 
-class EventEditComponent {
+export default class EventEditComponent {
   constructor(eventItem) {
     this._element = null;
     this._eventItem = eventItem;
@@ -186,6 +186,13 @@ class EventEditComponent {
   removeElement() {
     this._element = null;
   }
-}
 
-export default EventEditComponent;
+  setRollupButtonClickHandler(handler) {
+    const rollupButton = this.getElement().querySelector(`.event__rollup-btn`);
+    rollupButton.addEventListener(`click`, handler);
+  }
+
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
+  }
+}
