@@ -1,5 +1,5 @@
 import AbstractComponent from './abstract-component.js';
-import {getShortDate, getDateTime} from '../utils/common.js';
+import { getShortDate, getDateTime } from '../utils/common.js';
 
 export default class DayComponent extends AbstractComponent {
   constructor(dayItem) {

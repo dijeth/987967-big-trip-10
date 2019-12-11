@@ -1,12 +1,12 @@
 export const MovingType = {
   MOVING: `moving`,
   STAYING: `staying`
-}
+};
 
 export const PlaceholderParticle = {
   [MovingType.MOVING]: `to`,
   [MovingType.STAYING]: `in`
-}
+};
 
 export const EventType = {
   TAXI: `Taxi`,
@@ -88,7 +88,7 @@ export const EventTypeProperties = {
     icon: `trip.png`,
     movingType: MovingType.MOVING
   }
-}
+};
 
 export const Destinations = [
   `Vein`,
@@ -112,7 +112,7 @@ export const Destinations = [
   `Paris`,
   `Prague`,
   `Sydney`
-]
+];
 
 export const Months = [
   `JAN`,
@@ -138,7 +138,7 @@ export const TimeValue = {
   TWO_DAYS: 2 * 2 * 12 * 60 * 60 * 1000,
   WEEK: 7 * 2 * 12 * 60 * 60 * 1000,
   TWO_WEEKS: 14 * 2 * 12 * 60 * 60 * 1000
-}
+};
 
 export const EVENT_DEFAULT = {
   type: EventType.FLIGHT,
@@ -178,4 +178,4 @@ export const OfferTypeOptions = {
   [OfferType.TRAIN]: {
     name: `Travel by train`
   }
-}
+};

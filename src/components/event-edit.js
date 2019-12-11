@@ -165,7 +165,7 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
 
 export default class EventEditComponent extends AbstractComponent {
   constructor(eventItem) {
-    super()
+    super();
     this._eventItem = eventItem;
   }
 

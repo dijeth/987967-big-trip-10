@@ -23,14 +23,14 @@ const splitEventsByDay = (eventList) => {
       continue;
     }
 
-    days.push({ dayDate: dayDate, dayCounter: dayCounter, dayEvents: dayEvents });
+    days.push({ dayDate, dayCounter, dayEvents });
     dayCounter += daysCount;
     dayDate = eventList[i].start;
     dayEvents = [eventList[i]];
   }
 
   if (dayEvents.length) {
-    days.push({ dayDate: dayDate, dayCounter: dayCounter, dayEvents: dayEvents });
+    days.push({ dayDate, dayCounter, dayEvents });
   }
 
   return days;
@@ -49,10 +49,7 @@ const renderEvent = (eventData) => {
   };
 
   const eventComponent = new EventComponent(eventData);
-  const eventElement = eventComponent.getElement();
-
   const eventEditComponent = new EventEditComponent(eventData);
-  const eventEditElement = eventEditComponent.getElement();
 
   eventComponent.setRollupButtonClickHandler(() => {
     eventToEdit();
@@ -76,14 +73,14 @@ const renderEvent = (eventData) => {
 const renderEvents = (container, eventList) => {
   const eventComponents = eventList.map((it) => renderEvent(it));
   renderComponent(container.getElement(), RenderPosition.BEFORE_END, ...eventComponents);
-}
+};
 
 export default class TripController {
   constructor(container, eventList) {
     this._container = container;
     this._eventList = eventList;
-    this._sortComponent = new SortComponent(sortList)
-    this._dayListComponent = new DayListComponent()
+    this._sortComponent = new SortComponent(sortList);
+    this._dayListComponent = new DayListComponent();
   }
 
   render() {
@@ -104,6 +101,6 @@ export default class TripController {
       renderComponent(this._container, RenderPosition.BEFORE_END, this._dayListComponent);
     } else {
       renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
-    };
+    }
   }
 }

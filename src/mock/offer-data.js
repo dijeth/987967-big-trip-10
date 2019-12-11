@@ -1,5 +1,5 @@
-import {getRandomNumber, getRandomElement, getRandomBoolean} from '../utils/common.js';
-import {OfferType} from '../const.js';
+import { getRandomNumber, getRandomElement, getRandomBoolean } from '../utils/common.js';
+import { OfferType } from '../const.js';
 
 export const generateOfferList = () => {
   const set = new Set();
@@ -12,7 +12,7 @@ export const generateOfferList = () => {
 
   const offers = [];
   set.forEach((item) => {
-    offers.push({type: item, checked: getRandomBoolean(), cost: getRandomNumber(200)});
+    offers.push({ type: item, checked: getRandomBoolean(), cost: getRandomNumber(200) });
   });
 
   return offers;

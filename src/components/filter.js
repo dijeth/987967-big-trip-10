@@ -15,8 +15,8 @@ const createFilterItemHtml = (filterItem) => `
 const createFilterHtml = (filterItems) => {
   const filterItemsHtml = filterItems.map((item) => createFilterItemHtml(item)).join(`\n`);
   return `
-	        <form class="trip-filters" action="#" method="get">
-	          ${filterItemsHtml}
+          <form class="trip-filters" action="#" method="get">
+            ${filterItemsHtml}
               <button class="visually-hidden" type="submit">Accept filter</button>
             </form>`;
 };

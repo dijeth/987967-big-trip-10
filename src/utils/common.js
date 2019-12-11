@@ -1,4 +1,4 @@
-import { Months, TimeValue } from '../const.js'
+import { Months, TimeValue } from '../const.js';
 
 export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
 
@@ -17,7 +17,7 @@ const getRandomDate = (dateStart, during) => {
   date.setTime(time);
 
   return date;
-}
+};
 
 export const getRandomHour = (dateStart) => getRandomDate(dateStart, TimeValue.HOUR);
 export const getRandomTwoHours = (dateStart) => getRandomDate(dateStart, TimeValue.TWO_HOURS);
@@ -33,10 +33,10 @@ export const getDaysCount = (dateMin, dateMax) => {
   dateMinCopy.setMinutes(0);
   dateMinCopy.setHours(0);
   return Math.floor((+dateMax - dateMinCopy) / TimeValue.DAY);
-}
+};
 
 export const getShortYear = (date) => String(date.getFullYear()).substr(2, 2);
-export const getDate = (date, separator = '-') => `${getShortYear(date)}${separator}${formatNumber(date.getMonth()+1)}${separator}${formatNumber(date.getDate())}`;
+export const getDate = (date, separator = `-`) => `${getShortYear(date)}${separator}${formatNumber(date.getMonth() + 1)}${separator}${formatNumber(date.getDate())}`;
 export const getTime = (date) => `${formatNumber(date.getHours())}:${formatNumber(date.getMinutes())}`;
 export const getDateTime = (date) => `${getDate(date)}T${getTime(date)}`;
 
@@ -54,7 +54,7 @@ export const formatDate = (date1, date2) => {
   hoursCount = hoursCount === 0 && daysCount === 0 ? `` : `${formatNumber(hoursCount)}H`;
   minutesCount = `${formatNumber(minutesCount)}M`;
 
-  return `${daysCount} ${hoursCount} ${minutesCount}`.replace(/  +/g, ' ');
-}
+  return `${daysCount} ${hoursCount} ${minutesCount}`.replace(/  +/g, ` `);
+};
 
 export const getShortDate = (date) => `${date.getDate()} ${Months[date.getMonth()]}`;
