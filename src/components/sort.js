@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render.js';
+import AbstractComponent from './abstract-component.js';
 
 export const sortList = [
   { name: `Event`, checked: true, direction: false },
@@ -35,25 +35,13 @@ const createSortHtml = (sortItems) => {
           </form>`;
 };
 
-export default class SortComponent {
+export default class SortComponent extends AbstractComponent {
   constructor(sortItems) {
-    this._element = null;
+    super();
     this._sortItems = sortItems;
   }
 
   getTemplate() {
     return createSortHtml(this._sortItems);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

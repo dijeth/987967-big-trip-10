@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render.js';
+import AbstractComponent from './abstract-component.js';
 
 export const filterList = [
   { name: `Everything`, checked: true },
@@ -21,25 +21,13 @@ const createFilterHtml = (filterItems) => {
             </form>`;
 };
 
-export default class FilterComponent {
+export default class FilterComponent extends AbstractComponent {
   constructor(filterItems) {
-    this._element = null;
+    super();
     this._filterItems = filterItems;
   }
 
   getTemplate() {
     return createFilterHtml(this._filterItems);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

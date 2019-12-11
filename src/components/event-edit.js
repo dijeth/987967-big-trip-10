@@ -1,6 +1,6 @@
-import {createElement} from '../utils/render.js';
-import {generatePhotoList, generateDescription} from '../mock/destination-data.js';
-import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions} from '../const.js';
+import AbstractComponent from './abstract-component.js';
+import { generatePhotoList, generateDescription } from '../mock/destination-data.js';
+import { EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions } from '../const.js';
 import * as util from '../utils/common.js';
 
 const createEventTypeItem = (eventType) => {
@@ -78,8 +78,7 @@ const createDestinationHtml = (destination) => {
                             ${photoList}
                           </div>
                         </div>
-                      </section>
-`;
+                      </section>`;
 };
 
 const createForm = (eventItem = EVENT_DEFAULT) => {
@@ -164,27 +163,14 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                   </form>`;
 };
 
-
-export default class EventEditComponent {
+export default class EventEditComponent extends AbstractComponent {
   constructor(eventItem) {
-    this._element = null;
+    super()
     this._eventItem = eventItem;
   }
 
   getTemplate() {
     return createForm(this._eventItem);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   setRollupButtonClickHandler(handler) {

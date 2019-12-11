@@ -1,9 +1,9 @@
-import {createElement} from '../utils/render.js';
+import AbstractComponent from './abstract-component.js';
 import {getShortDate, getDateTime} from '../utils/common.js';
 
-class DayComponent {
+export default class DayComponent extends AbstractComponent {
   constructor(dayItem) {
-    this._element = null;
+    super();
     this._dayItem = dayItem;
   }
 
@@ -19,18 +19,4 @@ class DayComponent {
               </div>
           </li>`;
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
 }
-
-export default DayComponent;

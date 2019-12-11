@@ -1,4 +1,4 @@
-import {createElement} from '../utils/render.js';
+import AbstractComponent from './abstract-component.js';
 import {getShortDate} from '../utils/common.js';
 
 const getDateTitle = (eventList) => {
@@ -16,27 +16,13 @@ const createTripInfoHtml = (eventList) => {
             </div>`;
 };
 
-class TripInfoComponent {
+export default class TripInfoComponent extends AbstractComponent {
   constructor(eventList) {
-    this._element = null;
+    super();
     this._eventList = eventList;
   }
 
   getTemplate() {
     return createTripInfoHtml(this._eventList);
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
 }
-
-export default TripInfoComponent;

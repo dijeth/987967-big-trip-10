@@ -1,6 +1,6 @@
-import {createElement} from '../utils/render.js';
-import {getDateTime, getTime, formatDate} from '../utils/common.js';
-import {EventTypeProperties, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import AbstractComponent from './abstract-component.js';
+import { getDateTime, getTime, formatDate } from '../utils/common.js';
+import { EventTypeProperties, PlaceholderParticle, OfferTypeOptions } from '../const.js';
 
 const createOffersHtml = (offerData) => {
   const selected = offerData.filter((item) => item.checked).slice(0, 3);
@@ -58,26 +58,14 @@ const createEventHtml = (eventItem) => {
                 </li>`;
 };
 
-export default class EventComponent {
+export default class EventComponent extends AbstractComponent {
   constructor(eventItem) {
-    this._element = null;
+    super();
     this._eventItem = eventItem;
   }
 
   getTemplate() {
     return createEventHtml(this._eventItem);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   setRollupButtonClickHandler(handler) {
