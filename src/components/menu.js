@@ -1,8 +1,8 @@
 import AbstractComponent from './abstract-component.js';
 
 export const menuList = [
-  { name: `Table`, href: `#`, active: true },
-  { name: `Stats`, href: `#`, active: false }
+  {name: `Table`, href: `#`, active: true},
+  {name: `Stats`, href: `#`, active: false}
 ];
 
 const createMenuItemHtml = (menuItem) => `              

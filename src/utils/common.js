@@ -1,4 +1,4 @@
-import { Months, TimeValue } from '../const.js';
+import {Months, TimeValue} from '../const.js';
 
 export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
 

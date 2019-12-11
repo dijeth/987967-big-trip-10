@@ -1,6 +1,6 @@
 import AbstractComponent from './abstract-component.js';
-import { generatePhotoList, generateDescription } from '../mock/destination-data.js';
-import { EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions } from '../const.js';
+import {generatePhotoList, generateDescription} from '../mock/destination-data.js';
+import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions} from '../const.js';
 import * as util from '../utils/common.js';
 
 const createEventTypeItem = (eventType) => {

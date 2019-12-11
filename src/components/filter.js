@@ -1,9 +1,9 @@
 import AbstractComponent from './abstract-component.js';
 
 export const filterList = [
-  { name: `Everything`, checked: true },
-  { name: `Future`, checked: false },
-  { name: `Past`, checked: false }
+  {name: `Everything`, checked: true},
+  {name: `Future`, checked: false},
+  {name: `Past`, checked: false}
 ];
 
 const createFilterItemHtml = (filterItem) => `

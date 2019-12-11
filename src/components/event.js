@@ -1,6 +1,6 @@
 import AbstractComponent from './abstract-component.js';
-import { getDateTime, getTime, formatDate } from '../utils/common.js';
-import { EventTypeProperties, PlaceholderParticle, OfferTypeOptions } from '../const.js';
+import {getDateTime, getTime, formatDate} from '../utils/common.js';
+import {EventTypeProperties, PlaceholderParticle, OfferTypeOptions} from '../const.js';
 
 const createOffersHtml = (offerData) => {
   const selected = offerData.filter((item) => item.checked).slice(0, 3);

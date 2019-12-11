@@ -1,9 +1,9 @@
 import AbstractComponent from './abstract-component.js';
 
 export const sortList = [
-  { name: `Event`, checked: true, direction: false },
-  { name: `Time`, checked: false, direction: true },
-  { name: `Price`, checked: false, direction: true }
+  {name: `Event`, checked: true, direction: false},
+  {name: `Time`, checked: false, direction: true},
+  {name: `Price`, checked: false, direction: true}
 ];
 
 const createSortItem = (sortItem) => {

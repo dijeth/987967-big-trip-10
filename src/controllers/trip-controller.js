@@ -1,8 +1,8 @@
-import { getDaysCount } from '../utils/common.js';
-import { RenderPosition, renderComponent, replaceComponent } from '../utils/render.js';
+import {getDaysCount} from '../utils/common.js';
+import {RenderPosition, renderComponent, replaceComponent} from '../utils/render.js';
 import DayListComponent from '../components/day-list.js';
-import SortComponent, { sortList } from '../components/sort.js';
-import NoPointsComponent, { NO_POINTS_TEXT } from '../components/no-points.js';
+import SortComponent, {sortList} from '../components/sort.js';
+import NoPointsComponent, {NO_POINTS_TEXT} from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventComponent from '../components/event.js';
@@ -23,14 +23,14 @@ const splitEventsByDay = (eventList) => {
       continue;
     }
 
-    days.push({ dayDate, dayCounter, dayEvents });
+    days.push({dayDate, dayCounter, dayEvents});
     dayCounter += daysCount;
     dayDate = eventList[i].start;
     dayEvents = [eventList[i]];
   }
 
   if (dayEvents.length) {
-    days.push({ dayDate, dayCounter, dayEvents });
+    days.push({dayDate, dayCounter, dayEvents});
   }
 
   return days;
