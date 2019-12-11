@@ -1,5 +1,10 @@
 import {createElement} from '../util.js';
 
+export const menuList = [
+  { name: `Table`, href: `#`, active: true },
+  { name: `Stats`, href: `#`, active: false }
+];
+
 const createMenuItemHtml = (menuItem) => `              
 <a class="trip-tabs__btn${menuItem.active ? `  trip-tabs__btn--active` : ``}" href="${menuItem.href}">${menuItem.name}</a>`;
 
@@ -9,7 +14,7 @@ const createMenuHtml = (menuItems) => {
               <nav class="trip-controls__trip-tabs  trip-tabs">${menuItemList}</nav>`;
 };
 
-class MenuComponent {
+export default class MenuComponent {
   constructor(menuItems) {
     this._element = null;
     this._menuItems = menuItems;
@@ -31,5 +36,3 @@ class MenuComponent {
     this._element = null;
   }
 }
-
-export default MenuComponent;

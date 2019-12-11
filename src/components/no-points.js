@@ -1,6 +1,8 @@
 import {createElement} from '../util.js';
 
-class NoPointsComponent {
+export const NO_POINTS_TEXT = `Click New Event to create your first point`;
+
+export default class NoPointsComponent {
   constructor(text) {
     this._element = null;
     this._text = text;
@@ -22,5 +24,3 @@ class NoPointsComponent {
     this._element = null;
   }
 }
-
-export default NoPointsComponent;

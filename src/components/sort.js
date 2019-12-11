@@ -1,5 +1,11 @@
 import {createElement} from '../util.js';
 
+export const sortList = [
+  { name: `Event`, checked: true, direction: false },
+  { name: `Time`, checked: false, direction: true },
+  { name: `Price`, checked: false, direction: true }
+];
+
 const createSortItem = (sortItem) => {
   const name = sortItem.name.toLowerCase();
   const direction = sortItem.direction ? `
@@ -29,7 +35,7 @@ const createSortHtml = (sortItems) => {
           </form>`;
 };
 
-class SortComponent {
+export default class SortComponent {
   constructor(sortItems) {
     this._element = null;
     this._sortItems = sortItems;
@@ -51,5 +57,3 @@ class SortComponent {
     this._element = null;
   }
 }
-
-export default SortComponent;
