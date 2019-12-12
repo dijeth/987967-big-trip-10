@@ -36,9 +36,9 @@ export const getDaysCount = (dateMin, dateMax) => {
 };
 
 export const getShortYear = (date) => String(date.getFullYear()).substr(2, 2);
-export const getDate = (date, separator = `-`) => `${getShortYear(date)}${separator}${formatNumber(date.getMonth() + 1)}${separator}${formatNumber(date.getDate())}`;
-export const getTime = (date) => `${formatNumber(date.getHours())}:${formatNumber(date.getMinutes())}`;
-export const getDateTime = (date) => `${getDate(date)}T${getTime(date)}`;
+export const getDate = (date, separator = `-`) => date ? `${getShortYear(date)}${separator}${formatNumber(date.getMonth() + 1)}${separator}${formatNumber(date.getDate())}` : ``;
+export const getTime = (date) => date ? `${formatNumber(date.getHours())}:${formatNumber(date.getMinutes())}` : ``;
+export const getDateTime = (date) => date ? `${getDate(date)}T${getTime(date)}` : ``;
 
 export const formatDate = (date1, date2) => {
   let time = Math.abs(+date1 - date2);
@@ -57,4 +57,4 @@ export const formatDate = (date1, date2) => {
   return `${daysCount} ${hoursCount} ${minutesCount}`.replace(/  +/g, ` `);
 };
 
-export const getShortDate = (date) => `${date.getDate()} ${Months[date.getMonth()]}`;
+export const getShortDate = (date) => date ? `${date.getDate()} ${Months[date.getMonth()]}` : ``;
