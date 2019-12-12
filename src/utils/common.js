@@ -1,4 +1,4 @@
-import { Months, TimeValue } from './const.js'
+import {Months, TimeValue} from '../const.js';
 
 export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
 
@@ -17,7 +17,7 @@ const getRandomDate = (dateStart, during) => {
   date.setTime(time);
 
   return date;
-}
+};
 
 export const getRandomHour = (dateStart) => getRandomDate(dateStart, TimeValue.HOUR);
 export const getRandomTwoHours = (dateStart) => getRandomDate(dateStart, TimeValue.TWO_HOURS);
@@ -33,10 +33,10 @@ export const getDaysCount = (dateMin, dateMax) => {
   dateMinCopy.setMinutes(0);
   dateMinCopy.setHours(0);
   return Math.floor((+dateMax - dateMinCopy) / TimeValue.DAY);
-}
+};
 
 export const getShortYear = (date) => String(date.getFullYear()).substr(2, 2);
-export const getDate = (date, separator = '-') => `${getShortYear(date)}${separator}${formatNumber(date.getMonth()+1)}${separator}${formatNumber(date.getDate())}`;
+export const getDate = (date, separator = `-`) => `${getShortYear(date)}${separator}${formatNumber(date.getMonth() + 1)}${separator}${formatNumber(date.getDate())}`;
 export const getTime = (date) => `${formatNumber(date.getHours())}:${formatNumber(date.getMinutes())}`;
 export const getDateTime = (date) => `${getDate(date)}T${getTime(date)}`;
 
@@ -54,67 +54,7 @@ export const formatDate = (date1, date2) => {
   hoursCount = hoursCount === 0 && daysCount === 0 ? `` : `${formatNumber(hoursCount)}H`;
   minutesCount = `${formatNumber(minutesCount)}M`;
 
-  return `${daysCount} ${hoursCount} ${minutesCount}`.replace(/  +/g, ' ');
-}
+  return `${daysCount} ${hoursCount} ${minutesCount}`.replace(/  +/g, ` `);
+};
 
 export const getShortDate = (date) => `${date.getDate()} ${Months[date.getMonth()]}`;
-
-export const RenderElementPosition = {
-  BEFORE_BEGIN: `beforebegin`,
-  AFTER_BEGIN: `afterbegin`,
-  BEFORE_END: `beforeend`,
-  AFTER_END: `afterend`
-};
-
-export const renderElement = (container, position, ...elements) => {
-  switch (position) {
-    case RenderElementPosition.BEFORE_BEGIN:
-      container.before(...elements);
-      break;
-
-    case RenderElementPosition.AFTER_BEGIN:
-      container.prepend(...elements);
-      break;
-
-    case RenderElementPosition.BEFORE_END:
-      container.append(...elements);
-      break;
-
-    case RenderElementPosition.AFTER_END:
-      container.after(...elements);
-      break;
-  }
-};
-
-export const createElement = (template) => {
-  const newElement = document.createElement(`div`);
-  newElement.innerHTML = template;
-  return newElement.firstElementChild;
-};
-
-export const splitEventsByDay = (eventList) => {
-  const days = [];
-  let dayCounter = 1;
-  let dayDate = eventList[0].start;
-  let dayEvents = [eventList[0]];
-
-  for (let i = 1; i < eventList.length; i++) {
-    const daysCount = getDaysCount(dayDate, eventList[i].start);
-
-    if (daysCount === 0) {
-      dayEvents.push(eventList[i]);
-      continue;
-    }
-
-    days.push({ dayDate: dayDate, dayCounter: dayCounter, dayEvents: dayEvents });
-    dayCounter += daysCount;
-    dayDate = eventList[i].start;
-    dayEvents = [eventList[i]];
-  }
-
-  if (dayEvents.length) {
-    days.push({ dayDate: dayDate, dayCounter: dayCounter, dayEvents: dayEvents });
-  }
-
-  return days;
-};

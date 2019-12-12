@@ -1,7 +1,7 @@
-import {createElement} from '../util.js';
+import AbstractComponent from './abstract-component.js';
 import {generatePhotoList, generateDescription} from '../mock/destination-data.js';
 import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions} from '../const.js';
-import * as util from '../util.js';
+import * as util from '../utils/common.js';
 
 const createEventTypeItem = (eventType) => {
   const eventTypeCode = eventType.toLowerCase();
@@ -78,8 +78,7 @@ const createDestinationHtml = (destination) => {
                             ${photoList}
                           </div>
                         </div>
-                      </section>
-`;
+                      </section>`;
 };
 
 const createForm = (eventItem = EVENT_DEFAULT) => {
@@ -164,10 +163,9 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                   </form>`;
 };
 
-
-class EventEditComponent {
+export default class EventEditComponent extends AbstractComponent {
   constructor(eventItem) {
-    this._element = null;
+    super();
     this._eventItem = eventItem;
   }
 
@@ -175,17 +173,12 @@ class EventEditComponent {
     return createForm(this._eventItem);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  setRollupButtonClickHandler(handler) {
+    const rollupButton = this.getElement().querySelector(`.event__rollup-btn`);
+    rollupButton.addEventListener(`click`, handler);
   }
 
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
   }
 }
-
-export default EventEditComponent;

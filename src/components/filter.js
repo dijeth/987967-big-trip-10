@@ -1,4 +1,10 @@
-import {createElement} from '../util.js';
+import AbstractComponent from './abstract-component.js';
+
+export const filterList = [
+  {name: `Everything`, checked: true},
+  {name: `Future`, checked: false},
+  {name: `Past`, checked: false}
+];
 
 const createFilterItemHtml = (filterItem) => `
               <div class="trip-filters__filter">
@@ -9,33 +15,19 @@ const createFilterItemHtml = (filterItem) => `
 const createFilterHtml = (filterItems) => {
   const filterItemsHtml = filterItems.map((item) => createFilterItemHtml(item)).join(`\n`);
   return `
-	        <form class="trip-filters" action="#" method="get">
-	          ${filterItemsHtml}
+          <form class="trip-filters" action="#" method="get">
+            ${filterItemsHtml}
               <button class="visually-hidden" type="submit">Accept filter</button>
             </form>`;
 };
 
-class FilterComponent {
+export default class FilterComponent extends AbstractComponent {
   constructor(filterItems) {
-    this._element = null;
+    super();
     this._filterItems = filterItems;
   }
 
   getTemplate() {
     return createFilterHtml(this._filterItems);
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
-  }
 }
-
-export default FilterComponent;
