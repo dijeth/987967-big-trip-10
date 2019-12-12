@@ -1,13 +1,12 @@
-import {getDaysCount} from '../utils/common.js';
-import {RenderPosition, renderComponent, replaceComponent} from '../utils/render.js';
+import { getDaysCount } from '../utils/common.js';
+import { RenderPosition, renderComponent, replaceComponent } from '../utils/render.js';
 import DayListComponent from '../components/day-list.js';
-import SortComponent, {sortList} from '../components/sort.js';
-import NoPointsComponent, {NO_POINTS_TEXT} from '../components/no-points.js';
+import SortComponent, { sortList, SortType } from '../components/sort.js';
+import NoPointsComponent, { NO_POINTS_TEXT } from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventComponent from '../components/event.js';
 import EventEditComponent from '../components/event-edit.js';
-
 
 const splitEventsByDay = (eventList) => {
   const days = [];
@@ -23,17 +22,33 @@ const splitEventsByDay = (eventList) => {
       continue;
     }
 
-    days.push({dayDate, dayCounter, dayEvents});
+    days.push({ dayDate, dayCounter, dayEvents });
     dayCounter += daysCount;
     dayDate = eventList[i].start;
     dayEvents = [eventList[i]];
   }
 
   if (dayEvents.length) {
-    days.push({dayDate, dayCounter, dayEvents});
+    days.push({ dayDate, dayCounter, dayEvents });
   }
 
   return days;
+};
+
+const sortEventsByTime = (eventList) => {
+  const dayCounter = ``;
+  const dayDate = ``;
+  const dayEvents = eventList.slice().sort((a, b) => (+a.finish - a.start) - (b.finish - b.start));
+
+  return [{ dayCounter, dayDate, dayEvents }];
+};
+
+const sortEventsByPrice = (eventList) => {
+  const dayCounter = ``;
+  const dayDate = ``;
+  const dayEvents = eventList.slice().sort((a, b) => a.cost - b.cost);
+
+  return [{ dayCounter, dayDate, dayEvents }];
 };
 
 const renderEvent = (eventData) => {
@@ -75,6 +90,18 @@ const renderEvents = (container, eventList) => {
   renderComponent(container.getElement(), RenderPosition.BEFORE_END, ...eventComponents);
 };
 
+const renderDays = (container, dayList) => {
+  dayList.forEach((it) => {
+    const dayComponent = new DayComponent(it);
+    const dayEventListComponent = new EventListComponent();
+
+    renderComponent(container, RenderPosition.BEFORE_END, dayComponent);
+    renderComponent(dayComponent.getElement(), RenderPosition.BEFORE_END, dayEventListComponent);
+
+    renderEvents(dayEventListComponent, it.dayEvents);
+  });
+}
+
 export default class TripController {
   constructor(container, eventList) {
     this._container = container;
@@ -84,21 +111,36 @@ export default class TripController {
   }
 
   render() {
+    let sortedDays = [];
+
     if (this._eventList.length) {
+      this._sortComponent.setSortTypeChangeHandler((sortType) => {
+        switch (sortType) {
+          case SortType.TIME:
+            sortedDays = sortEventsByTime(this._eventList);
+            break;
+
+          case SortType.PRICE:
+            sortedDays = sortEventsByPrice(this._eventList);
+            break;
+
+          default:
+          case SortType.DEFAULT:
+            sortedDays = splitEventsByDay(this._eventList);
+            break;
+        };
+
+        this._dayListComponent.getElement().innerHTML = ``;
+        renderDays(this._dayListComponent.getElement(), sortedDays);
+      });
+
       const days = splitEventsByDay(this._eventList);
 
-      days.forEach((it) => {
-        const dayComponent = new DayComponent(it);
-        const dayEventListComponent = new EventListComponent();
-
-        renderComponent(this._dayListComponent.getElement(), RenderPosition.BEFORE_END, dayComponent);
-        renderComponent(dayComponent.getElement(), RenderPosition.BEFORE_END, dayEventListComponent);
-
-        renderEvents(dayEventListComponent, it.dayEvents);
-      });
+      renderDays(this._dayListComponent.getElement(), days);
 
       renderComponent(this._container, RenderPosition.BEFORE_END, this._sortComponent);
       renderComponent(this._container, RenderPosition.BEFORE_END, this._dayListComponent);
+
     } else {
       renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
     }
