@@ -51,56 +51,6 @@ const sortEventsByPrice = (eventList) => {
   return [{ dayCounter, dayDate, dayEvents }];
 };
 
-const renderEvent = (eventData) => {
-  const eventToEdit = () => replaceComponent(eventEditComponent, eventComponent);
-  const editToEvent = () => replaceComponent(eventComponent, eventEditComponent);
-  const documentKeyDownHandler = (evt) => {
-    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-
-    if (isEscKey) {
-      editToEvent();
-      document.removeEventListener(`keydown`, documentKeyDownHandler);
-    }
-  };
-
-  const eventComponent = new EventComponent(eventData);
-  const eventEditComponent = new EventEditComponent(eventData);
-
-  eventComponent.setRollupButtonClickHandler(() => {
-    eventToEdit();
-    document.addEventListener(`keydown`, documentKeyDownHandler);
-  });
-
-  eventEditComponent.setRollupButtonClickHandler(() => {
-    editToEvent();
-    document.removeEventListener(`keydown`, documentKeyDownHandler);
-  });
-
-  eventEditComponent.setSubmitHandler((evt) => {
-    evt.preventDefault();
-    editToEvent();
-    document.removeEventListener(`keydown`, documentKeyDownHandler);
-  });
-
-  return eventComponent;
-};
-
-const renderEvents = (container, eventList) => {
-  const eventComponents = eventList.map((it) => renderEvent(it));
-  renderComponent(container.getElement(), RenderPosition.BEFORE_END, ...eventComponents);
-};
-
-const renderDays = (container, dayList) => {
-  dayList.forEach((it) => {
-    const dayComponent = new DayComponent(it);
-    const dayEventListComponent = new EventListComponent();
-
-    renderComponent(container, RenderPosition.BEFORE_END, dayComponent);
-    renderComponent(dayComponent.getElement(), RenderPosition.BEFORE_END, dayEventListComponent);
-
-    renderEvents(dayEventListComponent, it.dayEvents);
-  });
-}
 
 export default class TripController {
   constructor(container, eventList) {
@@ -108,6 +58,8 @@ export default class TripController {
     this._eventList = eventList;
     this._sortComponent = new SortComponent(sortList);
     this._dayListComponent = new DayListComponent();
+
+    this._editingEventComponent = null;
   }
 
   render() {
@@ -131,12 +83,12 @@ export default class TripController {
         };
 
         this._dayListComponent.getElement().innerHTML = ``;
-        renderDays(this._dayListComponent.getElement(), sortedDays);
+        this.renderDays(this._dayListComponent.getElement(), sortedDays);
       });
 
       const days = splitEventsByDay(this._eventList);
 
-      renderDays(this._dayListComponent.getElement(), days);
+      this.renderDays(this._dayListComponent.getElement(), days);
 
       renderComponent(this._container, RenderPosition.BEFORE_END, this._sortComponent);
       renderComponent(this._container, RenderPosition.BEFORE_END, this._dayListComponent);
@@ -144,5 +96,68 @@ export default class TripController {
     } else {
       renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
     }
+  }
+
+  renderEvent(eventData) {
+    const editToEvent = () => {
+      replaceComponent(eventComponent, eventEditComponent);
+      this._editingEventComponent = null;
+    };
+
+    const eventToEdit = () => {
+      if (this._editingEventComponent) {
+        replaceComponent(this._editingEventComponent.eventComponent, this._editingEventComponent);
+      };
+
+      this._editingEventComponent = eventEditComponent;
+      replaceComponent(eventEditComponent, eventComponent)
+    };
+
+    const documentKeyDownHandler = (evt) => {
+      const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+      if (isEscKey) {
+        editToEvent();
+        document.removeEventListener(`keydown`, documentKeyDownHandler);
+      }
+    };
+
+    const eventComponent = new EventComponent(eventData);
+    const eventEditComponent = new EventEditComponent(eventData, eventComponent);
+
+    eventComponent.setRollupButtonClickHandler(() => {
+      eventToEdit();
+      document.addEventListener(`keydown`, documentKeyDownHandler);
+    });
+
+    eventEditComponent.setRollupButtonClickHandler(() => {
+      editToEvent();
+      document.removeEventListener(`keydown`, documentKeyDownHandler);
+    });
+
+    eventEditComponent.setSubmitHandler((evt) => {
+      evt.preventDefault();
+      editToEvent();
+      document.removeEventListener(`keydown`, documentKeyDownHandler);
+    });
+
+    return eventComponent;
+  }
+
+  renderEvents(container, eventList) {
+    const eventComponents = eventList.map((it) => this.renderEvent(it));
+    renderComponent(container.getElement(), RenderPosition.BEFORE_END, ...eventComponents);
+  }
+
+  renderDays(container, dayList) {
+    dayList.forEach((it) => {
+      const dayComponent = new DayComponent(it);
+      const dayEventListComponent = new EventListComponent();
+
+      renderComponent(container, RenderPosition.BEFORE_END, dayComponent);
+      renderComponent(dayComponent.getElement(), RenderPosition.BEFORE_END, dayEventListComponent);
+
+      this.renderEvents(dayEventListComponent, it.dayEvents);
+    });
   }
 }
