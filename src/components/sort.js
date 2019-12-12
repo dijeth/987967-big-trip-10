@@ -1,9 +1,15 @@
 import AbstractComponent from './abstract-component.js';
 
+export const SortType = {
+  DEFAULT: `default`,
+  TIME: `time`,
+  PRICE: `price`
+};
+
 export const sortList = [
-  {name: `Event`, checked: true, direction: false},
-  {name: `Time`, checked: false, direction: true},
-  {name: `Price`, checked: false, direction: true}
+  {name: `Event`, checked: true, direction: false, sortType: SortType.DEFAULT},
+  {name: `Time`, checked: false, direction: true, sortType: SortType.TIME},
+  {name: `Price`, checked: false, direction: true, sortType: SortType.PRICE}
 ];
 
 const createSortItem = (sortItem) => {
@@ -15,7 +21,7 @@ const createSortItem = (sortItem) => {
 
   return `
             <div class="trip-sort__item  trip-sort__item--${name}">
-              <input id="sort-${name}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${name}"${sortItem.checked ? `checked` : ``}>
+              <input  data-sort-type="${sortItem.sortType}" id="sort-${name}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${name}"${sortItem.checked ? `checked` : ``}>
               <label class="trip-sort__btn" for="sort-${name}">
                 ${sortItem.name}
                 ${direction}
@@ -39,9 +45,19 @@ export default class SortComponent extends AbstractComponent {
   constructor(sortItems) {
     super();
     this._sortItems = sortItems;
+    this._activeSortType = sortItems[0].sortType;
   }
 
   getTemplate() {
     return createSortHtml(this._sortItems);
+  }
+
+  setSortTypeChangeHandler(handler) {
+    this.getElement().addEventListener(`click`, (evt) => {
+      if (evt.target.dataset.sortType && evt.target.dataset.sortType !== this._activeSortType) {
+        this._activeSortType = evt.target.dataset.sortType;
+        handler(this._activeSortType);
+      }
+    });
   }
 }
