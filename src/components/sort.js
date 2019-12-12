@@ -7,9 +7,9 @@ export const SortType = {
 };
 
 export const sortList = [
-  { name: `Event`, checked: true, direction: false, sortType: SortType.DEFAULT },
-  { name: `Time`, checked: false, direction: true, sortType: SortType.TIME },
-  { name: `Price`, checked: false, direction: true, sortType: SortType.PRICE }
+  {name: `Event`, checked: true, direction: false, sortType: SortType.DEFAULT},
+  {name: `Time`, checked: false, direction: true, sortType: SortType.TIME},
+  {name: `Price`, checked: false, direction: true, sortType: SortType.PRICE}
 ];
 
 const createSortItem = (sortItem) => {
@@ -58,6 +58,6 @@ export default class SortComponent extends AbstractComponent {
         this._activeSortType = evt.target.dataset.sortType;
         handler(this._activeSortType);
       }
-    })
+    });
   }
 }

@@ -1,8 +1,8 @@
-import { getDaysCount } from '../utils/common.js';
-import { RenderPosition, renderComponent, replaceComponent } from '../utils/render.js';
+import {getDaysCount} from '../utils/common.js';
+import {RenderPosition, renderComponent, replaceComponent} from '../utils/render.js';
 import DayListComponent from '../components/day-list.js';
-import SortComponent, { sortList, SortType } from '../components/sort.js';
-import NoPointsComponent, { NO_POINTS_TEXT } from '../components/no-points.js';
+import SortComponent, {sortList, SortType} from '../components/sort.js';
+import NoPointsComponent, {NO_POINTS_TEXT} from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventComponent from '../components/event.js';
@@ -22,14 +22,14 @@ const splitEventsByDay = (eventList) => {
       continue;
     }
 
-    days.push({ dayDate, dayCounter, dayEvents });
+    days.push({dayDate, dayCounter, dayEvents});
     dayCounter += daysCount;
     dayDate = eventList[i].start;
     dayEvents = [eventList[i]];
   }
 
   if (dayEvents.length) {
-    days.push({ dayDate, dayCounter, dayEvents });
+    days.push({dayDate, dayCounter, dayEvents});
   }
 
   return days;
@@ -40,7 +40,7 @@ const sortEventsByTime = (eventList) => {
   const dayDate = ``;
   const dayEvents = eventList.slice().sort((a, b) => (+a.finish - a.start) - (b.finish - b.start));
 
-  return [{ dayCounter, dayDate, dayEvents }];
+  return [{dayCounter, dayDate, dayEvents}];
 };
 
 const sortEventsByPrice = (eventList) => {
@@ -48,7 +48,7 @@ const sortEventsByPrice = (eventList) => {
   const dayDate = ``;
   const dayEvents = eventList.slice().sort((a, b) => a.cost - b.cost);
 
-  return [{ dayCounter, dayDate, dayEvents }];
+  return [{dayCounter, dayDate, dayEvents}];
 };
 
 
@@ -80,7 +80,7 @@ export default class TripController {
           case SortType.DEFAULT:
             sortedDays = splitEventsByDay(this._eventList);
             break;
-        };
+        }
 
         this._dayListComponent.getElement().innerHTML = ``;
         this.renderDays(this._dayListComponent.getElement(), sortedDays);
@@ -107,10 +107,10 @@ export default class TripController {
     const eventToEdit = () => {
       if (this._editingEventComponent) {
         replaceComponent(this._editingEventComponent.eventComponent, this._editingEventComponent);
-      };
+      }
 
       this._editingEventComponent = eventEditComponent;
-      replaceComponent(eventEditComponent, eventComponent)
+      replaceComponent(eventEditComponent, eventComponent);
     };
 
     const documentKeyDownHandler = (evt) => {
