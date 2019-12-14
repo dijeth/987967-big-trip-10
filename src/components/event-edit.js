@@ -1,6 +1,6 @@
 import AbstractComponent from './abstract-component.js';
-import {generatePhotoList, generateDescription} from '../mock/destination-data.js';
-import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions} from '../const.js';
+import {destinations, DestinationOptions} from '../mock/destination-data.js';
+import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
 import * as util from '../utils/common.js';
 
 const createEventTypeItem = (eventType) => {
@@ -65,13 +65,13 @@ const createDestinationHtml = (destination) => {
     return ``;
   }
 
-  const photoList = generatePhotoList().map((item) => `
+  const photoList = DestinationOptions[destination].photoList.map((item) => `
                                 <img class="event__photo" src="${item}" alt="Event photo">`).join(`\n`);
 
   return `
                       <section class="event__section  event__section--destination">
                         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                        <p class="event__destination-description">${generateDescription()}</p>
+                        <p class="event__destination-description">${DestinationOptions[destination].description}</p>
 
                         <div class="event__photos-container">
                           <div class="event__photos-tape">
@@ -88,7 +88,7 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
   const icon = eventProperty.icon;
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination;
-  const destinationList = Destinations.map((item) => `<option value="${item}"></option>`).join(`\n`);
+  const destinationList = Object.keys(DestinationOptions).map((item) => `<option value="${item}"></option>`).join(`\n`);
   const startDateTime = `${util.getDate(eventItem.start, `/`)} ${util.getTime(eventItem.start)}`;
   const finishDateTime = `${util.getDate(eventItem.finish, `/`)} ${util.getTime(eventItem.finish)}`;
 
