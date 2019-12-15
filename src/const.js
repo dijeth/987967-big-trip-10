@@ -39,17 +39,17 @@ export const PlaceholderParticle = {
 };
 
 export const EventType = {
-  TAXI: `Taxi`,
-  BUS: `Bus`,
-  TRAIN: `Train`,
-  SHIP: `Ship`,
-  TRANSPORT: `Transport`,
-  DRIVE: `Drive`,
-  FLIGHT: `Flight`,
+  "TAXI": `Taxi`,
+  "BUS": `Bus`,
+  "TRAIN": `Train`,
+  "SHIP": `Ship`,
+  "TRANSPORT": `Transport`,
+  "DRIVE": `Drive`,
+  "FLIGHT": `Flight`,
   'CHECK-IN': `Check-in`,
-  SIGHTSEEING: `Sightseeing`,
-  RESTAURANT: `Restaurant`,
-  TRIP: `Trip`
+  "SIGHTSEEING": `Sightseeing`,
+  "RESTAURANT": `Restaurant`,
+  "TRIP": `Trip`
 };
 
 export const EventTypeProperties = {

@@ -1,6 +1,6 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {destinations, DestinationOptions} from '../mock/destination-data.js';
-import { generateOfferList } from '../mock/offer-data.js';
+import {DestinationOptions} from '../mock/destination-data.js';
+import {generateOfferList} from '../mock/offer-data.js';
 import {EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
 import * as util from '../utils/common.js';
 
@@ -211,9 +211,9 @@ export default class EventEditComponent extends AbstractSmartComponent {
       it.addEventListener(`change`, (evt) => {
         this._eventItem.type = EventType[evt.target.value.toUpperCase()];
         this._eventItem.offers = generateOfferList(this._eventItem.type);
-        
+
         this.rerender();
-      })
+      });
     });
   }
 

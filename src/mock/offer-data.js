@@ -1,5 +1,5 @@
-import { getRandomNumber, getRandomElement, getRandomBoolean } from '../utils/common.js';
-import { OfferType, EventType, EventTypeProperties } from '../const.js';
+import {getRandomNumber, getRandomBoolean} from '../utils/common.js';
+import {EventTypeProperties} from '../const.js';
 
 export const generateOfferList = (eventType) => {
   const availableOfferTypes = EventTypeProperties[eventType].availableOfferTypes;
@@ -8,7 +8,7 @@ export const generateOfferList = (eventType) => {
       type: it,
       checked: getRandomBoolean(),
       cost: getRandomNumber(200)
-    }
+    };
   }) : [];
 
   return offers;

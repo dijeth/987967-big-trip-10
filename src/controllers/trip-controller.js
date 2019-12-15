@@ -1,5 +1,5 @@
 import {getDaysCount} from '../utils/common.js';
-import {RenderPosition, renderComponent, replaceComponent} from '../utils/render.js';
+import {RenderPosition, renderComponent} from '../utils/render.js';
 import DayListComponent from '../components/day-list.js';
 import SortComponent, {sortList, SortType} from '../components/sort.js';
 import NoPointsComponent, {NO_POINTS_TEXT} from '../components/no-points.js';
@@ -115,12 +115,12 @@ export default class TripController {
   }
 
   _onDataChange(pointController, oldEventData, newEventData, pointEventMode) {
-    pointController.render(newEventData, pointEventMode)
+    pointController.render(newEventData, pointEventMode);
   }
 
   _onViewChange() {
     this._pointControllers.forEach((it) => {
       it.setDefaultView();
-    })
+    });
   }
 }

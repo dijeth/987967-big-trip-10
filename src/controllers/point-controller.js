@@ -1,11 +1,11 @@
-import { RenderPosition, renderComponent, replaceComponent } from '../utils/render.js';
+import {RenderPosition, renderComponent, replaceComponent} from '../utils/render.js';
 import EventComponent from '../components/event.js';
 import EventEditComponent from '../components/event-edit.js';
 
 export const PointEventMode = {
   DEFAULT: `event`,
   EDITING: `event-edit`
-}
+};
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
@@ -23,14 +23,14 @@ export default class PointController {
 
   _eventToEdit() {
     this._onViewChange();
-    
+
     this._mode = PointEventMode.EDITING;
-    replaceComponent(this._eventEditComponent, this._eventComponent)
+    replaceComponent(this._eventEditComponent, this._eventComponent);
   }
 
   _editToEvent() {
     this._mode = PointEventMode.DEFAULT;
-    replaceComponent(this._eventComponent, this._eventEditComponent)
+    replaceComponent(this._eventComponent, this._eventEditComponent);
   }
 
   _documentKeyDownHandler(evt) {
@@ -71,22 +71,22 @@ export default class PointController {
 
     eventEditComponent.setInputFavoriteChangeHandler(() => {
       this._onDataChange(this,
-        eventData,
-        Object.assign({}, eventData, { isFavorite: !eventData.isFavorite }),
-        PointEventMode.EDITING);
+          eventData,
+          Object.assign({}, eventData, {isFavorite: !eventData.isFavorite}),
+          PointEventMode.EDITING);
     });
 
-    const { newComponent, oldComponent } = mode === PointEventMode.EDITING ? { newComponent: eventEditComponent, oldComponent: this._eventEditComponent } : { newComponent: eventComponent, oldComponent: this._eventComponent };
+    const {newComponent, oldComponent} = mode === PointEventMode.EDITING ? {newComponent: eventEditComponent, oldComponent: this._eventEditComponent} : {newComponent: eventComponent, oldComponent: this._eventComponent};
 
     if (oldComponent === null) {
       renderComponent(this._container, RenderPosition.BEFORE_END, newComponent);
     } else {
       replaceComponent(newComponent, oldComponent);
-    };
+    }
 
     this._eventComponent = eventComponent;
     this._eventEditComponent = eventEditComponent;
 
     return this;
-  };
+  }
 }
