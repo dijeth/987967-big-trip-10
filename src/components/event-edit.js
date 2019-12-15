@@ -107,6 +107,7 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
 `;
 
   return `
+                <li class="trip-events__item">
                   <form class="event  event--edit" action="#" method="post">
                     <header class="event__header">
                       <div class="event__type-wrapper">
@@ -160,14 +161,14 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                       ${createDestinationHtml(eventItem.destination)}
 
                     </section>
-                  </form>`;
+                  </form>
+                </li>`;
 };
 
 export default class EventEditComponent extends AbstractComponent {
-  constructor(eventItem, eventComponent) {
+  constructor(eventItem) {
     super();
     this._eventItem = eventItem;
-    this.eventComponent = eventComponent;
   }
 
   getTemplate() {
@@ -181,5 +182,9 @@ export default class EventEditComponent extends AbstractComponent {
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+  }
+
+  setInputFavoriteChangeHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`change`, handler);
   }
 }
