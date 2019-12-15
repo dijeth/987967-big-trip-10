@@ -5,8 +5,7 @@ import SortComponent, { sortList, SortType } from '../components/sort.js';
 import NoPointsComponent, { NO_POINTS_TEXT } from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
-import EventComponent from '../components/event.js';
-import EventEditComponent from '../components/event-edit.js';
+import PointController from './point-controller.js';
 
 const splitEventsByDay = (eventList) => {
   const days = [];
@@ -51,63 +50,14 @@ const sortEventsByPrice = (eventList) => {
   return [{ dayCounter, dayDate, dayEvents }];
 };
 
-const renderEvent = (eventData) => {
-  const eventToEdit = () => replaceComponent(eventEditComponent, eventComponent);
-  const editToEvent = () => replaceComponent(eventComponent, eventEditComponent);
-  const documentKeyDownHandler = (evt) => {
-    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-
-    if (isEscKey) {
-      editToEvent();
-      document.removeEventListener(`keydown`, documentKeyDownHandler);
-    }
-  };
-
-  const eventComponent = new EventComponent(eventData);
-  const eventEditComponent = new EventEditComponent(eventData);
-
-  eventComponent.setRollupButtonClickHandler(() => {
-    eventToEdit();
-    document.addEventListener(`keydown`, documentKeyDownHandler);
-  });
-
-  eventEditComponent.setRollupButtonClickHandler(() => {
-    editToEvent();
-    document.removeEventListener(`keydown`, documentKeyDownHandler);
-  });
-
-  eventEditComponent.setSubmitHandler((evt) => {
-    evt.preventDefault();
-    editToEvent();
-    document.removeEventListener(`keydown`, documentKeyDownHandler);
-  });
-
-  return eventComponent;
-};
-
-const renderEvents = (container, eventList) => {
-  const eventComponents = eventList.map((it) => renderEvent(it));
-  renderComponent(container.getElement(), RenderPosition.BEFORE_END, ...eventComponents);
-};
-
-const renderDays = (container, dayList) => {
-  dayList.forEach((it) => {
-    const dayComponent = new DayComponent(it);
-    const dayEventListComponent = new EventListComponent();
-
-    renderComponent(container, RenderPosition.BEFORE_END, dayComponent);
-    renderComponent(dayComponent.getElement(), RenderPosition.BEFORE_END, dayEventListComponent);
-
-    renderEvents(dayEventListComponent, it.dayEvents);
-  });
-}
-
 export default class TripController {
   constructor(container, eventList) {
     this._container = container;
     this._eventList = eventList;
     this._sortComponent = new SortComponent(sortList);
     this._dayListComponent = new DayListComponent();
+
+    this._pointControllers = [];
   }
 
   render() {
@@ -131,12 +81,12 @@ export default class TripController {
         };
 
         this._dayListComponent.getElement().innerHTML = ``;
-        renderDays(this._dayListComponent.getElement(), sortedDays);
+        this._renderDays(this._dayListComponent.getElement(), sortedDays);
       });
 
       const days = splitEventsByDay(this._eventList);
 
-      renderDays(this._dayListComponent.getElement(), days);
+      this._renderDays(this._dayListComponent.getElement(), days);
 
       renderComponent(this._container, RenderPosition.BEFORE_END, this._sortComponent);
       renderComponent(this._container, RenderPosition.BEFORE_END, this._dayListComponent);
@@ -144,5 +94,21 @@ export default class TripController {
     } else {
       renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
     }
+  }
+
+  _renderEvents(container, eventList) {
+    this._pointControllers = eventList.map((it) => new PointController(container).render(it));
+  }
+
+  _renderDays(container, dayList) {
+    dayList.forEach((it) => {
+      const dayComponent = new DayComponent(it);
+      const dayEventListComponent = new EventListComponent();
+
+      renderComponent(container, RenderPosition.BEFORE_END, dayComponent);
+      renderComponent(dayComponent.getElement(), RenderPosition.BEFORE_END, dayEventListComponent);
+
+      this._renderEvents(dayEventListComponent.getElement(), it.dayEvents);
+    });
   }
 }
