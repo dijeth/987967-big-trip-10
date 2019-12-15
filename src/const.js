@@ -46,7 +46,7 @@ export const EventType = {
   TRANSPORT: `Transport`,
   DRIVE: `Drive`,
   FLIGHT: `Flight`,
-  CHECKIN: `Check-in`,
+  'CHECK-IN': `Check-in`,
   SIGHTSEEING: `Sightseeing`,
   RESTAURANT: `Restaurant`,
   TRIP: `Trip`
@@ -125,7 +125,7 @@ export const EventTypeProperties = {
     ])
   },
 
-  [EventType.CHECKIN]: {
+  [EventType[`CHECK-IN`]]: {
     name: `Check-in`,
     icon: `check-in.png`,
     movingType: MovingType.STAYING,

@@ -1,6 +1,7 @@
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
 import {destinations, DestinationOptions} from '../mock/destination-data.js';
-import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import { generateOfferList } from '../mock/offer-data.js';
+import {EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
 import * as util from '../utils/common.js';
 
 const createEventTypeItem = (eventType) => {
@@ -13,8 +14,15 @@ const createEventTypeItem = (eventType) => {
 };
 
 const createEventTypeList = () => {
-  const transferEvents = Object.entries(EventTypeProperties).filter((item) => item[1].movingType === MovingType.MOVING).map((item) => item[0]).map((item) => createEventTypeItem(item)).join(`\n`);
-  const activityEvents = Object.entries(EventTypeProperties).filter((item) => item[1].movingType === MovingType.STAYING).map((item) => item[0]).map((item) => createEventTypeItem(item)).join(`\n`);
+  const transferEvents = Object.entries(EventTypeProperties)
+    .filter((item) => item[1].movingType === MovingType.MOVING)
+    .map((item) => item[0])
+    .map((item) => createEventTypeItem(item)).join(`\n`);
+
+  const activityEvents = Object.entries(EventTypeProperties)
+    .filter((item) => item[1].movingType === MovingType.STAYING)
+    .map((item) => item[0])
+    .map((item) => createEventTypeItem(item)).join(`\n`);
 
   return `
                           <div class="event__type-list">
@@ -61,7 +69,7 @@ const createEventOffers = (offers) => {
 };
 
 const createDestinationHtml = (destination) => {
-  if (!destination) {
+  if (!DestinationOptions[destination]) {
     return ``;
   }
 
@@ -165,10 +173,12 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                 </li>`;
 };
 
-export default class EventEditComponent extends AbstractComponent {
+export default class EventEditComponent extends AbstractSmartComponent {
   constructor(eventItem) {
     super();
     this._eventItem = eventItem;
+
+    this._addListeners();
   }
 
   getTemplate() {
@@ -186,5 +196,28 @@ export default class EventEditComponent extends AbstractComponent {
 
   setInputFavoriteChangeHandler(handler) {
     this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`change`, handler);
+  }
+
+  _addListeners() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
+      this._eventItem.destination = evt.target.value;
+
+      this.rerender();
+    });
+
+    element.querySelectorAll(`.event__type-input`).forEach((it) => {
+      it.addEventListener(`change`, (evt) => {
+        this._eventItem.type = EventType[evt.target.value.toUpperCase()];
+        this._eventItem.offers = generateOfferList(this._eventItem.type);
+        
+        this.rerender();
+      })
+    });
+  }
+
+  recoveryListeners() {
+    this._addListeners();
   }
 }
