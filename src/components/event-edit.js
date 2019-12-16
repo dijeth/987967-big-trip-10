@@ -1,7 +1,7 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {DestinationOptions} from '../mock/destination-data.js';
-import {generateOfferList} from '../mock/offer-data.js';
-import {EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import { DestinationOptions } from '../mock/destination-data.js';
+import { generateOfferList } from '../mock/offer-data.js';
+import { EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions } from '../const.js';
 import * as util from '../utils/common.js';
 
 const createEventTypeItem = (eventType) => {
@@ -185,17 +185,41 @@ export default class EventEditComponent extends AbstractSmartComponent {
     return createForm(this._eventItem);
   }
 
+  _setHandler(handler, element, handlerKeeperName, eventName) {
+    if (handler) {
+      this[handlerKeeperName] = handler;
+    };
+
+    if (this[handlerKeeperName]) {
+      element.addEventListener(eventName, this[handlerKeeperName])
+    };
+  }
+
   setRollupButtonClickHandler(handler) {
-    const rollupButton = this.getElement().querySelector(`.event__rollup-btn`);
-    rollupButton.addEventListener(`click`, handler);
+    this._setHandler(
+      handler,
+      this.getElement().querySelector(`.event__rollup-btn`),
+      `_rollupButtonClickHandler`,
+      `click`
+    )
   }
 
   setSubmitHandler(handler) {
-    this.getElement().addEventListener(`submit`, handler);
+    this._setHandler(
+      handler,
+      this.getElement().querySelector(`form`),
+      `_submitHandler`,
+      `submit`
+    )
   }
 
   setInputFavoriteChangeHandler(handler) {
-    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`change`, handler);
+    this._setHandler(
+      handler,
+      this.getElement().querySelector(`.event__favorite-checkbox`),
+      `_inputFavoriteChangeHandler`,
+      `change`
+    )
   }
 
   _addListeners() {
@@ -219,5 +243,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   recoveryListeners() {
     this._addListeners();
+    this.setRollupButtonClickHandler();
+    this.setSubmitHandler();
+    this.setInputFavoriteChangeHandler();
   }
 }
