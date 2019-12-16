@@ -3,7 +3,6 @@ import TripInfoComponent from './components/trip-info.js';
 import MenuComponent, {menuList} from './components/menu.js';
 import FilterComponent, {filterList} from './components/filter.js';
 import generateEventList from './mock/event-data.js';
-
 import TripController from './controllers/trip-controller.js';
 
 const eventList = generateEventList();

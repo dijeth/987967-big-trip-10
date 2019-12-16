@@ -1,6 +1,7 @@
-import AbstractComponent from './abstract-component.js';
-import {generatePhotoList, generateDescription} from '../mock/destination-data.js';
-import {EVENT_DEFAULT, EventTypeProperties, MovingType, PlaceholderParticle, Destinations, OfferTypeOptions} from '../const.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
+import {DestinationOptions} from '../mock/destination-data.js';
+import {generateOfferList} from '../mock/offer-data.js';
+import {EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
 import * as util from '../utils/common.js';
 
 const createEventTypeItem = (eventType) => {
@@ -13,8 +14,15 @@ const createEventTypeItem = (eventType) => {
 };
 
 const createEventTypeList = () => {
-  const transferEvents = Object.entries(EventTypeProperties).filter((item) => item[1].movingType === MovingType.MOVING).map((item) => item[0]).map((item) => createEventTypeItem(item)).join(`\n`);
-  const activityEvents = Object.entries(EventTypeProperties).filter((item) => item[1].movingType === MovingType.STAYING).map((item) => item[0]).map((item) => createEventTypeItem(item)).join(`\n`);
+  const transferEvents = Object.entries(EventTypeProperties)
+    .filter((item) => item[1].movingType === MovingType.MOVING)
+    .map((item) => item[0])
+    .map((item) => createEventTypeItem(item)).join(`\n`);
+
+  const activityEvents = Object.entries(EventTypeProperties)
+    .filter((item) => item[1].movingType === MovingType.STAYING)
+    .map((item) => item[0])
+    .map((item) => createEventTypeItem(item)).join(`\n`);
 
   return `
                           <div class="event__type-list">
@@ -61,17 +69,17 @@ const createEventOffers = (offers) => {
 };
 
 const createDestinationHtml = (destination) => {
-  if (!destination) {
+  if (!DestinationOptions[destination]) {
     return ``;
   }
 
-  const photoList = generatePhotoList().map((item) => `
+  const photoList = DestinationOptions[destination].photoList.map((item) => `
                                 <img class="event__photo" src="${item}" alt="Event photo">`).join(`\n`);
 
   return `
                       <section class="event__section  event__section--destination">
                         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                        <p class="event__destination-description">${generateDescription()}</p>
+                        <p class="event__destination-description">${DestinationOptions[destination].description}</p>
 
                         <div class="event__photos-container">
                           <div class="event__photos-tape">
@@ -88,7 +96,7 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
   const icon = eventProperty.icon;
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination;
-  const destinationList = Destinations.map((item) => `<option value="${item}"></option>`).join(`\n`);
+  const destinationList = Object.keys(DestinationOptions).map((item) => `<option value="${item}"></option>`).join(`\n`);
   const startDateTime = `${util.getDate(eventItem.start, `/`)} ${util.getTime(eventItem.start)}`;
   const finishDateTime = `${util.getDate(eventItem.finish, `/`)} ${util.getTime(eventItem.finish)}`;
 
@@ -107,6 +115,7 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
 `;
 
   return `
+                <li class="trip-events__item">
                   <form class="event  event--edit" action="#" method="post">
                     <header class="event__header">
                       <div class="event__type-wrapper">
@@ -160,14 +169,16 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                       ${createDestinationHtml(eventItem.destination)}
 
                     </section>
-                  </form>`;
+                  </form>
+                </li>`;
 };
 
-export default class EventEditComponent extends AbstractComponent {
-  constructor(eventItem, eventComponent) {
+export default class EventEditComponent extends AbstractSmartComponent {
+  constructor(eventItem) {
     super();
     this._eventItem = eventItem;
-    this.eventComponent = eventComponent;
+
+    this._addListeners();
   }
 
   getTemplate() {
@@ -181,5 +192,32 @@ export default class EventEditComponent extends AbstractComponent {
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+  }
+
+  setInputFavoriteChangeHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`change`, handler);
+  }
+
+  _addListeners() {
+    const element = this.getElement();
+
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
+      this._eventItem.destination = evt.target.value;
+
+      this.rerender();
+    });
+
+    element.querySelectorAll(`.event__type-input`).forEach((it) => {
+      it.addEventListener(`change`, (evt) => {
+        this._eventItem.type = EventType[evt.target.value.toUpperCase()];
+        this._eventItem.offers = generateOfferList(this._eventItem.type);
+
+        this.rerender();
+      });
+    });
+  }
+
+  recoveryListeners() {
+    this._addListeners();
   }
 }

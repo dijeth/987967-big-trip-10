@@ -1,5 +1,6 @@
 import {getRandomElement, getRandomWeek, getRandomTwoDays, getRandomNumber, getRandomBoolean} from '../utils/common.js';
-import {EventType, Destinations, EVENT_DEFAULT} from '../const.js';
+import {EventType, EVENT_DEFAULT} from '../const.js';
+import {destinations} from './destination-data.js';
 import {generateOfferList} from './offer-data.js';
 
 const generateEventData = (startData) => {
@@ -10,12 +11,11 @@ const generateEventData = (startData) => {
   event.type = getRandomElement(Object.values(EventType));
   event.start = startData;
   event.finish = getRandomTwoDays(event.start);
-  event.destination = getRandomElement(Destinations);
-  // event.destination = getRandomBoolean() ? getRandomElement(Destinations) : ``;
+  event.destination = getRandomElement(destinations);
   event.cost = getRandomNumber(1000, 20);
   event.isFavorite = getRandomBoolean();
 
-  event.offers = generateOfferList();
+  event.offers = generateOfferList(event.type);
 
   return event;
 };
