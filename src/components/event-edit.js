@@ -3,6 +3,8 @@ import { DestinationOptions } from '../mock/destination-data.js';
 import { generateOfferList } from '../mock/offer-data.js';
 import { EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions } from '../const.js';
 import * as util from '../utils/common.js';
+import '../../node_modules/flatpickr/dist/flatpickr.css';
+import flatpickr from 'flatpickr';
 
 const createEventTypeItem = (eventType) => {
   const eventTypeCode = eventType.toLowerCase();
@@ -139,15 +141,15 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                       </div>
 
                       <div class="event__field-group  event__field-group--time">
-                        <label class="visually-hidden" for="event-start-time-1">
+                        <label class="visually-hidden" for="event-start-time">
                           From
                         </label>
-                        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDateTime}">
+                        <input class="event__input  event__input--time" id="event-start-time" type="text" name="event-start-time" value="${startDateTime}">
                         &mdash;
-                        <label class="visually-hidden" for="event-end-time-1">
+                        <label class="visually-hidden" for="event-end-time">
                           To
                         </label>
-                        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${finishDateTime}">
+                        <input class="event__input  event__input--time" id="event-end-time" type="text" name="event-end-time" value="${finishDateTime}">
                       </div>
 
                       <div class="event__field-group  event__field-group--price">
@@ -178,7 +180,11 @@ export default class EventEditComponent extends AbstractSmartComponent {
     super();
     this._eventItem = eventItem;
 
+    this._startFlatpickr = null;
+    this._finishFlatpickr = null;
+
     this._addListeners();
+    this._configFlatpickr();
   }
 
   getTemplate() {
@@ -193,6 +199,23 @@ export default class EventEditComponent extends AbstractSmartComponent {
     if (this[handlerKeeperName]) {
       element.addEventListener(eventName, this[handlerKeeperName])
     };
+  }
+
+  _configFlatpickr() {
+
+    this._startFlatpickr = flatpickr(this.getElement().querySelector(`#event-start-time`), {
+      dateFormat: `y/m/d H:i`,
+      enableTime: true,
+      time_24hr: true,
+      defaultDate: this._eventItem.start
+    });
+
+    this._finishFlatpickr = flatpickr(this.getElement().querySelector(`#event-end-time`), {
+      dateFormat: `y/m/d H:i`,
+      enableTime: true,
+      time_24hr: true,
+      defaultDate: this._eventItem.finish
+    });
   }
 
   setRollupButtonClickHandler(handler) {
@@ -239,6 +262,14 @@ export default class EventEditComponent extends AbstractSmartComponent {
       this.rerender();
     });
 
+    element.querySelector(`#event-start-time`).addEventListener(`change`, (evt) => {
+      this._eventItem.start = this._startFlatpickr.selectedDates[0];
+    });
+
+    element.querySelector(`#event-end-time`).addEventListener(`change`, (evt) => {
+      this._eventItem.finish = this._finishFlatpickr.selectedDates[0];
+    });
+
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
       it.addEventListener(`change`, (evt) => {
         this._eventItem.type = EventType[evt.target.value.toUpperCase()];
@@ -267,6 +298,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   recoveryListeners() {
     this._addListeners();
+    this._configFlatpickr();
+
     this.setRollupButtonClickHandler();
     this.setSubmitHandler();
     this.setInputFavoriteChangeHandler();
