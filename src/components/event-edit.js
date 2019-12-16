@@ -8,8 +8,8 @@ const createEventTypeItem = (eventType) => {
   const eventTypeCode = eventType.toLowerCase();
   return `
                             <div class="event__type-item">
-                              <input id="event-type-${eventTypeCode}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventTypeCode}">
-                              <label class="event__type-label  event__type-label--${eventTypeCode}" for="event-type-${eventTypeCode}-1">${eventType}</label>
+                              <input id="event-type-${eventTypeCode}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventTypeCode}">
+                              <label class="event__type-label  event__type-label--${eventTypeCode}" for="event-type-${eventTypeCode}">${eventType}</label>
                             </div>`;
 };
 
@@ -38,12 +38,12 @@ const createEventTypeList = () => {
                         </div>`;
 };
 
-const createEventOffer = (offer) => {
+const createEventOffer = (offer, index) => {
   const offerOptions = OfferTypeOptions[offer.type];
   return `
                           <div class="event__offer-selector">
-                            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.checked ? `checked` : ``}>
-                            <label class="event__offer-label" for="event-offer-${offer.type}-1">
+                            <input data-offer-index="${index}" class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}" type="checkbox" name="event-offer-${offer.type}" ${offer.checked ? `checked` : ``}>
+                            <label class="event__offer-label" for="event-offer-${offer.type}">
                               <span class="event__offer-title">${offerOptions.name}</span>
                               &plus;
                               &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
@@ -56,7 +56,7 @@ const createEventOffers = (offers) => {
     return ``;
   }
 
-  const eventOffersHtml = offers.map((item) => createEventOffer(item)).join(`\n`);
+  const eventOffersHtml = offers.map((it, i) => createEventOffer(it, i)).join(`\n`);
 
   return `
                       <section class="event__section  event__section--offers">
@@ -222,6 +222,14 @@ export default class EventEditComponent extends AbstractSmartComponent {
     )
   }
 
+  getData() {
+    return this._eventItem;
+  }
+
+  getOldData() {
+
+  }
+
   _addListeners() {
     const element = this.getElement();
 
@@ -239,6 +247,17 @@ export default class EventEditComponent extends AbstractSmartComponent {
         this.rerender();
       });
     });
+
+    const offersElement = element.querySelector(`.event__available-offers`);
+    if (offersElement) {
+      offersElement.addEventListener(`click`, (evt) => {
+        const offerIndex = parseInt(evt.target.dataset.offerIndex, 10);
+        
+        if (!isNaN(offerIndex)) {
+          this._eventItem.offers[offerIndex].checked = evt.target.checked
+        };
+      })
+    };
   }
 
   recoveryListeners() {

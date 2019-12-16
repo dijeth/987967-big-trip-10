@@ -65,8 +65,11 @@ export default class PointController {
 
     eventEditComponent.setSubmitHandler((evt) => {
       evt.preventDefault();
-      this._editToEvent();
       document.removeEventListener(`keydown`, this._documentKeyDownHandler);
+
+      this._editToEvent();
+
+      this._onDataChange(this, eventEditComponent.getOldData(), eventEditComponent.getData())
     });
 
     eventEditComponent.setInputFavoriteChangeHandler(() => {
