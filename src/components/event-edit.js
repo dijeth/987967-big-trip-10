@@ -1,8 +1,7 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import { DestinationOptions } from '../mock/destination-data.js';
-import { generateOfferList } from '../mock/offer-data.js';
-import { EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions } from '../const.js';
-import * as util from '../utils/common.js';
+import {DestinationOptions} from '../mock/destination-data.js';
+import {generateOfferList} from '../mock/offer-data.js';
+import {EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
 import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
 
@@ -192,11 +191,11 @@ export default class EventEditComponent extends AbstractSmartComponent {
   _setHandler(handler, element, handlerKeeperName, eventName) {
     if (handler) {
       this[handlerKeeperName] = handler;
-    };
+    }
 
     if (this[handlerKeeperName]) {
-      element.addEventListener(eventName, this[handlerKeeperName])
-    };
+      element.addEventListener(eventName, this[handlerKeeperName]);
+    }
   }
 
   _configFlatpickr() {
@@ -204,43 +203,43 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._startFlatpickr = flatpickr(this.getElement().querySelector(`#event-start-time`), {
       dateFormat: `y/m/d H:i`,
       enableTime: true,
-      time_24hr: true,
+      [`time_24hr`]: true,
       defaultDate: this._eventItem.start
     });
 
     this._finishFlatpickr = flatpickr(this.getElement().querySelector(`#event-end-time`), {
       dateFormat: `y/m/d H:i`,
       enableTime: true,
-      time_24hr: true,
+      [`time_24hr`]: true,
       defaultDate: this._eventItem.finish
     });
   }
 
   setRollupButtonClickHandler(handler) {
     this._setHandler(
-      handler,
-      this.getElement().querySelector(`.event__rollup-btn`),
-      `_rollupButtonClickHandler`,
-      `click`
-    )
+        handler,
+        this.getElement().querySelector(`.event__rollup-btn`),
+        `_rollupButtonClickHandler`,
+        `click`
+    );
   }
 
   setSubmitHandler(handler) {
     this._setHandler(
-      handler,
-      this.getElement().querySelector(`form`),
-      `_submitHandler`,
-      `submit`
-    )
+        handler,
+        this.getElement().querySelector(`form`),
+        `_submitHandler`,
+        `submit`
+    );
   }
 
   setInputFavoriteChangeHandler(handler) {
     this._setHandler(
-      handler,
-      this.getElement().querySelector(`.event__favorite-checkbox`),
-      `_inputFavoriteChangeHandler`,
-      `change`
-    )
+        handler,
+        this.getElement().querySelector(`.event__favorite-checkbox`),
+        `_inputFavoriteChangeHandler`,
+        `change`
+    );
   }
 
   getData() {
@@ -260,11 +259,11 @@ export default class EventEditComponent extends AbstractSmartComponent {
       this.rerender();
     });
 
-    element.querySelector(`#event-start-time`).addEventListener(`change`, (evt) => {
+    element.querySelector(`#event-start-time`).addEventListener(`change`, () => {
       this._eventItem.start = this._startFlatpickr.selectedDates[0];
     });
 
-    element.querySelector(`#event-end-time`).addEventListener(`change`, (evt) => {
+    element.querySelector(`#event-end-time`).addEventListener(`change`, () => {
       this._eventItem.finish = this._finishFlatpickr.selectedDates[0];
     });
 
@@ -288,10 +287,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
         const offerIndex = parseInt(evt.target.dataset.offerIndex, 10);
 
         if (!isNaN(offerIndex)) {
-          this._eventItem.offers[offerIndex].checked = evt.target.checked
-        };
-      })
-    };
+          this._eventItem.offers[offerIndex].checked = evt.target.checked;
+        }
+      });
+    }
   }
 
   recoveryListeners() {

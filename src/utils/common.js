@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {Months, TimeValue} from '../const.js';
+import {TimeValue} from '../const.js';
 
 export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
 
@@ -8,8 +8,6 @@ export const getRandomElement = (array) => array[getRandomNumber(array.length - 
 export const getRandomBoolean = () => {
   return Math.random() > 0.5 ? true : false;
 };
-
-const formatNumber = (number) => number < 10 ? `0${number}` : `${number}`;
 
 const getRandomDate = (dateStart, during) => {
   const time = getRandomNumber(+dateStart + during, +dateStart + TimeValue.HOUR);
@@ -29,7 +27,7 @@ export const getRandomWeek = (dateStart) => getRandomDate(dateStart, TimeValue.W
 export const getRandom2Week = (dateStart) => getRandomDate(dateStart, TimeValue.TWO_WEEKS);
 
 export const getDaysCount = (dateMin, dateMax) => {
-  return Math.floor(moment.duration(+dateMax - moment(dateMin).startOf('day').toDate()).asDays());
+  return Math.floor(moment.duration(+dateMax - moment(dateMin).startOf(`day`).toDate()).asDays());
 };
 
 export const getDate = (date, separator = `-`) => date ? moment(date).format(`YY${separator}MM${separator}D`) : ``;

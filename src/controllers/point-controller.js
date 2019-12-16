@@ -69,7 +69,7 @@ export default class PointController {
 
       this._editToEvent();
 
-      this._onDataChange(this, eventEditComponent.getOldData(), eventEditComponent.getData())
+      this._onDataChange(this, eventEditComponent.getOldData(), eventEditComponent.getData());
     });
 
     eventEditComponent.setInputFavoriteChangeHandler(() => {
