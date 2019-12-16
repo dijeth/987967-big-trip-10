@@ -248,11 +248,16 @@ export default class EventEditComponent extends AbstractSmartComponent {
       });
     });
 
+    element.querySelector(`.event__input--price`).addEventListener(`change`, (evt) => {
+      const cost = +evt.target.value;
+      this._eventItem.cost = isNaN(cost) ? 0 : cost;
+    });
+
     const offersElement = element.querySelector(`.event__available-offers`);
     if (offersElement) {
       offersElement.addEventListener(`click`, (evt) => {
         const offerIndex = parseInt(evt.target.dataset.offerIndex, 10);
-        
+
         if (!isNaN(offerIndex)) {
           this._eventItem.offers[offerIndex].checked = evt.target.checked
         };
