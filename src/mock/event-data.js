@@ -32,6 +32,8 @@ const generateEventList = () => {
     eventList.push(eventData);
   }
 
+  // console.log(eventList)
+
   return eventList;
 };
 

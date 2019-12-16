@@ -1,3 +1,4 @@
+import moment from 'moment';
 import {Months, TimeValue} from '../const.js';
 
 export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
@@ -28,33 +29,19 @@ export const getRandomWeek = (dateStart) => getRandomDate(dateStart, TimeValue.W
 export const getRandom2Week = (dateStart) => getRandomDate(dateStart, TimeValue.TWO_WEEKS);
 
 export const getDaysCount = (dateMin, dateMax) => {
-  const dateMinCopy = new Date(+dateMin);
-  dateMinCopy.setSeconds(0);
-  dateMinCopy.setMinutes(0);
-  dateMinCopy.setHours(0);
-  return Math.floor((+dateMax - dateMinCopy) / TimeValue.DAY);
+  return Math.floor(moment.duration(+dateMax - moment(dateMin).startOf('day').toDate()).asDays());
 };
 
-export const getShortYear = (date) => String(date.getFullYear()).substr(2, 2);
-export const getDate = (date, separator = `-`) => date ? `${getShortYear(date)}${separator}${formatNumber(date.getMonth() + 1)}${separator}${formatNumber(date.getDate())}` : ``;
-export const getTime = (date) => date ? `${formatNumber(date.getHours())}:${formatNumber(date.getMinutes())}` : ``;
-export const getDateTime = (date) => date ? `${getDate(date)}T${getTime(date)}` : ``;
+export const getDate = (date, separator = `-`) => date ? moment(date).format(`YY${separator}MM${separator}D`) : ``;
+export const getTime = (date) => date ? moment(date).format(`HH:mm`) : ``;
+export const getDateTime = (date) => date ? moment(date).format(`YYYY-MM-D[T]HH:mm`) : ``;
 
 export const formatDate = (date1, date2) => {
-  let time = Math.abs(+date1 - date2);
-  let daysCount = Math.floor(time / TimeValue.DAY);
+  const ms = Math.abs(+date1 - date2);
+  const daysCount = Math.floor(moment.duration(ms).asDays());
+  const time = moment(new Date(ms)).utc().format(`H[H] mm[M]`);
 
-  time -= daysCount * TimeValue.DAY;
-  let hoursCount = Math.floor(time / TimeValue.HOUR);
-
-  time -= hoursCount * TimeValue.HOUR;
-  let minutesCount = Math.round(time / TimeValue.MINUTE);
-
-  daysCount = daysCount > 0 ? `${formatNumber(daysCount)}D` : ``;
-  hoursCount = hoursCount === 0 && daysCount === 0 ? `` : `${formatNumber(hoursCount)}H`;
-  minutesCount = `${formatNumber(minutesCount)}M`;
-
-  return `${daysCount} ${hoursCount} ${minutesCount}`.replace(/  +/g, ` `);
+  return `${daysCount > 0 ? `${daysCount}D ` : ``}${time}`;
 };
 
-export const getShortDate = (date) => date ? `${date.getDate()} ${Months[date.getMonth()]}` : ``;
+export const getShortDate = (date) => date ? moment(date).format(`D MMM`) : ``;

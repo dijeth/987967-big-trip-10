@@ -99,8 +99,6 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination;
   const destinationList = Object.keys(DestinationOptions).map((item) => `<option value="${item}"></option>`).join(`\n`);
-  const startDateTime = `${util.getDate(eventItem.start, `/`)} ${util.getTime(eventItem.start)}`;
-  const finishDateTime = `${util.getDate(eventItem.finish, `/`)} ${util.getTime(eventItem.finish)}`;
 
   const editFormButtons = `
                       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${eventItem.isFavorite ? `checked` : ``}>
@@ -144,12 +142,12 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                         <label class="visually-hidden" for="event-start-time">
                           From
                         </label>
-                        <input class="event__input  event__input--time" id="event-start-time" type="text" name="event-start-time" value="${startDateTime}">
+                        <input class="event__input  event__input--time" id="event-start-time" type="text" name="event-start-time" value="">
                         &mdash;
                         <label class="visually-hidden" for="event-end-time">
                           To
                         </label>
-                        <input class="event__input  event__input--time" id="event-end-time" type="text" name="event-end-time" value="${finishDateTime}">
+                        <input class="event__input  event__input--time" id="event-end-time" type="text" name="event-end-time" value="">
                       </div>
 
                       <div class="event__field-group  event__field-group--price">
