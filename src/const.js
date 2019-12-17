@@ -153,21 +153,6 @@ export const EventTypeProperties = {
   }
 };
 
-export const Months = [
-  `JAN`,
-  `FEB`,
-  `MAR`,
-  `APR`,
-  `MAY`,
-  `JUN`,
-  `JUL`,
-  `AUG`,
-  `SEP`,
-  `OCT`,
-  `NOV`,
-  `DEC`
-];
-
 export const TimeValue = {
   MINUTE: 60 * 1000,
   HOUR: 60 * 60 * 1000,

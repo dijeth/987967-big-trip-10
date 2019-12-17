@@ -2,14 +2,15 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import {DestinationOptions} from '../mock/destination-data.js';
 import {generateOfferList} from '../mock/offer-data.js';
 import {EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
-import * as util from '../utils/common.js';
+import '../../node_modules/flatpickr/dist/flatpickr.css';
+import flatpickr from 'flatpickr';
 
 const createEventTypeItem = (eventType) => {
   const eventTypeCode = eventType.toLowerCase();
   return `
                             <div class="event__type-item">
-                              <input id="event-type-${eventTypeCode}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventTypeCode}">
-                              <label class="event__type-label  event__type-label--${eventTypeCode}" for="event-type-${eventTypeCode}-1">${eventType}</label>
+                              <input id="event-type-${eventTypeCode}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventTypeCode}">
+                              <label class="event__type-label  event__type-label--${eventTypeCode}" for="event-type-${eventTypeCode}">${eventType}</label>
                             </div>`;
 };
 
@@ -38,12 +39,12 @@ const createEventTypeList = () => {
                         </div>`;
 };
 
-const createEventOffer = (offer) => {
+const createEventOffer = (offer, index) => {
   const offerOptions = OfferTypeOptions[offer.type];
   return `
                           <div class="event__offer-selector">
-                            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}-1" type="checkbox" name="event-offer-${offer.type}" ${offer.checked ? `checked` : ``}>
-                            <label class="event__offer-label" for="event-offer-${offer.type}-1">
+                            <input data-offer-index="${index}" class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}" type="checkbox" name="event-offer-${offer.type}" ${offer.checked ? `checked` : ``}>
+                            <label class="event__offer-label" for="event-offer-${offer.type}">
                               <span class="event__offer-title">${offerOptions.name}</span>
                               &plus;
                               &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
@@ -56,7 +57,7 @@ const createEventOffers = (offers) => {
     return ``;
   }
 
-  const eventOffersHtml = offers.map((item) => createEventOffer(item)).join(`\n`);
+  const eventOffersHtml = offers.map((it, i) => createEventOffer(it, i)).join(`\n`);
 
   return `
                       <section class="event__section  event__section--offers">
@@ -97,8 +98,6 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination;
   const destinationList = Object.keys(DestinationOptions).map((item) => `<option value="${item}"></option>`).join(`\n`);
-  const startDateTime = `${util.getDate(eventItem.start, `/`)} ${util.getTime(eventItem.start)}`;
-  const finishDateTime = `${util.getDate(eventItem.finish, `/`)} ${util.getTime(eventItem.finish)}`;
 
   const editFormButtons = `
                       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${eventItem.isFavorite ? `checked` : ``}>
@@ -139,15 +138,15 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                       </div>
 
                       <div class="event__field-group  event__field-group--time">
-                        <label class="visually-hidden" for="event-start-time-1">
+                        <label class="visually-hidden" for="event-start-time">
                           From
                         </label>
-                        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDateTime}">
+                        <input class="event__input  event__input--time" id="event-start-time" type="text" name="event-start-time" value="">
                         &mdash;
-                        <label class="visually-hidden" for="event-end-time-1">
+                        <label class="visually-hidden" for="event-end-time">
                           To
                         </label>
-                        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${finishDateTime}">
+                        <input class="event__input  event__input--time" id="event-end-time" type="text" name="event-end-time" value="">
                       </div>
 
                       <div class="event__field-group  event__field-group--price">
@@ -178,24 +177,77 @@ export default class EventEditComponent extends AbstractSmartComponent {
     super();
     this._eventItem = eventItem;
 
+    this._startFlatpickr = null;
+    this._finishFlatpickr = null;
+
     this._addListeners();
+    this._configFlatpickr();
   }
 
   getTemplate() {
     return createForm(this._eventItem);
   }
 
+  _setHandler(handler, element, handlerKeeperName, eventName) {
+    if (handler) {
+      this[handlerKeeperName] = handler;
+    }
+
+    if (this[handlerKeeperName]) {
+      element.addEventListener(eventName, this[handlerKeeperName]);
+    }
+  }
+
+  _configFlatpickr() {
+
+    this._startFlatpickr = flatpickr(this.getElement().querySelector(`#event-start-time`), {
+      dateFormat: `y/m/d H:i`,
+      enableTime: true,
+      [`time_24hr`]: true,
+      defaultDate: this._eventItem.start
+    });
+
+    this._finishFlatpickr = flatpickr(this.getElement().querySelector(`#event-end-time`), {
+      dateFormat: `y/m/d H:i`,
+      enableTime: true,
+      [`time_24hr`]: true,
+      defaultDate: this._eventItem.finish
+    });
+  }
+
   setRollupButtonClickHandler(handler) {
-    const rollupButton = this.getElement().querySelector(`.event__rollup-btn`);
-    rollupButton.addEventListener(`click`, handler);
+    this._setHandler(
+        handler,
+        this.getElement().querySelector(`.event__rollup-btn`),
+        `_rollupButtonClickHandler`,
+        `click`
+    );
   }
 
   setSubmitHandler(handler) {
-    this.getElement().addEventListener(`submit`, handler);
+    this._setHandler(
+        handler,
+        this.getElement().querySelector(`form`),
+        `_submitHandler`,
+        `submit`
+    );
   }
 
   setInputFavoriteChangeHandler(handler) {
-    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`change`, handler);
+    this._setHandler(
+        handler,
+        this.getElement().querySelector(`.event__favorite-checkbox`),
+        `_inputFavoriteChangeHandler`,
+        `change`
+    );
+  }
+
+  getData() {
+    return this._eventItem;
+  }
+
+  getOldData() {
+
   }
 
   _addListeners() {
@@ -207,6 +259,14 @@ export default class EventEditComponent extends AbstractSmartComponent {
       this.rerender();
     });
 
+    element.querySelector(`#event-start-time`).addEventListener(`change`, () => {
+      this._eventItem.start = this._startFlatpickr.selectedDates[0];
+    });
+
+    element.querySelector(`#event-end-time`).addEventListener(`change`, () => {
+      this._eventItem.finish = this._finishFlatpickr.selectedDates[0];
+    });
+
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
       it.addEventListener(`change`, (evt) => {
         this._eventItem.type = EventType[evt.target.value.toUpperCase()];
@@ -215,9 +275,30 @@ export default class EventEditComponent extends AbstractSmartComponent {
         this.rerender();
       });
     });
+
+    element.querySelector(`.event__input--price`).addEventListener(`change`, (evt) => {
+      const cost = +evt.target.value;
+      this._eventItem.cost = isNaN(cost) ? 0 : cost;
+    });
+
+    const offersElement = element.querySelector(`.event__available-offers`);
+    if (offersElement) {
+      offersElement.addEventListener(`click`, (evt) => {
+        const offerIndex = parseInt(evt.target.dataset.offerIndex, 10);
+
+        if (!isNaN(offerIndex)) {
+          this._eventItem.offers[offerIndex].checked = evt.target.checked;
+        }
+      });
+    }
   }
 
   recoveryListeners() {
     this._addListeners();
+    this._configFlatpickr();
+
+    this.setRollupButtonClickHandler();
+    this.setSubmitHandler();
+    this.setInputFavoriteChangeHandler();
   }
 }
