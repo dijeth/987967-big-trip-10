@@ -2,12 +2,12 @@ import {RenderPosition, renderComponent, replaceComponent} from '../utils/render
 import EventComponent from '../components/event.js';
 import EventEditComponent from '../components/event-edit.js';
 
-export const PointEventMode = {
+export const EventViewMode = {
   DEFAULT: `event`,
   EDITING: `event-edit`
 };
 
-export default class PointController {
+export default class EventController {
   constructor(container, onDataChange, onViewChange) {
     this._container = container;
     this._onDataChange = onDataChange;
@@ -18,18 +18,18 @@ export default class PointController {
 
     this._documentKeyDownHandler = this._documentKeyDownHandler.bind(this);
 
-    this._mode = PointEventMode.DEFAULT;
+    this._mode = EventViewMode.DEFAULT;
   }
 
   _eventToEdit() {
     this._onViewChange();
 
-    this._mode = PointEventMode.EDITING;
+    this._mode = EventViewMode.EDITING;
     replaceComponent(this._eventEditComponent, this._eventComponent);
   }
 
   _editToEvent() {
-    this._mode = PointEventMode.DEFAULT;
+    this._mode = EventViewMode.DEFAULT;
     replaceComponent(this._eventComponent, this._eventEditComponent);
   }
 
@@ -43,12 +43,12 @@ export default class PointController {
   }
 
   setDefaultView() {
-    if (this._mode !== PointEventMode.DEFAULT) {
+    if (this._mode !== EventViewMode.DEFAULT) {
       this._editToEvent();
     }
   }
 
-  render(eventData, mode = PointEventMode.DEFAULT) {
+  render(eventData, mode = EventViewMode.DEFAULT) {
 
     const eventComponent = new EventComponent(eventData);
     const eventEditComponent = new EventEditComponent(eventData);
@@ -76,10 +76,10 @@ export default class PointController {
       this._onDataChange(this,
           eventData,
           Object.assign({}, eventData, {isFavorite: !eventData.isFavorite}),
-          PointEventMode.EDITING);
+          EventViewMode.EDITING);
     });
 
-    const {newComponent, oldComponent} = mode === PointEventMode.EDITING ? {newComponent: eventEditComponent, oldComponent: this._eventEditComponent} : {newComponent: eventComponent, oldComponent: this._eventComponent};
+    const {newComponent, oldComponent} = mode === EventViewMode.EDITING ? {newComponent: eventEditComponent, oldComponent: this._eventEditComponent} : {newComponent: eventComponent, oldComponent: this._eventComponent};
 
     if (oldComponent === null) {
       renderComponent(this._container, RenderPosition.BEFORE_END, newComponent);

@@ -5,7 +5,7 @@ import SortComponent, {sortList, SortType} from '../components/sort.js';
 import NoPointsComponent, {NO_POINTS_TEXT} from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
-import PointController from './point-controller.js';
+import EventController from './event-controller.js';
 
 const splitEventsByDay = (eventList) => {
   const days = [];
@@ -57,7 +57,7 @@ export default class TripController {
     this._sortComponent = new SortComponent(sortList);
     this._dayListComponent = new DayListComponent();
 
-    this._pointControllers = [];
+    this._eventControllers = [];
     this._showenEvents = [];
 
     this._onViewChange = this._onViewChange.bind(this);
@@ -101,7 +101,7 @@ export default class TripController {
   }
 
   _renderEvents(container, eventList) {
-    this._pointControllers = this._pointControllers.concat(eventList.map((it) => new PointController(container, this._onDataChange, this._onViewChange).render(it)));
+    this._eventControllers = this._eventControllers.concat(eventList.map((it) => new EventController(container, this._onDataChange, this._onViewChange).render(it)));
   }
 
   _renderDays(container, dayList) {
@@ -116,12 +116,12 @@ export default class TripController {
     });
   }
 
-  _onDataChange(pointController, oldEventData, newEventData, pointEventMode) {
-    pointController.render(newEventData, pointEventMode);
+  _onDataChange(eventController, oldEventData, newEventData, eventViewMode) {
+    eventController.render(newEventData, eventViewMode);
   }
 
   _onViewChange() {
-    this._pointControllers.forEach((it) => {
+    this._eventControllers.forEach((it) => {
       it.setDefaultView();
     });
   }
