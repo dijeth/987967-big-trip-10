@@ -51,34 +51,36 @@ const sortEventsByPrice = (eventList) => {
 };
 
 export default class TripController {
-  constructor(container, eventList) {
+  constructor(container, events) {
     this._container = container;
-    this._eventList = eventList;
+    this._events = events;
     this._sortComponent = new SortComponent(sortList);
     this._dayListComponent = new DayListComponent();
 
     this._pointControllers = [];
+    this._showenEvents = [];
 
     this._onViewChange = this._onViewChange.bind(this);
   }
 
   render() {
+    this._showenEvents = this._events.get();
     let sortedDays = [];
 
-    if (this._eventList.length) {
+    if (this._showenEvents.length) {
       this._sortComponent.setSortTypeChangeHandler((sortType) => {
         switch (sortType) {
           case SortType.TIME:
-            sortedDays = sortEventsByTime(this._eventList);
+            sortedDays = sortEventsByTime(this._showenEvents);
             break;
 
           case SortType.PRICE:
-            sortedDays = sortEventsByPrice(this._eventList);
+            sortedDays = sortEventsByPrice(this._showenEvents);
             break;
 
           default:
           case SortType.DEFAULT:
-            sortedDays = splitEventsByDay(this._eventList);
+            sortedDays = splitEventsByDay(this._showenEvents);
             break;
         }
 
@@ -86,7 +88,7 @@ export default class TripController {
         this._renderDays(this._dayListComponent.getElement(), sortedDays);
       });
 
-      const days = splitEventsByDay(this._eventList);
+      const days = splitEventsByDay(this._showenEvents);
 
       this._renderDays(this._dayListComponent.getElement(), days);
 
