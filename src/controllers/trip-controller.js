@@ -1,7 +1,8 @@
 import { getDaysCount } from '../utils/common.js';
 import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
+import { SortOptions, SortType } from '../utils/sort.js';
 import DayListComponent from '../components/day-list.js';
-import SortComponent, { sortList, SortType } from '../components/sort.js';
+import SortComponent from '../components/sort.js';
 import NoPointsComponent, { NO_POINTS_TEXT } from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
@@ -54,22 +55,48 @@ export default class TripController {
   constructor(container, eventsModel) {
     this._container = container;
     this._eventsModel = eventsModel;
-    this._sortComponent = new SortComponent(sortList);
+    this._sortComponent = null;
     this._dayListComponent = null;
+
+    this._activeSortType = SortType.DEFAULT;
 
     this._eventControllers = [];
     this._showenEvents = [];
 
     this._viewChangeHandler = this._viewChangeHandler.bind(this);
     this._filterChangeHandler = this._filterChangeHandler.bind(this);
+    this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
 
     this._eventsModel.setFilterChangeHandler(this._filterChangeHandler)
+  }
+
+  _renderSort(activeSortType) {
+    const sortItems = Object.entries(SortOptions).map((it) => {
+      const [type, options] = it;
+      const { name, showDirection } = options;
+      return { type, name, showDirection, checked: type === activeSortType };
+    });
+
+    console.log(activeSortType);
+    console.log(sortItems);
+
+    const sortComponent = new SortComponent(sortItems);
+    sortComponent.setSortTypeChangeHandler(this._sortTypeChangeHandler);
+
+    if (this._sortComponent) {
+      replaceComponent(sortComponent, this._sortComponent);
+    } else {
+      renderComponent(this._container, RenderPosition.BEFORE_END, sortComponent);
+    };
+
+    this._sortComponent = sortComponent;
   }
 
   _renderEvents(events) {
     this._dayListComponent = new DayListComponent();
 
-    const days = splitEventsByDay(events);
+    const days = SortOptions[this._activeSortType].sort(this._showenEvents);
+
     this._eventControllers = this._renderDays(this._dayListComponent.getElement(), days);
 
     renderComponent(this._container, RenderPosition.BEFORE_END, this._dayListComponent);
@@ -88,14 +115,14 @@ export default class TripController {
   }
 
   render() {
-    this._showenEvents = this._eventsModel.getFiltered().slice();
+    this._showenEvents = this._eventsModel.get().slice();
 
     if (!this._showenEvents.length) {
       renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
       return;
     };
 
-    renderComponent(this._container, RenderPosition.BEFORE_END, this._sortComponent);
+    this._renderSort(this._activeSortType);
     this._renderEvents(this._showenEvents);
 
 
@@ -170,6 +197,11 @@ export default class TripController {
 
   _filterChangeHandler() {
     this._showenEvents = this._eventsModel.getFiltered().slice();
+    this._updateEvents(this._showenEvents);
+  }
+
+  _sortTypeChangeHandler(activeSortType) {
+    this._activeSortType = activeSortType;
     this._updateEvents(this._showenEvents);
   }
 }
