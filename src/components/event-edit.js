@@ -1,7 +1,7 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {DestinationOptions} from '../mock/destination-data.js';
-import {generateOfferList} from '../mock/offer-data.js';
-import {EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import { DestinationOptions } from '../mock/destination-data.js';
+import { generateOfferList } from '../mock/offer-data.js';
+import { EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions } from '../const.js';
 import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
 
@@ -176,6 +176,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   constructor(eventItem) {
     super();
     this._eventItem = eventItem;
+    this._copyData = Object.assign({}, eventItem);
 
     this._startFlatpickr = null;
     this._finishFlatpickr = null;
@@ -217,37 +218,33 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   setRollupButtonClickHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__rollup-btn`),
-        `_rollupButtonClickHandler`,
-        `click`
+      handler,
+      this.getElement().querySelector(`.event__rollup-btn`),
+      `_rollupButtonClickHandler`,
+      `click`
     );
   }
 
   setSubmitHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`form`),
-        `_submitHandler`,
-        `submit`
+      handler,
+      this.getElement().querySelector(`form`),
+      `_submitHandler`,
+      `submit`
     );
   }
 
   setInputFavoriteChangeHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__favorite-checkbox`),
-        `_inputFavoriteChangeHandler`,
-        `change`
+      handler,
+      this.getElement().querySelector(`.event__favorite-checkbox`),
+      `_inputFavoriteChangeHandler`,
+      `change`
     );
   }
 
   getData() {
     return this._eventItem;
-  }
-
-  getOldData() {
-
   }
 
   _addListeners() {
@@ -300,5 +297,24 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this.setRollupButtonClickHandler();
     this.setSubmitHandler();
     this.setInputFavoriteChangeHandler();
+  }
+
+  removeElement() {
+    if (this._startFlatpickr) {
+      this._startFlatpickr.destroy();
+      this._startFlatpickr = null;
+    };
+
+    if (this._finishFlatpickr) {
+      this._finishFlatpickr.destroy();
+      this._finishFlatpickr = null;
+    };
+
+    super.removeElement();
+  }
+
+  reset() {
+    this._eventItem = Object.assign({}, this._copyData);
+    this.rerender();
   }
 }

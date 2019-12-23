@@ -1,17 +1,13 @@
 import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
 import EventComponent from '../components/event.js';
 import EventEditComponent from '../components/event-edit.js';
-
-export const EventViewMode = {
-  DEFAULT: `event`,
-  EDITING: `event-edit`
-};
+import {EventViewMode} from '../const.js';
 
 export default class EventController {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, dataChangeHandler, viewChangeHandler, mode = EventViewMode.DEFAULT) {
     this._container = container;
-    this._onDataChange = onDataChange;
-    this._onViewChange = onViewChange;
+    this._dataChangeHandler = dataChangeHandler;
+    this._viewChangeHandler = viewChangeHandler;
 
     this._eventComponent = null;
     this._eventEditComponent = null;
@@ -22,7 +18,7 @@ export default class EventController {
   }
 
   _eventToEdit() {
-    this._onViewChange();
+    this._viewChangeHandler();
 
     this._mode = EventViewMode.EDITING;
     replaceComponent(this._eventEditComponent, this._eventComponent);
@@ -31,6 +27,7 @@ export default class EventController {
   _editToEvent() {
     this._mode = EventViewMode.DEFAULT;
     replaceComponent(this._eventComponent, this._eventEditComponent);
+    this._eventEditComponent.reset();
   }
 
   _documentKeyDownHandler(evt) {
@@ -67,16 +64,19 @@ export default class EventController {
       evt.preventDefault();
       document.removeEventListener(`keydown`, this._documentKeyDownHandler);
 
-      this._editToEvent();
-
-      this._onDataChange(this, eventEditComponent.getOldData(), eventEditComponent.getData());
+      this._dataChangeHandler(this, eventEditComponent.getData());
     });
 
     eventEditComponent.setInputFavoriteChangeHandler(() => {
-      this._onDataChange(this,
-        eventData,
+      if (this._mode === EventViewMode.ADDING) {
+        return
+      };
+
+      const keepInEditing = true;
+
+      this._dataChangeHandler(this,
         Object.assign({}, eventData, { isFavorite: !eventData.isFavorite }),
-        EventViewMode.EDITING);
+        keepInEditing);
     });
 
     const { newComponent, oldComponent } = mode === EventViewMode.EDITING ? { newComponent: eventEditComponent, oldComponent: this._eventEditComponent } : { newComponent: eventComponent, oldComponent: this._eventComponent };

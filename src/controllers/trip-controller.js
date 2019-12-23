@@ -7,49 +7,7 @@ import NoPointsComponent, { NO_POINTS_TEXT } from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
-
-const splitEventsByDay = (eventList) => {
-  const days = [];
-  let dayCounter = 1;
-  let dayDate = eventList[0].start;
-  let dayEvents = [eventList[0]];
-
-  for (let i = 1; i < eventList.length; i++) {
-    const daysCount = getDaysCount(dayDate, eventList[i].start);
-
-    if (daysCount === 0) {
-      dayEvents.push(eventList[i]);
-      continue;
-    }
-
-    days.push({ dayDate, dayCounter, dayEvents });
-    dayCounter += daysCount;
-    dayDate = eventList[i].start;
-    dayEvents = [eventList[i]];
-  }
-
-  if (dayEvents.length) {
-    days.push({ dayDate, dayCounter, dayEvents });
-  }
-
-  return days;
-};
-
-const sortEventsByTime = (eventList) => {
-  const dayCounter = ``;
-  const dayDate = ``;
-  const dayEvents = eventList.slice().sort((a, b) => (+a.finish - a.start) - (b.finish - b.start));
-
-  return [{ dayCounter, dayDate, dayEvents }];
-};
-
-const sortEventsByPrice = (eventList) => {
-  const dayCounter = ``;
-  const dayDate = ``;
-  const dayEvents = eventList.slice().sort((a, b) => a.cost - b.cost);
-
-  return [{ dayCounter, dayDate, dayEvents }];
-};
+import { EventViewMode } from '../const.js';
 
 export default class TripController {
   constructor(container, eventsModel) {
@@ -57,17 +15,21 @@ export default class TripController {
     this._eventsModel = eventsModel;
     this._sortComponent = null;
     this._dayListComponent = null;
+    this._editingEventID = null;
 
     this._activeSortType = SortType.DEFAULT;
 
     this._eventControllers = [];
     this._showenEvents = [];
 
+    this._dataChangeHandler = this._dataChangeHandler.bind(this);
     this._viewChangeHandler = this._viewChangeHandler.bind(this);
     this._filterChangeHandler = this._filterChangeHandler.bind(this);
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
+    this._modelDataChangeHandler = this._modelDataChangeHandler.bind(this);
 
-    this._eventsModel.setFilterChangeHandler(this._filterChangeHandler)
+    this._eventsModel.setFilterChangeHandler(this._filterChangeHandler);
+    this._eventsModel.setDataChangeHandler(this._modelDataChangeHandler);
   }
 
   _renderSort(activeSortType) {
@@ -76,9 +38,6 @@ export default class TripController {
       const { name, showDirection } = options;
       return { type, name, showDirection, checked: type === activeSortType };
     });
-
-    console.log(activeSortType);
-    console.log(sortItems);
 
     const sortComponent = new SortComponent(sortItems);
     sortComponent.setSortTypeChangeHandler(this._sortTypeChangeHandler);
@@ -112,6 +71,7 @@ export default class TripController {
   _updateEvents(events) {
     this._removeEvents();
     this._renderEvents(events);
+    this._editingEventID = null;
   }
 
   render() {
@@ -124,49 +84,17 @@ export default class TripController {
 
     this._renderSort(this._activeSortType);
     this._renderEvents(this._showenEvents);
+  }
 
+  createEvent() {
 
-
-
-    // const oldDayListComponent = this._dayListComponent;
-
-    // let sortedDays = [];
-
-    // if (this._showenEvents.length) {
-    //   this._sortComponent.setSortTypeChangeHandler((sortType) => {
-    //     switch (sortType) {
-    //       case SortType.TIME:
-    //         sortedDays = sortEventsByTime(this._showenEvents);
-    //         break;
-
-    //       case SortType.PRICE:
-    //         sortedDays = sortEventsByPrice(this._showenEvents);
-    //         break;
-
-    //       default:
-    //       case SortType.DEFAULT:
-    //         sortedDays = splitEventsByDay(this._showenEvents);
-    //         break;
-    //     }
-
-    //     this._dayListComponent.getElement().innerHTML = ``;
-    //     this._renderDays(this._dayListComponent.getElement(), sortedDays);
-    //   });
-
-
-    //   if (oldDayListComponent === null) {
-    //     renderComponent(this._container, RenderPosition.BEFORE_END, this._dayListComponent)
-    //   } else {
-    //     replaceComponent(this._dayListComponent, oldDayListComponent);
-    //   }
-
-    // } else {
-    //   renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
-    // }
   }
 
   _renderDayEvents(container, eventList) {
-    return eventList.map((it) => new EventController(container, this._onDataChange, this._viewChangeHandler).render(it));
+    return eventList.map((it) => {
+      const mode = this._editingEventID !== null && it.id === this._editingEventID ? EventViewMode.EDITING : EventViewMode.DEFAULT;
+      return new EventController(container, this._dataChangeHandler, this._viewChangeHandler).render(it, mode)
+    });
   }
 
   _renderDays(container, dayList) {
@@ -185,8 +113,10 @@ export default class TripController {
     return eventControllers;
   }
 
-  _onDataChange(eventController, oldEventData, newEventData, eventViewMode) {
-    eventController.render(newEventData, eventViewMode);
+  _dataChangeHandler(eventController, newEventData, keepInEditMode) {
+    this._editingEventID = keepInEditMode ? newEventData.id : null;
+    this._eventsModel.update(newEventData.id, newEventData);
+    // eventController.render(newEventData, eventViewMode);
   }
 
   _viewChangeHandler() {
@@ -196,13 +126,22 @@ export default class TripController {
   }
 
   _filterChangeHandler() {
-    this._activeSortType = SortType.DEFAULT;
+    if (this._activeSortType !== SortType.DEFAULT) {
+      this._activeSortType = SortType.DEFAULT;
+      this._renderSort(this._activeSortType);
+    };
+
     this._showenEvents = this._eventsModel.getFiltered().slice();
     this._updateEvents(this._showenEvents);
   }
 
   _sortTypeChangeHandler(activeSortType) {
     this._activeSortType = activeSortType;
+    this._updateEvents(this._showenEvents);
+  }
+
+  _modelDataChangeHandler() {
+    this._showenEvents = this._eventsModel.getFiltered().slice();
     this._updateEvents(this._showenEvents);
   }
 }

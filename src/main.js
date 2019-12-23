@@ -14,6 +14,7 @@ const tripMainElement = document.querySelector(`.trip-main`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 const tripInfoElement = tripMainElement.querySelector(`.trip-info`);
 const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
+const createEventElement = tripMainElement.querySelector(`.trip-main__event-add-btn`);
 
 const events = new Events(generateEventList());
 
@@ -21,13 +22,13 @@ const filterController = new FilterController(tripControlElements[1], events);
 filterController.render();
 
 const tripController = new TripController(tripEventsElement, events);
+createEventElement.addEventListener(`click`, tripController.createEvent);
 
 // if (eventList.length) {
 //   renderComponent(tripInfoElement, RenderPosition.AFTER_BEGIN, new TripInfoComponent(eventList));
 // }
 
 renderComponent(tripControlElements[0], RenderPosition.AFTER_END, new MenuComponent(menuList));
-// renderComponent(tripControlElements[1], RenderPosition.AFTER_END, new FilterComponent(filterList));
 
 tripController.render();
 
