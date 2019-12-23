@@ -196,6 +196,7 @@ export default class TripController {
   }
 
   _filterChangeHandler() {
+    this._activeSortType = SortType.DEFAULT;
     this._showenEvents = this._eventsModel.getFiltered().slice();
     this._updateEvents(this._showenEvents);
   }
