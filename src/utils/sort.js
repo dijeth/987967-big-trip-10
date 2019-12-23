@@ -11,6 +11,8 @@ const SortOptions = {
     name: `Event`,
     showDirection: false,
     sort: (events) => {
+      events = events.sort((a, b) => +a.start - b.start);
+
       const days = [];
       let dayCounter = 1;
       let dayDate = events[0].start;
@@ -44,7 +46,7 @@ const SortOptions = {
     sort: (events) => {
       const dayCounter = ``;
       const dayDate = ``;
-      const dayEvents = events.slice().sort((a, b) => (+b.finish - b.start) - (a.finish - a.start));
+      const dayEvents = events.sort((a, b) => (+b.finish - b.start) - (a.finish - a.start));
 
       return [{ dayCounter, dayDate, dayEvents }];
     }
@@ -56,7 +58,7 @@ const SortOptions = {
     sort: (events) => {
       const dayCounter = ``;
       const dayDate = ``;
-      const dayEvents = events.slice().sort((a, b) => b.cost - a.cost);
+      const dayEvents = events.sort((a, b) => b.cost - a.cost);
 
       return [{ dayCounter, dayDate, dayEvents }];
     }

@@ -13,7 +13,7 @@ class TripInfoController {
   }
 
   render() {
-    const eventList = this._eventsModel.get();
+    const eventList = this._eventsModel.get().slice().sort((a, b) => +a.start - b.start);
     const tripInfoComponent = new TripInfoComponent(this._getDateTitle(eventList), this._getShortTrip(eventList), this._getInfoCost(eventList));
 
     if (this._tripInfoComponent) {

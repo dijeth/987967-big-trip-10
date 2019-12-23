@@ -7,9 +7,6 @@ import FilterController from './controllers/filter-controller.js';
 import Events from './models/events.js';
 import TripInfoController from './controllers/trip-info-controller.js';
 
-const sumOffers = (offerList) => offerList.reduce((accum, current) => accum + current.checked * current.cost, 0);
-const sumEvents = (events) => events.reduce((accum, current) => accum + current.cost + sumOffers(current.offers), 0);
-
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
