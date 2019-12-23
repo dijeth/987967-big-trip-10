@@ -1,28 +1,27 @@
 import AbstractComponent from './abstract-component.js';
-import {getShortDate} from '../utils/common.js';
 
-const getDateTitle = (eventList) => {
-  return `${getShortDate(eventList[0].start)}&nbsp;&mdash;&nbsp;${getShortDate(eventList[eventList.length - 1].finish)}`;
-};
-
-const createTripInfoHtml = (eventList) => {
-  const shortTrip = eventList.length > 2 ? [eventList[0].destination, `...`, eventList[eventList.length - 1].destination] : [eventList[0].destination, eventList[1].destination];
-
+const createTripInfoHtml = (infoDates, infoTitle, infoCost) => {
   return `
+          <section class="trip-main__trip-info  trip-info">
             <div class="trip-info__main">
-              <h1 class="trip-info__title">${shortTrip.join(` &mdash; `)}</h1>
-
-              <p class="trip-info__dates">${getDateTitle(eventList)}</p>
-            </div>`;
+              <h1 class="trip-info__title">${infoTitle.join(` &mdash; `)}</h1>
+              <p class="trip-info__dates">${infoDates}</p>
+            </div>
+            <p class="trip-info__cost">
+              Total: &euro;&nbsp;<span class="trip-info__cost-value">${infoCost}</span>
+            </p>
+          </section>`;
 };
 
 export default class TripInfoComponent extends AbstractComponent {
-  constructor(eventList) {
+  constructor(infoDates, infoTitle, infoCost) {
     super();
-    this._eventList = eventList;
+    this._infoDates = infoDates;
+    this._infoTitle = infoTitle;
+    this._infoCost = infoCost;
   }
 
   getTemplate() {
-    return createTripInfoHtml(this._eventList);
+    return createTripInfoHtml(this._infoDates, this._infoTitle, this._infoCost);
   }
 }
