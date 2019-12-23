@@ -52,12 +52,14 @@ export default class TripController {
   }
 
   _renderEvents(events) {
+    if (! events.length) {
+      return
+    };
+    
     this._dayListComponent = new DayListComponent();
-
     const days = SortOptions[this._activeSortType].sort(this._showenEvents);
 
     this._eventControllers = this._renderDays(this._dayListComponent.getElement(), days);
-
     renderComponent(this._container, RenderPosition.BEFORE_END, this._dayListComponent);
   }
 
@@ -113,10 +115,9 @@ export default class TripController {
     return eventControllers;
   }
 
-  _dataChangeHandler(eventController, newEventData, keepInEditMode) {
-    this._editingEventID = keepInEditMode ? newEventData.id : null;
-    this._eventsModel.update(newEventData.id, newEventData);
-    // eventController.render(newEventData, eventViewMode);
+  _dataChangeHandler(id, newEventData, keepInEditMode) {
+    this._editingEventID = keepInEditMode ? id : null;
+    this._eventsModel.update(id, newEventData);
   }
 
   _viewChangeHandler() {

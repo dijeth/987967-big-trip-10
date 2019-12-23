@@ -64,7 +64,7 @@ export default class EventController {
       evt.preventDefault();
       document.removeEventListener(`keydown`, this._documentKeyDownHandler);
 
-      this._dataChangeHandler(this, eventEditComponent.getData());
+      this._dataChangeHandler(eventData.id, eventEditComponent.getData());
     });
 
     eventEditComponent.setInputFavoriteChangeHandler(() => {
@@ -74,9 +74,17 @@ export default class EventController {
 
       const keepInEditing = true;
 
-      this._dataChangeHandler(this,
-        Object.assign({}, eventData, { isFavorite: !eventData.isFavorite }),
-        keepInEditing);
+      this._dataChangeHandler(eventData.id, Object.assign({}, eventData, { isFavorite: !eventData.isFavorite }), keepInEditing);
+    });
+
+    eventEditComponent.setDeleteButtonClickHandler((evt) => {
+      evt.preventDefault();
+      
+      if (this._mode === EventViewMode.ADDING) {
+        return
+      };
+
+      this._dataChangeHandler(eventData.id, null);
     });
 
     const { newComponent, oldComponent } = mode === EventViewMode.EDITING ? { newComponent: eventEditComponent, oldComponent: this._eventEditComponent } : { newComponent: eventComponent, oldComponent: this._eventComponent };

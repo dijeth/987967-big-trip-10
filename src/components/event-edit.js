@@ -243,6 +243,15 @@ export default class EventEditComponent extends AbstractSmartComponent {
     );
   }
 
+  setDeleteButtonClickHandler(handler) {
+    this._setHandler(
+      handler,
+      this.getElement().querySelector(`.event__reset-btn`),
+      `_deleteButtonClickHandler`,
+      `click`
+    );
+  }
+
   getData() {
     return this._eventItem;
   }
