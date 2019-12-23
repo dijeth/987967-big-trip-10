@@ -1,4 +1,4 @@
-import {RenderPosition, renderComponent, replaceComponent} from '../utils/render.js';
+import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
 import EventComponent from '../components/event.js';
 import EventEditComponent from '../components/event-edit.js';
 
@@ -74,12 +74,12 @@ export default class EventController {
 
     eventEditComponent.setInputFavoriteChangeHandler(() => {
       this._onDataChange(this,
-          eventData,
-          Object.assign({}, eventData, {isFavorite: !eventData.isFavorite}),
-          EventViewMode.EDITING);
+        eventData,
+        Object.assign({}, eventData, { isFavorite: !eventData.isFavorite }),
+        EventViewMode.EDITING);
     });
 
-    const {newComponent, oldComponent} = mode === EventViewMode.EDITING ? {newComponent: eventEditComponent, oldComponent: this._eventEditComponent} : {newComponent: eventComponent, oldComponent: this._eventComponent};
+    const { newComponent, oldComponent } = mode === EventViewMode.EDITING ? { newComponent: eventEditComponent, oldComponent: this._eventEditComponent } : { newComponent: eventComponent, oldComponent: this._eventComponent };
 
     if (oldComponent === null) {
       renderComponent(this._container, RenderPosition.BEFORE_END, newComponent);
@@ -91,5 +91,11 @@ export default class EventController {
     this._eventEditComponent = eventEditComponent;
 
     return this;
+  }
+
+  destroy() {
+    removeComponent(this._eventComponent);
+    removeComponent(this._eventEditComponent);
+    document.removeEventListener(`keydown`, this._documentKeyDownHandler);
   }
 }

@@ -23,7 +23,10 @@ const generateEventData = (startData) => {
 const generateEventList = () => {
   const eventCount = getRandomNumber(10, 5);
   const eventList = [];
-  let startData = getRandomWeek(new Date());
+  let startData = new Date();
+
+  startData.setDate(startData.getDate() - 7);
+  startData = getRandomWeek(startData);
 
   for (let i = 0; i < eventCount; i++) {
     const eventData = generateEventData(startData);

@@ -1,9 +1,10 @@
-import {RenderPosition, renderComponent} from './utils/render.js';
+import { RenderPosition, renderComponent } from './utils/render.js';
+import { FilterType } from './utils/filter.js';
 import TripInfoComponent from './components/trip-info.js';
-import MenuComponent, {menuList} from './components/menu.js';
-import FilterComponent, {filterList} from './components/filter.js';
+import MenuComponent, { menuList } from './components/menu.js';
 import generateEventList from './mock/event-data.js';
 import TripController from './controllers/trip-controller.js';
+import FilterController from './controllers/filter-controller.js';
 import Events from './models/events.js';
 
 const sumOffers = (offerList) => offerList.reduce((accum, current) => accum + current.checked * current.cost, 0);
@@ -16,6 +17,9 @@ const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`
 
 const events = new Events(generateEventList());
 
+const filterController = new FilterController(tripControlElements[1], events);
+filterController.render();
+
 const tripController = new TripController(tripEventsElement, events);
 
 // if (eventList.length) {
@@ -23,7 +27,7 @@ const tripController = new TripController(tripEventsElement, events);
 // }
 
 renderComponent(tripControlElements[0], RenderPosition.AFTER_END, new MenuComponent(menuList));
-renderComponent(tripControlElements[1], RenderPosition.AFTER_END, new FilterComponent(filterList));
+// renderComponent(tripControlElements[1], RenderPosition.AFTER_END, new FilterComponent(filterList));
 
 tripController.render();
 
