@@ -1,7 +1,7 @@
 import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
 import EventComponent from '../components/event.js';
 import EventEditComponent from '../components/event-edit.js';
-import {EventViewMode} from '../const.js';
+import { EventViewMode } from '../const.js';
 
 export default class EventController {
   constructor(container, dataChangeHandler, viewChangeHandler, mode = EventViewMode.DEFAULT) {
@@ -22,10 +22,15 @@ export default class EventController {
 
     this._mode = EventViewMode.EDITING;
     replaceComponent(this._eventEditComponent, this._eventComponent);
+
+    document.addEventListener(`keydown`, this._documentKeyDownHandler);
   }
 
   _editToEvent() {
+    document.removeEventListener(`keydown`, this._documentKeyDownHandler);
+    
     this._mode = EventViewMode.DEFAULT;
+
     replaceComponent(this._eventComponent, this._eventEditComponent);
     this._eventEditComponent.reset();
   }
@@ -52,12 +57,10 @@ export default class EventController {
 
     eventComponent.setRollupButtonClickHandler(() => {
       this._eventToEdit();
-      document.addEventListener(`keydown`, this._documentKeyDownHandler);
     });
 
     eventEditComponent.setRollupButtonClickHandler(() => {
       this._editToEvent();
-      document.removeEventListener(`keydown`, this._documentKeyDownHandler);
     });
 
     eventEditComponent.setSubmitHandler((evt) => {
@@ -79,7 +82,7 @@ export default class EventController {
 
     eventEditComponent.setDeleteButtonClickHandler((evt) => {
       evt.preventDefault();
-      
+
       if (this._mode === EventViewMode.ADDING) {
         return
       };
@@ -87,16 +90,55 @@ export default class EventController {
       this._dataChangeHandler(eventData.id, null);
     });
 
-    const { newComponent, oldComponent } = mode === EventViewMode.EDITING ? { newComponent: eventEditComponent, oldComponent: this._eventEditComponent } : { newComponent: eventComponent, oldComponent: this._eventComponent };
+    if (this._eventEditComponent || this._eventComponent) {
+      switch (this._mode) {
+        case EventViewMode.EDITING:
+          replaceComponent(eventEditComponent, this._eventEditComponent);
+          this._eventComponent = eventComponent;
+          this._eventEditComponent = eventEditComponent;
 
-    if (oldComponent === null) {
-      renderComponent(this._container, RenderPosition.BEFORE_END, newComponent);
+          if (mode !== this._mode) {
+            this._editToEvent();
+          };
+
+          break;
+
+        case EventViewMode.DEFAULT:
+          replaceComponent(eventComponent, this._eventComponent);
+          this._eventComponent = eventComponent;
+          this._eventEditComponent = eventEditComponent;
+
+          if (mode !== this._mode) {
+            this._eventToEdit();
+          };
+
+          break;
+      }
     } else {
-      replaceComponent(newComponent, oldComponent);
+      this._eventComponent = eventComponent;
+      this._eventEditComponent = eventEditComponent;
+
+      renderComponent(this._container, RenderPosition.BEFORE_END, this._eventComponent);
+
+      if (mode === EventViewMode.ADDING || mode === EventViewMode.EDITING) {
+        this._eventToEdit();
+      }
     }
 
-    this._eventComponent = eventComponent;
-    this._eventEditComponent = eventEditComponent;
+
+
+
+
+    // const { newComponent, oldComponent } = mode === EventViewMode.EDITING ? { newComponent: eventEditComponent, oldComponent: this._eventEditComponent } : { newComponent: eventComponent, oldComponent: this._eventComponent };
+
+    // if (oldComponent === null) {
+    //   renderComponent(this._container, RenderPosition.BEFORE_END, newComponent);
+    // } else {
+    //   replaceComponent(newComponent, oldComponent);
+    // }
+
+    // this._eventComponent = eventComponent;
+    // this._eventEditComponent = eventEditComponent;
 
     return this;
   }
