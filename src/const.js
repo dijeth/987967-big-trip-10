@@ -167,16 +167,22 @@ export const TimeValue = {
 export const EVENT_DEFAULT = {
   id: null,
   type: EventType.FLIGHT,
-  start: new Date(),
-  finish: new Date(Date.now() + TimeValue.DAY),
+  start: null,
+  finish: null,
   destination: ``,
   cost: 0,
   isFavorite: false,
   offers: []
 };
 
-export const EventViewMode = {
-  DEFAULT: `event`,
+export const EventMode = {
+  DEFAULT: `event-preview`,
   EDITING: `event-edit`,
-  ADDING: `adding`
+  ADDING: `event-adding`
+};
+
+export const TripMode = {
+  DEFAULT: `trip-default`,
+  ADDING: `trip-append`,
+  EMPTY: `trip-empty`
 };

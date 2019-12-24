@@ -7,7 +7,7 @@ import NoPointsComponent, { NO_POINTS_TEXT } from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
-import { EventViewMode } from '../const.js';
+import { EventMode, EVENT_DEFAULT, TripMode } from '../const.js';
 
 export default class TripController {
   constructor(container, eventsModel) {
@@ -16,17 +16,22 @@ export default class TripController {
     this._sortComponent = null;
     this._dayListComponent = null;
     this._editingEventID = null;
+    this._mode = TripMode.DEFAULT;
 
     this._activeSortType = SortType.DEFAULT;
 
     this._eventControllers = [];
     this._showenEvents = [];
+    this._modeChangeHandlers = [];
 
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
     this._viewChangeHandler = this._viewChangeHandler.bind(this);
     this._filterChangeHandler = this._filterChangeHandler.bind(this);
     this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
     this._modelDataChangeHandler = this._modelDataChangeHandler.bind(this);
+    this._eventDestroyHandler = this._eventDestroyHandler.bind(this);
+    this._newEventCancelHandler = this._newEventCancelHandler.bind(this);
+    this.createEvent = this.createEvent.bind(this);
 
     this._eventsModel.setFilterChangeHandler(this._filterChangeHandler);
     this._eventsModel.setDataChangeHandler(this._modelDataChangeHandler);
@@ -81,6 +86,7 @@ export default class TripController {
 
     if (!this._showenEvents.length) {
       renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
+      this._setMode(TripMode.EMPTY);
       return;
     };
 
@@ -89,12 +95,27 @@ export default class TripController {
   }
 
   createEvent() {
+    const container = this._sortComponent ===  null ? this._container.children[0] : this._sortComponent.getElement();
 
+    const newEvent = new EventController(
+      container, 
+      this._dataChangeHandler, 
+      this._viewChangeHandler
+      );
+
+    newEvent.setDestroyHandler(this._eventDestroyHandler);
+    newEvent.setEventCancelHandler(this._newEventCancelHandler);
+    
+    newEvent.render(EVENT_DEFAULT, EventMode.ADDING);
+
+    this._eventControllers.push(newEvent);
+
+    this._setMode(TripMode.ADDING);
   }
 
   _renderDayEvents(container, eventList) {
     return eventList.map((it) => {
-      const mode = this._editingEventID !== null && it.id === this._editingEventID ? EventViewMode.EDITING : EventViewMode.DEFAULT;
+      const mode = this._editingEventID !== null && it.id === this._editingEventID ? TripMode.EDITING : TripMode.DEFAULT;
       return new EventController(container, this._dataChangeHandler, this._viewChangeHandler).render(it, mode)
     });
   }
@@ -144,5 +165,25 @@ export default class TripController {
   _modelDataChangeHandler() {
     this._showenEvents = this._eventsModel.getFiltered().slice();
     this._updateEvents(this._showenEvents);
+  }
+
+  _eventDestroyHandler() {
+    this._setMode(TripMode.DEFAULT);
+  }
+
+  _newEventCancelHandler() {
+    this._eventControllers[this._eventControllers.length - 1].destroy();
+    this._eventControllers.pop();
+  }
+
+  _setMode(mode) {
+    if (this._mode !== mode) {
+      this._mode = mode;
+      this._modeChangeHandlers.forEach((it) => it(this._mode))
+    }
+  }
+
+  setModeChangeHandler(handler) {
+    this._modeChangeHandlers.push(handler);
   }
 }

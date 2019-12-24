@@ -23,7 +23,7 @@ export default class Events {
 
   set(eventList) {
     this._events = eventList.map((it) => {
-      it.id = this._generateId();
+      it.id = this._generateID();
       return it;
     });
   }
@@ -52,7 +52,7 @@ export default class Events {
     this._dataChangeHandlers.forEach((it) => it());
   }
 
-  _generateId() {
+  _generateID() {
     this._idCounter += 1;
     return this._idCounter;
   }

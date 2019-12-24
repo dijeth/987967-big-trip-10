@@ -6,6 +6,7 @@ import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import Events from './models/events.js';
 import TripInfoController from './controllers/trip-info-controller.js';
+import {TripMode} from './const.js';
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripEventsElement = document.querySelector(`.trip-events`);
@@ -22,6 +23,9 @@ const filterController = new FilterController(tripControlElements[1], events);
 filterController.render();
 
 const tripController = new TripController(tripEventsElement, events);
+tripController.setModeChangeHandler((mode) => {
+	createEventElement.disabled = mode === TripMode.ADDING;
+});
 createEventElement.addEventListener(`click`, tripController.createEvent);
 
 // if (eventList.length) {

@@ -230,9 +230,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   setSubmitHandler(handler) {
+    const form = this.getElement().tagName === 'FORM' ? this.getElement() : this.getElement().querySelector(`form`)
     this._setHandler(
       handler,
-      this.getElement().querySelector(`form`),
+      form,
       `_submitHandler`,
       `submit`
     );
