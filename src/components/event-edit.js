@@ -114,7 +114,7 @@ const createForm = (eventItem) => {
 `;
 
   return `
-                <li class="trip-events__item">
+                ${isNewEvent ? `` : `<li class="trip-events__item">`}
                   <form class="${isNewEvent ? `trip-events__item ` : ``}event  event--edit" action="#" method="post">
                     <header class="event__header">
                       <div class="event__type-wrapper">
@@ -169,7 +169,7 @@ const createForm = (eventItem) => {
 
                     </section>
                   </form>
-                </li>`;
+                ${isNewEvent ? `` : `</li>`}`;
 };
 
 export default class EventEditComponent extends AbstractSmartComponent {
@@ -190,6 +190,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   _setHandler(handler, element, handlerKeeperName, eventName) {
+    if (! element) {
+      return
+    };
+
     if (handler) {
       this[handlerKeeperName] = handler;
     }
