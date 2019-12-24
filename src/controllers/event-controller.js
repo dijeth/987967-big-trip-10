@@ -52,8 +52,8 @@ export default class EventController {
 
   render(eventData, mode = EventViewMode.DEFAULT) {
 
-    const eventComponent = new EventComponent(eventData);
-    const eventEditComponent = new EventEditComponent(eventData);
+    const eventComponent = new EventComponent(Object.assign({}, eventData));
+    const eventEditComponent = new EventEditComponent(Object.assign({}, eventData));
 
     eventComponent.setRollupButtonClickHandler(() => {
       this._eventToEdit();
