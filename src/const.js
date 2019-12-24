@@ -186,3 +186,8 @@ export const TripMode = {
   ADDING: `trip-append`,
   EMPTY: `trip-empty`
 };
+
+export const MenuMode = {
+  TABLE: 'table',
+  STATS: `stats`
+}

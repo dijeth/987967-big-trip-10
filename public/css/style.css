@@ -930,3 +930,7 @@ main {
 
 .statistics__item:not(:last-child) {
   margin-bottom: 78px; }
+
+.statistics--hidden {
+  display: none;
+}
