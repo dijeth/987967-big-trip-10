@@ -90,8 +90,8 @@ const createDestinationHtml = (destination) => {
                       </section>`;
 };
 
-const createForm = (eventItem = EVENT_DEFAULT) => {
-  const isEditForm = eventItem !== EVENT_DEFAULT;
+const createForm = (eventItem) => {
+  const isNewEvent = eventItem.id === null;
 
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
@@ -115,7 +115,7 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
 
   return `
                 <li class="trip-events__item">
-                  <form class="event  event--edit" action="#" method="post">
+                  <form class="${isNewEvent ? `trip-events__item ` : ``}event  event--edit" action="#" method="post">
                     <header class="event__header">
                       <div class="event__type-wrapper">
                         <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -158,8 +158,8 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                       </div>
 
                       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                      <button class="event__reset-btn" type="reset">${isEditForm ? `Delete` : `Cancel`}</button>
-                      ${isEditForm ? editFormButtons : ``}
+                      <button class="event__reset-btn" type="reset">${isNewEvent ? `Cancel` : `Delete`}</button>
+                      ${isNewEvent ? `` : editFormButtons}
                     </header>
 
                     <section class="event__details">
