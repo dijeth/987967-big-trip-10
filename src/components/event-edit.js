@@ -1,7 +1,7 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
 import {DestinationOptions} from '../mock/destination-data.js';
 import {generateOfferList} from '../mock/offer-data.js';
-import {EVENT_DEFAULT, EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import {EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
 import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
 
@@ -90,8 +90,8 @@ const createDestinationHtml = (destination) => {
                       </section>`;
 };
 
-const createForm = (eventItem = EVENT_DEFAULT) => {
-  const isEditForm = eventItem !== EVENT_DEFAULT;
+const createForm = (eventItem) => {
+  const isNewEvent = eventItem.id === null;
 
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
@@ -114,8 +114,8 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
 `;
 
   return `
-                <li class="trip-events__item">
-                  <form class="event  event--edit" action="#" method="post">
+                ${isNewEvent ? `` : `<li class="trip-events__item">`}
+                  <form class="${isNewEvent ? `trip-events__item ` : ``}event  event--edit" action="#" method="post">
                     <header class="event__header">
                       <div class="event__type-wrapper">
                         <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -158,8 +158,8 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
                       </div>
 
                       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                      <button class="event__reset-btn" type="reset">${isEditForm ? `Delete` : `Cancel`}</button>
-                      ${isEditForm ? editFormButtons : ``}
+                      <button class="event__reset-btn" type="reset">${isNewEvent ? `Cancel` : `Delete`}</button>
+                      ${isNewEvent ? `` : editFormButtons}
                     </header>
 
                     <section class="event__details">
@@ -169,13 +169,14 @@ const createForm = (eventItem = EVENT_DEFAULT) => {
 
                     </section>
                   </form>
-                </li>`;
+                ${isNewEvent ? `` : `</li>`}`;
 };
 
 export default class EventEditComponent extends AbstractSmartComponent {
   constructor(eventItem) {
     super();
     this._eventItem = eventItem;
+    this._copyData = Object.assign({}, eventItem);
 
     this._startFlatpickr = null;
     this._finishFlatpickr = null;
@@ -189,6 +190,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   _setHandler(handler, element, handlerKeeperName, eventName) {
+    if (!element) {
+      return;
+    }
+
     if (handler) {
       this[handlerKeeperName] = handler;
     }
@@ -225,9 +230,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   setSubmitHandler(handler) {
+    const form = this.getElement().tagName === `FORM` ? this.getElement() : this.getElement().querySelector(`form`);
     this._setHandler(
         handler,
-        this.getElement().querySelector(`form`),
+        form,
         `_submitHandler`,
         `submit`
     );
@@ -242,12 +248,17 @@ export default class EventEditComponent extends AbstractSmartComponent {
     );
   }
 
-  getData() {
-    return this._eventItem;
+  setDeleteButtonClickHandler(handler) {
+    this._setHandler(
+        handler,
+        this.getElement().querySelector(`.event__reset-btn`),
+        `_deleteButtonClickHandler`,
+        `click`
+    );
   }
 
-  getOldData() {
-
+  getData() {
+    return this._eventItem;
   }
 
   _addListeners() {
@@ -300,5 +311,24 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this.setRollupButtonClickHandler();
     this.setSubmitHandler();
     this.setInputFavoriteChangeHandler();
+  }
+
+  removeElement() {
+    if (this._startFlatpickr) {
+      this._startFlatpickr.destroy();
+      this._startFlatpickr = null;
+    }
+
+    if (this._finishFlatpickr) {
+      this._finishFlatpickr.destroy();
+      this._finishFlatpickr = null;
+    }
+
+    super.removeElement();
+  }
+
+  reset() {
+    this._eventItem = Object.assign({}, this._copyData);
+    this.rerender();
   }
 }

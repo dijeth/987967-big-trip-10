@@ -1,26 +1,63 @@
 import AbstractComponent from './abstract-component.js';
+import {MenuMode} from '../const.js';
 
-export const menuList = [
-  {name: `Table`, href: `#`, active: true},
-  {name: `Stats`, href: `#`, active: false}
+const menuList = [
+  {name: `Table`, mode: MenuMode.TABLE},
+  {name: `Stats`, mode: MenuMode.STATS}
 ];
 
-const createMenuItemHtml = (menuItem) => `              
-<a class="trip-tabs__btn${menuItem.active ? `  trip-tabs__btn--active` : ``}" href="${menuItem.href}">${menuItem.name}</a>`;
+const ACTIVE_CLASS = `trip-tabs__btn--active`;
 
-const createMenuHtml = (menuItems) => {
-  const menuItemList = menuItems.map((item) => createMenuItemHtml(item)).join(`\n`);
+const createMenuItemHtml = (menuItem, checked) => `              
+<a data-mode="${menuItem.mode}" class="trip-tabs__btn${checked ? ` ${ACTIVE_CLASS}` : ``}" href="#">${menuItem.name}</a>`;
+
+const createMenuHtml = (menuItems, mode) => {
+  const menuItemList = menuItems.map((it) => createMenuItemHtml(it, it.mode === mode)).join(`\n`);
   return `
               <nav class="trip-controls__trip-tabs  trip-tabs">${menuItemList}</nav>`;
 };
 
 export default class MenuComponent extends AbstractComponent {
-  constructor(menuItems) {
+  constructor() {
     super();
-    this._menuItems = menuItems;
+    this._menuItems = menuList;
+    this._mode = MenuMode.TABLE;
+    this._modeChangeHandler = null;
+
+    this._addClickListener();
   }
 
   getTemplate() {
-    return createMenuHtml(this._menuItems);
+    return createMenuHtml(this._menuItems, this._mode);
+  }
+
+  setMode(mode) {
+    if (this._mode === mode) {
+      return;
+    }
+
+    this.getElement().querySelector(`.${ACTIVE_CLASS}`).classList.remove(ACTIVE_CLASS);
+    this.getElement().querySelector(`[data-mode="${mode}"]`).classList.add(ACTIVE_CLASS);
+
+    this._mode = mode;
+
+    if (this._modeChangeHandler) {
+      this._modeChangeHandler(mode);
+    }
+  }
+
+  setModeChangeHandler(handler) {
+    this._modeChangeHandler = handler;
+  }
+
+  _addClickListener() {
+    this.getElement().addEventListener(`click`, (evt) => {
+      if (evt.target.tagName !== `A`) {
+        return;
+      }
+
+      evt.preventDefault();
+      this.setMode(evt.target.dataset.mode);
+    });
   }
 }

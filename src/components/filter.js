@@ -1,10 +1,6 @@
 import AbstractComponent from './abstract-component.js';
 
-export const filterList = [
-  {name: `Everything`, checked: true},
-  {name: `Future`, checked: false},
-  {name: `Past`, checked: false}
-];
+const FILTER_PREFIX = `filter-`;
 
 const createFilterItemHtml = (filterItem) => `
               <div class="trip-filters__filter">
@@ -29,5 +25,14 @@ export default class FilterComponent extends AbstractComponent {
 
   getTemplate() {
     return createFilterHtml(this._filterItems);
+  }
+
+  setFilterChangeHandler(handler) {
+    this.getElement().addEventListener(`click`, (evt) => {
+      if (evt.target.tagName === `INPUT`) {
+        const filter = evt.target.id.replace(FILTER_PREFIX, ``);
+        handler(filter);
+      }
+    });
   }
 }
