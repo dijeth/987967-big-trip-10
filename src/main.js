@@ -1,5 +1,6 @@
 import {RenderPosition, renderComponent} from './utils/render.js';
 import MenuComponent from './components/menu.js';
+import StatisticComponent from './components/stats.js';
 import generateEventList from './mock/event-data.js';
 import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
@@ -9,12 +10,8 @@ import {TripMode, MenuMode} from './const.js';
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripEventsElement = document.querySelector(`.trip-events`);
-const statisticsElement = document.querySelector(`.statistics`);
 const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 const createEventElement = tripMainElement.querySelector(`.trip-main__event-add-btn`);
-
-const TRIP_EVENTS_HIDDEN_CLASS = `trip-events--hidden`;
-const STATISTICS_HIDDEN_CLASS = `statistics--hidden`;
 
 const events = new Events(generateEventList());
 
@@ -29,11 +26,23 @@ tripController.setModeChangeHandler((mode) => {
   createEventElement.disabled = mode === TripMode.ADDING;
 });
 
+const statisticsComponent = new StatisticComponent();
+renderComponent(tripEventsElement, RenderPosition.AFTER_END, statisticsComponent);
+
 const menuComponent = new MenuComponent();
 renderComponent(tripControlElements[0], RenderPosition.AFTER_END, menuComponent);
-menuComponent.setModeChangeHandler(() => {
-  tripEventsElement.classList.toggle(TRIP_EVENTS_HIDDEN_CLASS);
-  statisticsElement.classList.toggle(STATISTICS_HIDDEN_CLASS);
+menuComponent.setModeChangeHandler((mode) => {
+	switch (mode) {
+		case MenuMode.TABLE: 
+			statisticsComponent.hide();
+			tripController.show();
+			break;
+
+		case MenuMode.STATS: 
+			statisticsComponent.show();
+			tripController.hide();
+			break;
+	}
 });
 
 tripController.render();

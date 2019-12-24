@@ -185,4 +185,12 @@ export default class TripController {
   setModeChangeHandler(handler) {
     this._modeChangeHandlers.push(handler);
   }
+
+  hide() {
+    this._container.classList.add(`visually-hidden`);
+  }
+
+  show() {
+    this._container.classList.remove(`visually-hidden`);
+  }
 }
