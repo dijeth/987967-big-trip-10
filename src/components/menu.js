@@ -1,9 +1,9 @@
 import AbstractComponent from './abstract-component.js';
 import {MenuMode} from '../const.js';
 
-const menuItems = [
-  { name: `Table`, mode: MenuMode.TABLE },
-  { name: `Stats`, mode: MenuMode.STATS }
+const menuList = [
+  {name: `Table`, mode: MenuMode.TABLE},
+  {name: `Stats`, mode: MenuMode.STATS}
 ];
 
 const ACTIVE_CLASS = `trip-tabs__btn--active`;
@@ -20,7 +20,7 @@ const createMenuHtml = (menuItems, mode) => {
 export default class MenuComponent extends AbstractComponent {
   constructor() {
     super();
-    this._menuItems = menuItems;
+    this._menuItems = menuList;
     this._mode = MenuMode.TABLE;
     this._modeChangeHandler = null;
 
@@ -34,7 +34,7 @@ export default class MenuComponent extends AbstractComponent {
   setMode(mode) {
     if (this._mode === mode) {
       return;
-    };
+    }
 
     this.getElement().querySelector(`.${ACTIVE_CLASS}`).classList.remove(ACTIVE_CLASS);
     this.getElement().querySelector(`[data-mode="${mode}"]`).classList.add(ACTIVE_CLASS);
@@ -42,7 +42,7 @@ export default class MenuComponent extends AbstractComponent {
     this._mode = mode;
 
     if (this._modeChangeHandler) {
-      this._modeChangeHandler(mode)
+      this._modeChangeHandler(mode);
     }
   }
 
@@ -53,11 +53,11 @@ export default class MenuComponent extends AbstractComponent {
   _addClickListener() {
     this.getElement().addEventListener(`click`, (evt) => {
       if (evt.target.tagName !== `A`) {
-        return
-      };
+        return;
+      }
 
       evt.preventDefault();
       this.setMode(evt.target.dataset.mode);
-    })
+    });
   }
 }

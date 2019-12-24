@@ -1,11 +1,11 @@
-import { RenderPosition, renderComponent } from './utils/render.js';
+import {RenderPosition, renderComponent} from './utils/render.js';
 import MenuComponent from './components/menu.js';
 import generateEventList from './mock/event-data.js';
 import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import Events from './models/events.js';
 import TripInfoController from './controllers/trip-info-controller.js';
-import { TripMode, MenuMode } from './const.js';
+import {TripMode, MenuMode} from './const.js';
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripEventsElement = document.querySelector(`.trip-events`);
@@ -40,5 +40,5 @@ tripController.render();
 
 createEventElement.addEventListener(`click`, () => {
   menuComponent.setMode(MenuMode.TABLE);
-  tripController.createEvent()
+  tripController.createEvent();
 });

@@ -188,6 +188,6 @@ export const TripMode = {
 };
 
 export const MenuMode = {
-  TABLE: 'table',
+  TABLE: `table`,
   STATS: `stats`
-}
+};
