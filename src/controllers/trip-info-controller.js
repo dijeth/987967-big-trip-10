@@ -1,6 +1,6 @@
 import TripInfoComponent from '../components/trip-info.js';
-import { getShortDate } from '../utils/common.js';
-import { replaceComponent, renderComponent, RenderPosition } from '../utils/render.js';
+import {getShortDate} from '../utils/common.js';
+import {replaceComponent, renderComponent, RenderPosition} from '../utils/render.js';
 
 class TripInfoController {
   constructor(container, eventsModel) {
@@ -17,10 +17,10 @@ class TripInfoController {
     const tripInfoComponent = new TripInfoComponent(this._getDateTitle(eventList), this._getShortTrip(eventList), this._getInfoCost(eventList));
 
     if (this._tripInfoComponent) {
-      replaceComponent(tripInfoComponent, this._tripInfoComponent)
+      replaceComponent(tripInfoComponent, this._tripInfoComponent);
     } else {
       renderComponent(this._container, RenderPosition.AFTER_BEGIN, tripInfoComponent);
-    };
+    }
 
     this._tripInfoComponent = tripInfoComponent;
   }
@@ -39,9 +39,9 @@ class TripInfoController {
 
   _getInfoCost(eventList) {
     const sumOffers = (offerList) => offerList.reduce((accum, current) => accum + current.checked * current.cost, 0);
-    
+
     return eventList.reduce((accum, current) => accum + current.cost + sumOffers(current.offers), 0);
   }
-};
+}
 
 export default TripInfoController;

@@ -29,7 +29,7 @@ export default class FilterComponent extends AbstractComponent {
 
   setFilterChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
-      if (evt.target.tagName === 'INPUT') {
+      if (evt.target.tagName === `INPUT`) {
         const filter = evt.target.id.replace(FILTER_PREFIX, ``);
         handler(filter);
       }

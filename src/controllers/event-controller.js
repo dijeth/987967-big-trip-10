@@ -1,10 +1,10 @@
-import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
+import {RenderPosition, renderComponent, replaceComponent, removeComponent} from '../utils/render.js';
 import EventComponent from '../components/event.js';
 import EventEditComponent from '../components/event-edit.js';
-import { EventMode } from '../const.js';
+import {EventMode} from '../const.js';
 
 export default class EventController {
-  constructor(container, dataChangeHandler, viewChangeHandler, mode = EventMode.DEFAULT) {
+  constructor(container, dataChangeHandler, viewChangeHandler) {
     this._container = container;
     this._dataChangeHandler = dataChangeHandler;
     this._viewChangeHandler = viewChangeHandler;
@@ -40,10 +40,10 @@ export default class EventController {
 
     if (isEscKey) {
       if (this._mode === EventMode.ADDING) {
-        this._eventCancelHandler()
+        this._eventCancelHandler();
       } else {
-        this._editToEvent()
-      };
+        this._editToEvent();
+      }
     }
   }
 
@@ -80,19 +80,19 @@ export default class EventController {
 
     eventEditComponent.setInputFavoriteChangeHandler(() => {
       if (this._mode === EventMode.ADDING) {
-        return
-      };
+        return;
+      }
 
       const keepInEditing = true;
 
-      this._dataChangeHandler(eventData.id, Object.assign({}, eventData, { isFavorite: !eventData.isFavorite }), keepInEditing);
+      this._dataChangeHandler(eventData.id, Object.assign({}, eventData, {isFavorite: !eventData.isFavorite}), keepInEditing);
     });
 
     eventEditComponent.setDeleteButtonClickHandler((evt) => {
       evt.preventDefault();
 
       if (this._mode === EventMode.ADDING) {
-        this._eventCancelHandler()
+        this._eventCancelHandler();
       } else {
         this._dataChangeHandler(eventData.id, null);
       }
@@ -107,7 +107,7 @@ export default class EventController {
 
           if (mode !== this._mode) {
             this._editToEvent();
-          };
+          }
 
           break;
 
@@ -118,7 +118,7 @@ export default class EventController {
 
           if (mode !== this._mode) {
             this._eventToEdit();
-          };
+          }
 
           break;
       }
@@ -144,7 +144,7 @@ export default class EventController {
         case EventMode.DEFAULT:
           renderComponent(this._container, RenderPosition.BEFORE_END, this._eventComponent);
       }
-    };
+    }
 
     this._mode = mode;
 
@@ -161,8 +161,8 @@ export default class EventController {
 
   destroy() {
     if (this._destroyHandler) {
-      this._destroyHandler()
-    };
+      this._destroyHandler();
+    }
 
     removeComponent(this._eventComponent);
     removeComponent(this._eventEditComponent);

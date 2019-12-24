@@ -1,4 +1,4 @@
-import { FilterType, FilterOptions } from '../utils/filter.js';
+import {FilterType, FilterOptions} from '../utils/filter.js';
 
 export default class Events {
   constructor(eventList) {
@@ -9,8 +9,8 @@ export default class Events {
     this._filterChangeHandlers = [];
 
     if (eventList) {
-      this.set(eventList)
-    };
+      this.set(eventList);
+    }
   }
 
   get() {
@@ -59,7 +59,7 @@ export default class Events {
 
   setFilter(filter) {
     this._activeFilter = filter;
-    this._filterChangeHandlers.forEach((it) => it(this._activeFilter))
+    this._filterChangeHandlers.forEach((it) => it(this._activeFilter));
   }
 
   getFilter() {
@@ -67,10 +67,10 @@ export default class Events {
   }
 
   setDataChangeHandler(handler) {
-    this._dataChangeHandlers.push(handler)
+    this._dataChangeHandlers.push(handler);
   }
-  
+
   setFilterChangeHandler(handler) {
-    this._filterChangeHandlers.push(handler)
+    this._filterChangeHandlers.push(handler);
   }
 }

@@ -1,13 +1,12 @@
-import { getDaysCount } from '../utils/common.js';
-import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
-import { SortOptions, SortType } from '../utils/sort.js';
+import {RenderPosition, renderComponent, replaceComponent, removeComponent} from '../utils/render.js';
+import {SortOptions, SortType} from '../utils/sort.js';
 import DayListComponent from '../components/day-list.js';
 import SortComponent from '../components/sort.js';
-import NoPointsComponent, { NO_POINTS_TEXT } from '../components/no-points.js';
+import NoPointsComponent, {NO_POINTS_TEXT} from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
-import { EventMode, EVENT_DEFAULT, TripMode } from '../const.js';
+import {EventMode, EVENT_DEFAULT, TripMode} from '../const.js';
 
 export default class TripController {
   constructor(container, eventsModel) {
@@ -40,8 +39,8 @@ export default class TripController {
   _renderSort(activeSortType) {
     const sortItems = Object.entries(SortOptions).map((it) => {
       const [type, options] = it;
-      const { name, showDirection } = options;
-      return { type, name, showDirection, checked: type === activeSortType };
+      const {name, showDirection} = options;
+      return {type, name, showDirection, checked: type === activeSortType};
     });
 
     const sortComponent = new SortComponent(sortItems);
@@ -51,16 +50,16 @@ export default class TripController {
       replaceComponent(sortComponent, this._sortComponent);
     } else {
       renderComponent(this._container, RenderPosition.BEFORE_END, sortComponent);
-    };
+    }
 
     this._sortComponent = sortComponent;
   }
 
   _renderEvents(events) {
-    if (! events.length) {
-      return
-    };
-    
+    if (!events.length) {
+      return;
+    }
+
     this._dayListComponent = new DayListComponent();
     const days = SortOptions[this._activeSortType].sort(this._showenEvents);
 
@@ -69,7 +68,7 @@ export default class TripController {
   }
 
   _removeEvents() {
-    this._eventControllers.forEach((it) => it.destroy())
+    this._eventControllers.forEach((it) => it.destroy());
     this._eventControllers = [];
 
     removeComponent(this._dayListComponent);
@@ -88,24 +87,24 @@ export default class TripController {
       renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
       this._setMode(TripMode.EMPTY);
       return;
-    };
+    }
 
     this._renderSort(this._activeSortType);
     this._renderEvents(this._showenEvents);
   }
 
   createEvent() {
-    const container = this._sortComponent ===  null ? this._container.children[0] : this._sortComponent.getElement();
+    const container = this._sortComponent === null ? this._container.children[0] : this._sortComponent.getElement();
 
     const newEvent = new EventController(
-      container, 
-      this._dataChangeHandler, 
-      this._viewChangeHandler
-      );
+        container,
+        this._dataChangeHandler,
+        this._viewChangeHandler
+    );
 
     newEvent.setDestroyHandler(this._eventDestroyHandler);
     newEvent.setEventCancelHandler(this._newEventCancelHandler);
-    
+
     newEvent.render(EVENT_DEFAULT, EventMode.ADDING);
 
     this._eventControllers.push(newEvent);
@@ -116,7 +115,7 @@ export default class TripController {
   _renderDayEvents(container, eventList) {
     return eventList.map((it) => {
       const mode = this._editingEventID !== null && it.id === this._editingEventID ? TripMode.EDITING : TripMode.DEFAULT;
-      return new EventController(container, this._dataChangeHandler, this._viewChangeHandler).render(it, mode)
+      return new EventController(container, this._dataChangeHandler, this._viewChangeHandler).render(it, mode);
     });
   }
 
@@ -151,7 +150,7 @@ export default class TripController {
     if (this._activeSortType !== SortType.DEFAULT) {
       this._activeSortType = SortType.DEFAULT;
       this._renderSort(this._activeSortType);
-    };
+    }
 
     this._showenEvents = this._eventsModel.getFiltered().slice();
     this._updateEvents(this._showenEvents);
@@ -179,7 +178,7 @@ export default class TripController {
   _setMode(mode) {
     if (this._mode !== mode) {
       this._mode = mode;
-      this._modeChangeHandlers.forEach((it) => it(this._mode))
+      this._modeChangeHandlers.forEach((it) => it(this._mode));
     }
   }
 

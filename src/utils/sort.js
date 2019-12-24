@@ -1,4 +1,4 @@
-import { getDaysCount } from './common.js';
+import {getDaysCount} from './common.js';
 
 const SortType = {
   DEFAULT: `default`,
@@ -26,14 +26,14 @@ const SortOptions = {
           continue;
         }
 
-        days.push({ dayDate, dayCounter, dayEvents });
+        days.push({dayDate, dayCounter, dayEvents});
         dayCounter += daysCount;
         dayDate = events[i].start;
         dayEvents = [events[i]];
       }
 
       if (dayEvents.length) {
-        days.push({ dayDate, dayCounter, dayEvents });
+        days.push({dayDate, dayCounter, dayEvents});
       }
 
       return days;
@@ -48,7 +48,7 @@ const SortOptions = {
       const dayDate = ``;
       const dayEvents = events.sort((a, b) => (+b.finish - b.start) - (a.finish - a.start));
 
-      return [{ dayCounter, dayDate, dayEvents }];
+      return [{dayCounter, dayDate, dayEvents}];
     }
   },
 
@@ -60,9 +60,9 @@ const SortOptions = {
       const dayDate = ``;
       const dayEvents = events.sort((a, b) => b.cost - a.cost);
 
-      return [{ dayCounter, dayDate, dayEvents }];
+      return [{dayCounter, dayDate, dayEvents}];
     }
   }
-}
+};
 
-export { SortType, SortOptions }
+export {SortType, SortOptions};

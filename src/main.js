@@ -1,6 +1,5 @@
-import { RenderPosition, renderComponent } from './utils/render.js';
-import { FilterType } from './utils/filter.js';
-import MenuComponent, { menuList } from './components/menu.js';
+import {RenderPosition, renderComponent} from './utils/render.js';
+import MenuComponent, {menuList} from './components/menu.js';
 import generateEventList from './mock/event-data.js';
 import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
@@ -12,7 +11,7 @@ const tripMainElement = document.querySelector(`.trip-main`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 const createEventElement = tripMainElement.querySelector(`.trip-main__event-add-btn`);
-// const 
+// const
 
 const events = new Events(generateEventList());
 
@@ -24,7 +23,7 @@ filterController.render();
 
 const tripController = new TripController(tripEventsElement, events);
 tripController.setModeChangeHandler((mode) => {
-	createEventElement.disabled = mode === TripMode.ADDING;
+  createEventElement.disabled = mode === TripMode.ADDING;
 });
 createEventElement.addEventListener(`click`, tripController.createEvent);
 
