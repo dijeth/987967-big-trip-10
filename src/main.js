@@ -1,4 +1,5 @@
-import { RenderPosition, renderComponent } from './utils/render.js';
+import { RenderPosition, renderComponent, removeComponent } from './utils/render.js';
+import NoPointsComponent from './components/no-points.js';
 import MenuComponent from './components/menu.js';
 import StatisticComponent from './components/stats.js';
 import generateEventList from './mock/event-data.js';
@@ -13,8 +14,8 @@ const tripEventsElement = document.querySelector(`.trip-events`);
 const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 const createEventElement = tripMainElement.querySelector(`.trip-main__event-add-btn`);
 
-const events = new Events([]);
-// const events = new Events(generateEventList());
+// const events = new Events([]);
+const events = new Events(generateEventList());
 
 const tripInfoController = new TripInfoController(tripMainElement, events);
 tripInfoController.render();
@@ -29,6 +30,15 @@ tripController.setModeChangeHandler((mode) => {
 
 const statisticsComponent = new StatisticComponent();
 renderComponent(tripEventsElement, RenderPosition.AFTER_END, statisticsComponent);
+
+const noPointsComponent = new NoPointsComponent();
+tripController.setModeChangeHandler((mode) => {
+  if (mode === TripMode.EMPTY) {
+    renderComponent(tripEventsElement, RenderPosition.BEFORE_END, noPointsComponent);
+  } else {
+  	removeComponent(noPointsComponent)
+  }
+});
 
 const menuComponent = new MenuComponent();
 renderComponent(tripControlElements[0], RenderPosition.AFTER_END, menuComponent);
@@ -46,10 +56,14 @@ menuComponent.setModeChangeHandler((mode) => {
   }
 });
 
-tripController.render();
-statisticsComponent.hide();
-
 createEventElement.addEventListener(`click`, () => {
   menuComponent.setMode(MenuMode.TABLE);
   tripController.createEvent();
 });
+
+tripController.render();
+statisticsComponent.hide();
+
+/*      this._noPointsComponent = new NoPointsComponent();
+      renderComponent(this._container, RenderPosition.BEFORE_END, this._noPointsComponent);
+*/

@@ -2,7 +2,6 @@ import { RenderPosition, renderComponent, replaceComponent, removeComponent } fr
 import { SortOptions, SortType } from '../utils/sort.js';
 import DayListComponent from '../components/day-list.js';
 import SortComponent from '../components/sort.js';
-import NoPointsComponent from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
@@ -58,12 +57,12 @@ export default class TripController {
 
   _renderEvents(events) {
     if (!events.length) {
-      this._noPointsComponent = new NoPointsComponent();
-      renderComponent(this._container, RenderPosition.BEFORE_END, this._noPointsComponent);
+      this._setMode(TripMode.EMPTY);
       this._sortComponent.hide();
       return;
     };
 
+    this._setMode(TripMode.DEFAULT);
     this._sortComponent.show();
 
     this._dayListComponent = new DayListComponent();
@@ -93,11 +92,6 @@ export default class TripController {
 
   render() {
     this._showenEvents = this._eventsModel.get().slice();
-
-    // if (!this._showenEvents.length) {
-    //   renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
-    //   return;
-    // }
 
     this._renderSort(this._activeSortType);
     this._renderEvents(this._showenEvents);
@@ -177,7 +171,7 @@ export default class TripController {
   }
 
   _eventDestroyHandler() {
-    this._setMode(TripMode.DEFAULT);
+    this._setMode(this._showenEvents.length ? TripMode.DEFAULT : TripMode.EMPTY);
   }
 
   _newEventCancelHandler() {
