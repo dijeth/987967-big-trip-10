@@ -39,6 +39,10 @@ export const replaceComponent = (newComponent, oldComponent) => {
 };
 
 export const removeComponent = (component) => {
+  if (!component) {
+    return
+  };
+  
   component.getElement().remove();
   component.removeElement();
 };

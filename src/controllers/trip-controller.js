@@ -1,17 +1,18 @@
-import {RenderPosition, renderComponent, replaceComponent, removeComponent} from '../utils/render.js';
-import {SortOptions, SortType} from '../utils/sort.js';
+import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
+import { SortOptions, SortType } from '../utils/sort.js';
 import DayListComponent from '../components/day-list.js';
 import SortComponent from '../components/sort.js';
-import NoPointsComponent, {NO_POINTS_TEXT} from '../components/no-points.js';
+import NoPointsComponent from '../components/no-points.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
-import {EventMode, EVENT_DEFAULT, TripMode} from '../const.js';
+import { EventMode, EVENT_DEFAULT, TripMode } from '../const.js';
 
 export default class TripController {
   constructor(container, eventsModel) {
     this._container = container;
     this._eventsModel = eventsModel;
+    this._noPointsComponent = null;
     this._sortComponent = null;
     this._dayListComponent = null;
     this._editingEventID = null;
@@ -39,8 +40,8 @@ export default class TripController {
   _renderSort(activeSortType) {
     const sortItems = Object.entries(SortOptions).map((it) => {
       const [type, options] = it;
-      const {name, showDirection} = options;
-      return {type, name, showDirection, checked: type === activeSortType};
+      const { name, showDirection } = options;
+      return { type, name, showDirection, checked: type === activeSortType };
     });
 
     const sortComponent = new SortComponent(sortItems);
@@ -57,8 +58,13 @@ export default class TripController {
 
   _renderEvents(events) {
     if (!events.length) {
+      this._noPointsComponent = new NoPointsComponent();
+      renderComponent(this._container, RenderPosition.BEFORE_END, this._noPointsComponent);
+      this._sortComponent.hide();
       return;
-    }
+    };
+
+    this._sortComponent.show();
 
     this._dayListComponent = new DayListComponent();
     const days = SortOptions[this._activeSortType].sort(this._showenEvents);
@@ -72,6 +78,11 @@ export default class TripController {
     this._eventControllers = [];
 
     removeComponent(this._dayListComponent);
+
+    if (this._noPointsComponent !== null) {
+      removeComponent(this._noPointsComponent);
+      this._noPointsComponent = null;
+    }
   }
 
   _updateEvents(events) {
@@ -83,11 +94,10 @@ export default class TripController {
   render() {
     this._showenEvents = this._eventsModel.get().slice();
 
-    if (!this._showenEvents.length) {
-      renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
-      this._setMode(TripMode.EMPTY);
-      return;
-    }
+    // if (!this._showenEvents.length) {
+    //   renderComponent(this._container, RenderPosition.BEFORE_END, new NoPointsComponent(NO_POINTS_TEXT));
+    //   return;
+    // }
 
     this._renderSort(this._activeSortType);
     this._renderEvents(this._showenEvents);
@@ -97,9 +107,9 @@ export default class TripController {
     const container = this._sortComponent === null ? this._container.children[0] : this._sortComponent.getElement();
 
     const newEvent = new EventController(
-        container,
-        this._dataChangeHandler,
-        this._viewChangeHandler
+      container,
+      this._dataChangeHandler,
+      this._viewChangeHandler
     );
 
     newEvent.setDestroyHandler(this._eventDestroyHandler);

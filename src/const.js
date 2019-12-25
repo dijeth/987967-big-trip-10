@@ -183,8 +183,7 @@ export const EventMode = {
 
 export const TripMode = {
   DEFAULT: `trip-default`,
-  ADDING: `trip-append`,
-  EMPTY: `trip-empty`
+  ADDING: `trip-append`
 };
 
 export const MenuMode = {
