@@ -29,8 +29,8 @@ export const OfferTypeOptions = {
 };
 
 export const MovingType = {
-  MOVING: `moving`,
-  STAYING: `staying`
+  MOVING: `Moving`,
+  STAYING: `Staying`
 };
 
 export const PlaceholderParticle = {

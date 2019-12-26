@@ -50,6 +50,7 @@ menuComponent.setModeChangeHandler((mode) => {
       break;
 
     case MenuMode.STATS:
+      statisticsComponent.rerender(events.get().slice());
       statisticsComponent.show();
       tripController.hide();
       break;
