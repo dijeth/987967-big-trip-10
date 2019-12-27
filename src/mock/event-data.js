@@ -21,7 +21,7 @@ const generateEventData = (startData) => {
 };
 
 const generateEventList = () => {
-  const eventCount = getRandomNumber(7, 0);
+  const eventCount = getRandomNumber(10, 5);
   const eventList = [];
   let startData = new Date();
 

@@ -30,13 +30,15 @@ tripController.setModeChangeHandler((mode) => {
 
 const statisticsComponent = new StatisticComponent();
 renderComponent(tripEventsElement, RenderPosition.AFTER_END, statisticsComponent);
+events.setDataChangeHandler(statisticsComponent.dataChangeHandler);
+statisticsComponent.render(events.get().slice());
 
 const noPointsComponent = new NoPointsComponent();
 tripController.setModeChangeHandler((mode) => {
   if (mode === TripMode.EMPTY) {
     renderComponent(tripEventsElement, RenderPosition.BEFORE_END, noPointsComponent);
   } else {
-  	removeComponent(noPointsComponent)
+    removeComponent(noPointsComponent)
   }
 });
 
@@ -50,9 +52,10 @@ menuComponent.setModeChangeHandler((mode) => {
       break;
 
     case MenuMode.STATS:
-      statisticsComponent.rerender(events.get().slice());
-      statisticsComponent.show();
       tripController.hide();
+      statisticsComponent.show();
+      statisticsComponent.render(events.get().slice());
+
       break;
   }
 });
@@ -64,7 +67,3 @@ createEventElement.addEventListener(`click`, () => {
 
 tripController.render();
 statisticsComponent.hide();
-
-/*      this._noPointsComponent = new NoPointsComponent();
-      renderComponent(this._container, RenderPosition.BEFORE_END, this._noPointsComponent);
-*/
