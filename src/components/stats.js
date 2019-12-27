@@ -4,32 +4,51 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { EventTypeProperties, PlaceholderParticle, MovingType } from '../const.js';
 
-const getChartConfig = (labels, data, title) => {
-  return {
+const BAR_HEIGHT = 50;
+const MIN_HEIGHT = 3;
 
+const getChartConfig = (labels, data, title, generatorLabel) => {
+  return {
+    maintainAspectRatio: false,
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
       labels: labels,
       datasets: [{
-        label: 'MONEY',
         data: data,
         backgroundColor: `#ffffff`
       }]
     },
+
     options: {
+      layout: {
+        padding: {
+          left: 35,
+          right: 0,
+          top: 0,
+          bottom: 0
+        }
+      },
+
+      tooltips: {
+        enabled: false
+      },
+
       legend: {
         display: false
       },
 
       plugins: {
         datalabels: {
+          formatter: function(value, context) {
+            return generatorLabel(value)
+          },
           font: {
             size: 15
           },
           color: `#000000`,
           anchor: `end`,
-          offset: 20,
+          offset: 10,
           align: `left`
         }
       },
@@ -48,6 +67,9 @@ const getChartConfig = (labels, data, title) => {
 
         yAxes: [{
           scaleLabel: {
+            padding: {
+              bottom: 80
+            },
             labelString: title,
             display: true,
             fontSize: 20,
@@ -56,7 +78,7 @@ const getChartConfig = (labels, data, title) => {
 
           ticks: {
             beginAtZero: true,
-            padding: 10,
+            padding: 20,
             fontSize: 15,
             fontColor: `#000000`,
           },
@@ -146,7 +168,7 @@ class StatisticsComponent extends AbstractSmartComponent {
 
     this._moneyChart = null;
     this._transportChart = null;
-    this._timeSpendChart = null;
+    this._timeSpentChart = null;
 
     this.needRerender = true;
     this.dataChangeHandler = this.dataChangeHandler.bind(this);
@@ -182,30 +204,57 @@ class StatisticsComponent extends AbstractSmartComponent {
 
     this._resetCharts();
 
-    this._timeSpendData = getTimeSpendData(eventList);
+    this._timeSpentData = getTimeSpendData(eventList);
     this._moneyData = getMoneyData(eventList);
     this._transportData = getTransportData(eventList);
 
     this._moneyChart = this._renderMoneyChart();
     this._transportChart = this._renderTransportChart();
-    this._timeSpendChart = this._renderTimeSpendChart();
+    this._timeSpentChart = this._renderTimeSpendChart();
 
     this.needRerender = false;
   }
 
   _renderMoneyChart() {
     const moneyCanvas = this.getElement().querySelector(`.statistics__chart--money`);
-    return new Chart(moneyCanvas.getContext('2d'), getChartConfig(this._moneyData.labels, this._moneyData.data, `MONEY`));
+    moneyCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._moneyData.data.length? MIN_HEIGHT : this._moneyData.data.length);
+
+
+    return new Chart(
+      moneyCanvas.getContext('2d'), 
+      getChartConfig(
+        this._moneyData.labels, 
+        this._moneyData.data, 
+        `MONEY`,
+        (value) => `€ ${value}`));
   }
 
   _renderTransportChart() {
     const transportCanvas = this.getElement().querySelector(`.statistics__chart--transport`);
-    return new Chart(transportCanvas.getContext('2d'), getChartConfig(this._transportData.labels, this._transportData.data, `TRANSPORT`));
+    transportCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._transportData.data.length? MIN_HEIGHT : this._transportData.data.length);
+
+
+    return new Chart(
+      transportCanvas.getContext('2d'), 
+      getChartConfig(
+        this._transportData.labels, 
+        this._transportData.data, 
+        `TRANSPORT`,
+        (value) => `x${value}`));
   }
 
   _renderTimeSpendChart() {
-    const timeSpendCanvas = this.getElement().querySelector(`.statistics__chart--time`);
-    return new Chart(timeSpendCanvas.getContext('2d'), getChartConfig(this._timeSpendData.labels, this._timeSpendData.data, `TIME SPEND`));
+    const timeSpentCanvas = this.getElement().querySelector(`.statistics__chart--time`);
+    timeSpentCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._timeSpentData.data.length? MIN_HEIGHT : this._timeSpentData.data.length);
+
+
+    return new Chart(
+      timeSpentCanvas.getContext('2d'), 
+      getChartConfig(
+        this._timeSpentData.labels, 
+        this._timeSpentData.data, 
+        `TIME SPEND`,
+        (value) => `${value}H`));
   }
 
   _resetCharts() {
@@ -219,9 +268,9 @@ class StatisticsComponent extends AbstractSmartComponent {
       this._transportChart = null;
     };
 
-    if (this._timeSpendChart) {
-      this._timeSpendChart.destroy();
-      this._timeSpendChart = null;
+    if (this._timeSpentChart) {
+      this._timeSpentChart.destroy();
+      this._timeSpentChart = null;
     };
   }
 
