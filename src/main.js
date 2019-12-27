@@ -49,10 +49,12 @@ menuComponent.setModeChangeHandler((mode) => {
     case MenuMode.TABLE:
       statisticsComponent.hide();
       tripController.show();
+      filterController.show()
       break;
 
     case MenuMode.STATS:
       tripController.hide();
+      filterController.hide()
       statisticsComponent.show();
       statisticsComponent.render(events.get().slice());
 
