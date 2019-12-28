@@ -1,7 +1,8 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {DestinationOptions} from '../mock/destination-data.js';
-import {generateOfferList} from '../mock/offer-data.js';
-import {EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import { DestinationOptions } from '../mock/destination-data.js';
+import { generateOfferList } from '../mock/offer-data.js';
+import { EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions } from '../const.js';
+import { getDataRange, getDateTime } from '../utils/common.js';
 import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
 
@@ -173,9 +174,10 @@ const createForm = (eventItem) => {
 };
 
 export default class EventEditComponent extends AbstractSmartComponent {
-  constructor(eventItem) {
+  constructor(eventItem, disabledRanges) {
     super();
     this._eventItem = eventItem;
+    this._disabledRanges = disabledRanges ? disabledRanges : [];
     this._copyData = Object.assign({}, eventItem);
 
     this._startFlatpickr = null;
@@ -222,38 +224,38 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   setRollupButtonClickHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__rollup-btn`),
-        `_rollupButtonClickHandler`,
-        `click`
+      handler,
+      this.getElement().querySelector(`.event__rollup-btn`),
+      `_rollupButtonClickHandler`,
+      `click`
     );
   }
 
   setSubmitHandler(handler) {
     const form = this.getElement().tagName === `FORM` ? this.getElement() : this.getElement().querySelector(`form`);
     this._setHandler(
-        handler,
-        form,
-        `_submitHandler`,
-        `submit`
+      handler,
+      form,
+      `_submitHandler`,
+      `submit`
     );
   }
 
   setInputFavoriteChangeHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__favorite-checkbox`),
-        `_inputFavoriteChangeHandler`,
-        `change`
+      handler,
+      this.getElement().querySelector(`.event__favorite-checkbox`),
+      `_inputFavoriteChangeHandler`,
+      `change`
     );
   }
 
   setDeleteButtonClickHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__reset-btn`),
-        `_deleteButtonClickHandler`,
-        `click`
+      handler,
+      this.getElement().querySelector(`.event__reset-btn`),
+      `_deleteButtonClickHandler`,
+      `click`
     );
   }
 
@@ -270,12 +272,48 @@ export default class EventEditComponent extends AbstractSmartComponent {
       this.rerender();
     });
 
-    element.querySelector(`#event-start-time`).addEventListener(`change`, () => {
-      this._eventItem.start = this._startFlatpickr.selectedDates[0];
+    element.querySelector(`#event-start-time`).addEventListener(`change`, (evt) => {
+      const start = this._startFlatpickr.selectedDates[0];
+      const dataRange = getDataRange(start, this._disabledRanges);
+      let message = [];
+
+      if (dataRange) {
+        message.push(`Введенная дата начала события уже занята, введите дату после ${getDateTime(dataRange.finish)} или до ${getDateTime(dataRange.start)}`)
+      };
+
+      if (this._eventItem.finish && (+start > +this._eventItem.finish)) {
+        message.push(`Введенная дата начала события должна быть меньше даты окончания события`)
+      };
+
+      if (!message.length) {
+        this._eventItem.start = this._startFlatpickr.selectedDates[0];
+      } else {
+        alert(message.join(`\n`));
+        this.rerender()
+      };
+
+      // evt.target.setCustomValidity(message.join(`\n`));
     });
 
     element.querySelector(`#event-end-time`).addEventListener(`change`, () => {
-      this._eventItem.finish = this._finishFlatpickr.selectedDates[0];
+      const finish = this._finishFlatpickr.selectedDates[0];
+      const dataRange = getDataRange(finish, this._disabledRanges);
+      let message = [];
+
+      if (dataRange) {
+        message.push(`Введенная дата окончания события уже занята, введите дату после ${getDateTime(dataRange.finish)} или до ${getDateTime(dataRange.start)}`)
+      };
+
+      if (this._eventItem.start && (+finish < +this._eventItem.start)) {
+        message.push(`Введенная дата окончания события должна быть больше даты начала события`)
+      };
+
+      if (!message.length) {
+        this._eventItem.finish = this._finishFlatpickr.selectedDates[0];
+      } else {
+        alert(message.join(`\n`));
+        this.rerender()
+      };
     });
 
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
@@ -291,10 +329,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
       const cost = +evt.target.value;
 
       switch (true) {
-        case isNaN(cost): 
+        case isNaN(cost):
           evt.target.setCustomValidity(`Значение стоимости должно быть числом`);
           break;
-        case Math.round(cost) !== cost: 
+        case Math.round(cost) !== cost:
           evt.target.setCustomValidity(`Значение стоимости должно быть целым числом`);
           break;
         default:

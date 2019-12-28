@@ -1,4 +1,5 @@
 import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
+import { flatDataRanges } from '../utils/common.js';
 import { SortOptions, SortType } from '../utils/sort.js';
 import DayListComponent from '../components/day-list.js';
 import SortComponent from '../components/sort.js';
@@ -21,6 +22,7 @@ export default class TripController {
 
     this._eventControllers = [];
     this._showenEvents = [];
+    this._disabledRanges = [];
     this._modeChangeHandlers = [];
 
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
@@ -92,6 +94,7 @@ export default class TripController {
 
   render() {
     this._showenEvents = this._eventsModel.get().slice();
+    this._disabledRanges = this._getDisabledRangers(this._eventsModel.get());
 
     this._renderSort(this._activeSortType);
     this._renderEvents(this._showenEvents);
@@ -103,7 +106,8 @@ export default class TripController {
     const newEvent = new EventController(
       container,
       this._dataChangeHandler,
-      this._viewChangeHandler
+      this._viewChangeHandler,
+      this._disabledRanges
     );
 
     newEvent.setDestroyHandler(this._eventDestroyHandler);
@@ -119,7 +123,7 @@ export default class TripController {
   _renderDayEvents(container, eventList) {
     return eventList.map((it) => {
       const mode = this._editingEventID !== null && it.id === this._editingEventID ? TripMode.EDITING : TripMode.DEFAULT;
-      return new EventController(container, this._dataChangeHandler, this._viewChangeHandler).render(it, mode);
+      return new EventController(container, this._dataChangeHandler, this._viewChangeHandler, this._disabledRanges).render(it, mode);
     });
   }
 
@@ -167,6 +171,7 @@ export default class TripController {
 
   _modelDataChangeHandler() {
     this._showenEvents = this._eventsModel.getFiltered().slice();
+    this._disabledRanges = this._getDisabledRangers(this._eventsModel.get());
     this._updateEvents(this._showenEvents);
   }
 
@@ -184,6 +189,15 @@ export default class TripController {
       this._mode = mode;
       this._modeChangeHandlers.forEach((it) => it(this._mode));
     }
+  }
+
+  _getDisabledRangers(eventList) {
+    return flatDataRanges(eventList.map((it) => {
+      return {
+        start: it.start,
+        finish: it.finish
+      }
+    }))
   }
 
   setModeChangeHandler(handler) {

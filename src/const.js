@@ -191,3 +191,5 @@ export const MenuMode = {
   TABLE: `table`,
   STATS: `stats`
 };
+
+export const MIN_EVENT_DURATION = TimeValue.HOUR;
