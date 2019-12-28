@@ -289,7 +289,18 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
     element.querySelector(`.event__input--price`).addEventListener(`change`, (evt) => {
       const cost = +evt.target.value;
-      this._eventItem.cost = isNaN(cost) ? 0 : cost;
+
+      switch (true) {
+        case isNaN(cost): 
+          evt.target.setCustomValidity(`Значение стоимости должно быть числом`);
+          break;
+        case Math.round(cost) !== cost: 
+          evt.target.setCustomValidity(`Значение стоимости должно быть целым числом`);
+          break;
+        default:
+          evt.target.setCustomValidity(``);
+          this._eventItem.cost = cost;
+      }
     });
 
     const offersElement = element.querySelector(`.event__available-offers`);
