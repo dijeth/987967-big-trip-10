@@ -35,6 +35,12 @@ const generateEventList = () => {
     eventList.push(eventData);
   }
 
+console.dir(JSON.stringify(eventList.map((it) => {
+  it.start = +it.start;
+  it.finish = +it.finish;
+  return it
+})));
+
   return eventList;
 };
 

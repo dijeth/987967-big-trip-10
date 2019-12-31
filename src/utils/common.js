@@ -59,13 +59,13 @@ export const getDataRange = (data, ranges) => {
 }
 
 export const flatDataRanges = (ranges) => {
-  let sortedRanges = ranges.slice().sort((a, b) => +a.start - b.start);
+  let sortedRanges = ranges.slice().sort((a, b) => +a.from - b.from);
   let range = sortedRanges[0];
   const flatedRanges = [];
 
   for (let i = 1; i < sortedRanges.length; i++) {
-    if (+sortedRanges[i].start - range.finish < MIN_EVENT_DURATION) {
-      range.finish = sortedRanges[i].finish
+    if (+sortedRanges[i].from - range.to < MIN_EVENT_DURATION) {
+      range.to = sortedRanges[i].to
     } else {
       flatedRanges.push(range);
       range = sortedRanges[i]

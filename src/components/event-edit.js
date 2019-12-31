@@ -5,6 +5,8 @@ import { EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferT
 import { getDataRange, getDateTime } from '../utils/common.js';
 import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
+import MinMaxTimePlugin from '../../node_modules/flatpickr/dist/plugins/MinMaxTimePlugin.js';
+import moment from 'moment';
 
 const createEventTypeItem = (eventType) => {
   const eventTypeCode = eventType.toLowerCase();
@@ -177,6 +179,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
   constructor(eventItem, disabledRanges) {
     super();
     this._eventItem = eventItem;
+    this._limitTimes = disabledRanges ? this._getLimitTimes(disabledRanges) : {};
+    this._disabledDates = disabledRanges ? this._getDisabledDates(disabledRanges) : [];
     this._disabledRanges = disabledRanges ? disabledRanges : [];
     this._copyData = Object.assign({}, eventItem);
 
@@ -206,19 +210,30 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   _configFlatpickr() {
-
     this._startFlatpickr = flatpickr(this.getElement().querySelector(`#event-start-time`), {
       dateFormat: `y/m/d H:i`,
       enableTime: true,
       [`time_24hr`]: true,
-      defaultDate: this._eventItem.start
+      defaultDate: this._eventItem.start,
+      disable: this._disabledDates,
+      plugins: [
+        new MinMaxTimePlugin({
+          table: this._limitTimes
+        })
+      ]
     });
 
     this._finishFlatpickr = flatpickr(this.getElement().querySelector(`#event-end-time`), {
       dateFormat: `y/m/d H:i`,
       enableTime: true,
       [`time_24hr`]: true,
-      defaultDate: this._eventItem.finish
+      defaultDate: this._eventItem.finish,
+      disable: this._disabledDates,
+      plugins: [
+        new MinMaxTimePlugin({
+          table: this._limitTimes
+        })
+      ]
     });
   }
 
@@ -273,47 +288,25 @@ export default class EventEditComponent extends AbstractSmartComponent {
     });
 
     element.querySelector(`#event-start-time`).addEventListener(`change`, (evt) => {
-      const start = this._startFlatpickr.selectedDates[0];
-      const dataRange = getDataRange(start, this._disabledRanges);
-      let message = [];
+      this._eventItem.start = this._startFlatpickr.selectedDates[0];
 
-      if (dataRange) {
-        message.push(`Введенная дата начала события уже занята, введите дату после ${getDateTime(dataRange.finish)} или до ${getDateTime(dataRange.start)}`)
-      };
+      debugger;
 
-      if (this._eventItem.finish && (+start > +this._eventItem.finish)) {
-        message.push(`Введенная дата начала события должна быть меньше даты окончания события`)
-      };
+      const finish = this._disabledRanges.slice().sort(
+        (a, b) => {
+          return (+a.from - this._eventItem.start) - (+b.from - this._eventItem.start)
+        }).filter((it) => +it.from - this._eventItem.start >= 0)[0].from;
 
-      if (!message.length) {
-        this._eventItem.start = this._startFlatpickr.selectedDates[0];
-      } else {
-        alert(message.join(`\n`));
-        this.rerender()
-      };
+      this._finishFlatpickr.config.enable = [{
+        from: this._eventItem.start,
+        to: finish
+      }];
 
-      // evt.target.setCustomValidity(message.join(`\n`));
+      console.log(this._finishFlatpickr.config.enable);
     });
 
     element.querySelector(`#event-end-time`).addEventListener(`change`, () => {
-      const finish = this._finishFlatpickr.selectedDates[0];
-      const dataRange = getDataRange(finish, this._disabledRanges);
-      let message = [];
-
-      if (dataRange) {
-        message.push(`Введенная дата окончания события уже занята, введите дату после ${getDateTime(dataRange.finish)} или до ${getDateTime(dataRange.start)}`)
-      };
-
-      if (this._eventItem.start && (+finish < +this._eventItem.start)) {
-        message.push(`Введенная дата окончания события должна быть больше даты начала события`)
-      };
-
-      if (!message.length) {
-        this._eventItem.finish = this._finishFlatpickr.selectedDates[0];
-      } else {
-        alert(message.join(`\n`));
-        this.rerender()
-      };
+      this._eventItem.finish = this._finishFlatpickr.selectedDates[0];
     });
 
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
@@ -353,6 +346,42 @@ export default class EventEditComponent extends AbstractSmartComponent {
     }
   }
 
+  _getDisabledDates(disabledRanges) {
+    const disabledDates = [];
+
+    disabledRanges.forEach((it) => {
+      const start = moment(it.from).add(1, `days`).toDate();
+      const finish = moment(it.to).subtract(1, `days`).toDate();
+
+      if (+finish >= +start) {
+        disabledDates.push({
+          from: moment(start).startOf(`day`).toDate(),
+          to: moment(finish).endOf(`day`).toDate()
+        })
+      }
+    });
+
+    return disabledDates;
+  }
+
+  _getLimitTimes(disabledRanges) {
+    const limitTimes = {};
+
+    disabledRanges.forEach((it) => {
+      limitTimes[moment(it.from).format(`YYYY-MM-DD`)] = {
+        minTime: `00:00`,
+        maxTime: moment(it.from).format(`hh:mm`)
+      };
+
+      limitTimes[moment(it.to).format(`YYYY-MM-DD`)] = {
+        minTime: moment(it.to).format(`hh:mm`),
+        maxTime: `23:59`
+      };
+    });
+
+    return limitTimes;
+  }
+
   recoveryListeners() {
     this._addListeners();
     this._configFlatpickr();
@@ -379,5 +408,60 @@ export default class EventEditComponent extends AbstractSmartComponent {
   reset() {
     this._eventItem = Object.assign({}, this._copyData);
     this.rerender();
+  }
+
+  getStartValidity(value) {
+    if (value === null) {
+      return `Необходимо ввести дату начала события`
+    }
+
+    if (getDataRange(value, this._disabledRanges)) {
+      return `Событие может начинаться после окончения предыдущего события`
+    };
+
+    if (this._eventItem.finish && (+value > +this._eventItem.finish)) {
+      return `Дата начала события должна быть меньше даты окончания события`
+    };
+
+    // if ()
+
+    return ``
+  }
+
+  getFinishValidity(value) {
+    if (value === null) {
+      return `Необходимо ввести дату окончания события`
+    }
+
+    if (getDataRange(value, this._disabledRanges)) {
+      return `Событие должно оканчиваться до начала следующего события`
+    };
+
+    // if ()
+
+    return ``
+  }
+
+  getCostValidity(value) {
+    switch (true) {
+      case isNaN(value):
+        return `Значение стоимости должно быть числом`;
+        break;
+
+      case Math.round(value) !== value:
+        return `Значение стоимости должно быть целым числом`;
+        break;
+
+      default:
+        return ``;
+    }
+  }
+
+  getDestinationValidity(value) {
+    if (value === ``) {
+      return `Необходимо выбрать место назначения`
+    };
+
+    return ``;
   }
 }
