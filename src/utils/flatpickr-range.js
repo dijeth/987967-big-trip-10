@@ -52,6 +52,10 @@ export default class FlatpickrRange {
     return this._finishFlatpickr.selectedDates[0];
   }
 
+  _rerenderStart(inputStart) {
+
+  }
+
   rerender(inputStart, inputFinish) {
     this._startFlatpickr.destroy();
     this._finishFlatpickr.destroy();
@@ -60,7 +64,7 @@ export default class FlatpickrRange {
     this._inputFinish = inputFinish;
 
     switch (this._changedInput) {
-      case  null:
+      case null:
         this._startFlatpickr = this._createFlatpickr(
           this._inputStart,
           this._dateStart,
@@ -237,32 +241,34 @@ export default class FlatpickrRange {
   }
 
   _finishFlatpickrChangeHandler(dates) {
-    if (!this._changedInput) {
-      this._changedInput = FlatpickrType.FINISH
-    };
+    switch (this._changedInput) {
+      case null:
+        this._changedInput = FlatpickrType.FINISH
+        break;
+
+      case FlatpickrType.START:
+        this._changedInput = null
+        break;
+    }
 
     this._dateFinish = dates[0];
 
-    const disabledRanges = this._getRangeByFinish();
-    const disabledDates = this._getDisabledDates(disabledRanges);
-    const limitTimes = this._getLimitTimes(disabledRanges);
-
-    this._startFlatpickr.destroy();
-    this._startFlatpickr = this._createFlatpickr(this._inputStart, this._dateStart, disabledDates, limitTimes, this._startFlatpickrChangeHandler);
+    this.rerender(this._inputStart, this._inputFinish);
   }
 
   _startFlatpickrChangeHandler(dates) {
-    if (!this._changedInput) {
-      this._changedInput = FlatpickrType.START
-    };
+    switch (this._changedInput) {
+      case null:
+        this._changedInput = FlatpickrType.START
+        break;
+
+      case FlatpickrType.FINISH:
+        this._changedInput = null
+        break;
+    }
 
     this._dateStart = dates[0];
 
-    const disabledRanges = this._getRangeByStart();
-    const disabledDates = this._getDisabledDates(disabledRanges);
-    const limitTimes = this._getLimitTimes(disabledRanges);
-
-    this._finishFlatpickr.destroy();
-    this._finishFlatpickr = this._createFlatpickr(this._inputFinish, this._dateFinish, disabledDates, limitTimes, this._finishFlatpickrChangeHandler);
+    this.rerender(this._inputStart, this._inputFinish);
   }
 }
