@@ -3,10 +3,7 @@ import { DestinationOptions } from '../mock/destination-data.js';
 import { generateOfferList } from '../mock/offer-data.js';
 import { EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions } from '../const.js';
 import { getDataRange, getDateTime } from '../utils/common.js';
-import '../../node_modules/flatpickr/dist/flatpickr.css';
-import flatpickr from 'flatpickr';
-import MinMaxTimePlugin from '../../node_modules/flatpickr/dist/plugins/MinMaxTimePlugin.js';
-import moment from 'moment';
+import FlatpickrRange from '../utils/flatpickr-range.js';
 
 const createEventTypeItem = (eventType) => {
   const eventTypeCode = eventType.toLowerCase();
@@ -179,16 +176,17 @@ export default class EventEditComponent extends AbstractSmartComponent {
   constructor(eventItem, disabledRanges) {
     super();
     this._eventItem = eventItem;
-    this._limitTimes = disabledRanges ? this._getLimitTimes(disabledRanges) : {};
-    this._disabledDates = disabledRanges ? this._getDisabledDates(disabledRanges) : [];
-    this._disabledRanges = disabledRanges ? disabledRanges : [];
     this._copyData = Object.assign({}, eventItem);
 
-    this._startFlatpickr = null;
-    this._finishFlatpickr = null;
-
     this._addListeners();
-    this._configFlatpickr();
+
+    this._flatpickrRange = new FlatpickrRange(
+      this.getElement().querySelector(`#event-start-time`),
+      this.getElement().querySelector(`#event-end-time`),
+      this._eventItem.start,
+      this._eventItem.finish,
+      disabledRanges
+    );
   }
 
   getTemplate() {
@@ -207,34 +205,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
     if (this[handlerKeeperName]) {
       element.addEventListener(eventName, this[handlerKeeperName]);
     }
-  }
-
-  _configFlatpickr() {
-    this._startFlatpickr = flatpickr(this.getElement().querySelector(`#event-start-time`), {
-      dateFormat: `y/m/d H:i`,
-      enableTime: true,
-      [`time_24hr`]: true,
-      defaultDate: this._eventItem.start,
-      disable: this._disabledDates,
-      plugins: [
-        new MinMaxTimePlugin({
-          table: this._limitTimes
-        })
-      ]
-    });
-
-    this._finishFlatpickr = flatpickr(this.getElement().querySelector(`#event-end-time`), {
-      dateFormat: `y/m/d H:i`,
-      enableTime: true,
-      [`time_24hr`]: true,
-      defaultDate: this._eventItem.finish,
-      disable: this._disabledDates,
-      plugins: [
-        new MinMaxTimePlugin({
-          table: this._limitTimes
-        })
-      ]
-    });
   }
 
   setRollupButtonClickHandler(handler) {
@@ -287,26 +257,14 @@ export default class EventEditComponent extends AbstractSmartComponent {
       this.rerender();
     });
 
-    element.querySelector(`#event-start-time`).addEventListener(`change`, (evt) => {
-      this._eventItem.start = this._startFlatpickr.selectedDates[0];
-
-      debugger;
-
-      const finish = this._disabledRanges.slice().sort(
-        (a, b) => {
-          return (+a.from - this._eventItem.start) - (+b.from - this._eventItem.start)
-        }).filter((it) => +it.from - this._eventItem.start >= 0)[0].from;
-
-      this._finishFlatpickr.config.enable = [{
-        from: this._eventItem.start,
-        to: finish
-      }];
-
-      console.log(this._finishFlatpickr.config.enable);
+    element.querySelector(`#event-start-time`).addEventListener(`change`, () => {
+      this._eventItem.start = this._flatpickrRange.getStartDate();
+      console.log(this._eventItem.start);
     });
 
     element.querySelector(`#event-end-time`).addEventListener(`change`, () => {
-      this._eventItem.finish = this._finishFlatpickr.selectedDates[0];
+      this._eventItem.finish = this._flatpickrRange.getFinishDate();
+      console.log(this._eventItem.finish);
     });
 
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
@@ -346,45 +304,12 @@ export default class EventEditComponent extends AbstractSmartComponent {
     }
   }
 
-  _getDisabledDates(disabledRanges) {
-    const disabledDates = [];
-
-    disabledRanges.forEach((it) => {
-      const start = moment(it.from).add(1, `days`).toDate();
-      const finish = moment(it.to).subtract(1, `days`).toDate();
-
-      if (+finish >= +start) {
-        disabledDates.push({
-          from: moment(start).startOf(`day`).toDate(),
-          to: moment(finish).endOf(`day`).toDate()
-        })
-      }
-    });
-
-    return disabledDates;
-  }
-
-  _getLimitTimes(disabledRanges) {
-    const limitTimes = {};
-
-    disabledRanges.forEach((it) => {
-      limitTimes[moment(it.from).format(`YYYY-MM-DD`)] = {
-        minTime: `00:00`,
-        maxTime: moment(it.from).format(`hh:mm`)
-      };
-
-      limitTimes[moment(it.to).format(`YYYY-MM-DD`)] = {
-        minTime: moment(it.to).format(`hh:mm`),
-        maxTime: `23:59`
-      };
-    });
-
-    return limitTimes;
-  }
-
   recoveryListeners() {
     this._addListeners();
-    this._configFlatpickr();
+    this._flatpickrRange.rerender(
+      this.getElement().querySelector(`#event-start-time`),
+      this.getElement().querySelector(`#event-end-time`),
+    );
 
     this.setRollupButtonClickHandler();
     this.setSubmitHandler();
