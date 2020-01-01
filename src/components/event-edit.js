@@ -259,12 +259,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
     element.querySelector(`#event-start-time`).addEventListener(`change`, () => {
       this._eventItem.start = this._flatpickrRange.getStartDate();
-      console.log(this._eventItem.start);
     });
 
     element.querySelector(`#event-end-time`).addEventListener(`change`, () => {
       this._eventItem.finish = this._flatpickrRange.getFinishDate();
-      console.log(this._eventItem.finish);
     });
 
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
