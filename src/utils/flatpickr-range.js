@@ -57,6 +57,9 @@ export default class FlatpickrRange {
   }
 
   rerender(inputStart, inputFinish) {
+  	inputStart = inputStart || this._inputStart;
+  	inputFinish = inputFinish || this._inputFinish;
+
     this._rerenderStart(inputStart);
     this._rerenderFinish(inputFinish);
   }
@@ -121,7 +124,7 @@ export default class FlatpickrRange {
       [`time_24hr`]: true,
       defaultDate: defaultDate,
       disable: disabledDates,
-      onChange: changeHandler,
+      onClose: changeHandler,
       plugins: [
         new MinMaxTimePlugin({
           table: limitTimes
@@ -173,8 +176,7 @@ export default class FlatpickrRange {
   }
 
   _finishFlatpickrChangeHandler(dates) {
-  	debugger;
-  	
+
     switch (this._flatpickrMode) {
       case FlatpickrMode.DEFAULT:
         this._flatpickrMode = FlatpickrMode.FINISH
@@ -191,8 +193,7 @@ export default class FlatpickrRange {
   }
 
   _startFlatpickrChangeHandler(dates) {
-  	debugger;
-  	
+
     switch (this._flatpickrMode) {
       case FlatpickrMode.DEFAULT:
         this._flatpickrMode = FlatpickrMode.START
@@ -280,6 +281,57 @@ export default class FlatpickrRange {
 
         break;
     }
+  }
+
+  _setRange() {
+  	debugger;
+
+  	let disabledRanges;
+  	let disabledDates;
+  	let limitTimes;
+
+    switch (this._flatpickrMode) {
+      case FlatpickrMode.DEFAULT:
+
+        this._startFlatpickr.config.disable = this._disabledDates;
+        this._startFlatpickr.config.plugins = [new MinMaxTimePlugin({table: this._limitTimes})];
+
+        this._finishFlatpickr.config.disable = this._disabledDates;
+        this._finishFlatpickr.config.plugins = [new MinMaxTimePlugin({table: this._limitTimes})];
+
+        break;
+
+      case FlatpickrMode.FINISH:
+
+        disabledRanges = this._getRangeByFinish();
+        disabledDates = this._getDisabledDates(disabledRanges)
+        limitTimes = this._getLimitTimes(disabledRanges);
+
+        this._startFlatpickr.config.disable = disabledDates;
+        this._startFlatpickr.config.plugins = [new MinMaxTimePlugin({table: limitTimes})];
+
+        this._finishFlatpickr.config.disable = this._disabledDates;
+        this._finishFlatpickr.config.plugins = [new MinMaxTimePlugin({table: this._limitTimes})];
+
+      	break;
+
+      case FlatpickrMode.START:
+
+        this._startFlatpickr.config.disable = this._disabledDates;
+        this._startFlatpickr.config.plugins = [new MinMaxTimePlugin({table: this._limitTimes})];
+
+        disabledRanges = this._getRangeByStart();
+        disabledDates = this._getDisabledDates(disabledRanges)
+        limitTimes = this._getLimitTimes(disabledRanges);
+
+        this._finishFlatpickr.config.disable = disabledDates;
+        this._finishFlatpickr.config.plugins = [new MinMaxTimePlugin({table: limitTimes})];
+
+        break;
+    };
+
+    this._startFlatpickr.redraw();
+    this._finishFlatpickr.redraw();
   }
 
 }
