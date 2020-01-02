@@ -22,8 +22,8 @@ export default class FlatpickrRange {
     this._dateStart = dateStart;
     this._dateFinish = dateFinish;
 
-    this._finishFlatpickrChangeHandler = this._finishFlatpickrChangeHandler.bind(this);
-    this._startFlatpickrChangeHandler = this._startFlatpickrChangeHandler.bind(this);
+    this._finishFlatpickrCloseHandler = this._finishFlatpickrCloseHandler.bind(this);
+    this._startFlatpickrCloseHandler = this._startFlatpickrCloseHandler.bind(this);
 
     this._disabledRanges = disabledRanges ? disabledRanges : [];
     this._limitTimes = disabledRanges ? this._getLimitTimes(disabledRanges) : {};
@@ -34,7 +34,7 @@ export default class FlatpickrRange {
       this._dateStart,
       this._disabledDates,
       this._limitTimes,
-      this._startFlatpickrChangeHandler
+      this._startFlatpickrCloseHandler
     );
 
     this._finishFlatpickr = this._createFlatpickr(
@@ -42,7 +42,7 @@ export default class FlatpickrRange {
       this._dateFinish,
       this._disabledDates,
       this._limitTimes,
-      this._finishFlatpickrChangeHandler
+      this._finishFlatpickrCloseHandler
     );
 
     this._flatpickrMode = FlatpickrMode.DEFAULT;
@@ -117,14 +117,14 @@ export default class FlatpickrRange {
     return limitTimes;
   }
 
-  _createFlatpickr(inputElement, defaultDate, disabledDates, limitTimes, changeHandler) {
+  _createFlatpickr(inputElement, defaultDate, disabledDates, limitTimes, closeHandler) {
     const config = {
       dateFormat: `y/m/d H:i`,
       enableTime: true,
       [`time_24hr`]: true,
       defaultDate: defaultDate,
       disable: disabledDates,
-      onClose: changeHandler,
+      onClose: closeHandler,
       plugins: [
         new MinMaxTimePlugin({
           table: limitTimes
@@ -175,7 +175,7 @@ export default class FlatpickrRange {
     return disabledRanges;
   }
 
-  _finishFlatpickrChangeHandler(dates) {
+  _finishFlatpickrCloseHandler(dates) {
 
     switch (this._flatpickrMode) {
       case FlatpickrMode.DEFAULT:
@@ -192,7 +192,7 @@ export default class FlatpickrRange {
     this._rerenderStart(this._inputStart);
   }
 
-  _startFlatpickrChangeHandler(dates) {
+  _startFlatpickrCloseHandler(dates) {
 
     switch (this._flatpickrMode) {
       case FlatpickrMode.DEFAULT:
@@ -222,7 +222,7 @@ export default class FlatpickrRange {
           this._dateStart,
           this._disabledDates,
           this._limitTimes,
-          this._startFlatpickrChangeHandler
+          this._startFlatpickrCloseHandler
         );
 
         break;
@@ -239,7 +239,7 @@ export default class FlatpickrRange {
           this._dateStart,
           finishDisabledDates,
           finishLimitTimes,
-          this._startFlatpickrChangeHandler
+          this._startFlatpickrCloseHandler
         );
 
         break;
@@ -259,7 +259,7 @@ export default class FlatpickrRange {
           this._dateFinish,
           this._disabledDates,
           this._limitTimes,
-          this._finishFlatpickrChangeHandler
+          this._finishFlatpickrCloseHandler
         );
 
         break;
@@ -276,7 +276,7 @@ export default class FlatpickrRange {
           this._dateFinish,
           startDisabledDates,
           startLimitTimes,
-          this._finishFlatpickrChangeHandler
+          this._finishFlatpickrCloseHandler
         );
 
         break;

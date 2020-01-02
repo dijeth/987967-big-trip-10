@@ -1,7 +1,7 @@
 import {getDaysCount} from './common.js';
 
 const SortType = {
-  DEFAULT: `default`,
+  DEFAULT: `event`,
   TIME: `time`,
   PRICE: `price`
 };
