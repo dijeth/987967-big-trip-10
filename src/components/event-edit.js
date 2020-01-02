@@ -1,8 +1,8 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import { DestinationOptions } from '../mock/destination-data.js';
-import { generateOfferList } from '../mock/offer-data.js';
-import { EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions } from '../const.js';
-import { getDataRange, getDateTime } from '../utils/common.js';
+import {DestinationOptions} from '../mock/destination-data.js';
+import {generateOfferList} from '../mock/offer-data.js';
+import {EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import {getDataRange} from '../utils/common.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 
 const createEventTypeItem = (eventType) => {
@@ -181,11 +181,11 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._addListeners();
 
     this._flatpickrRange = new FlatpickrRange(
-      this.getElement().querySelector(`#event-start-time`),
-      this.getElement().querySelector(`#event-end-time`),
-      this._eventItem.start,
-      this._eventItem.finish,
-      disabledRanges
+        this.getElement().querySelector(`#event-start-time`),
+        this.getElement().querySelector(`#event-end-time`),
+        this._eventItem.start,
+        this._eventItem.finish,
+        disabledRanges
     );
   }
 
@@ -209,38 +209,38 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   setRollupButtonClickHandler(handler) {
     this._setHandler(
-      handler,
-      this.getElement().querySelector(`.event__rollup-btn`),
-      `_rollupButtonClickHandler`,
-      `click`
+        handler,
+        this.getElement().querySelector(`.event__rollup-btn`),
+        `_rollupButtonClickHandler`,
+        `click`
     );
   }
 
   setSubmitHandler(handler) {
     const form = this.getElement().tagName === `FORM` ? this.getElement() : this.getElement().querySelector(`form`);
     this._setHandler(
-      handler,
-      form,
-      `_submitHandler`,
-      `submit`
+        handler,
+        form,
+        `_submitHandler`,
+        `submit`
     );
   }
 
   setInputFavoriteChangeHandler(handler) {
     this._setHandler(
-      handler,
-      this.getElement().querySelector(`.event__favorite-checkbox`),
-      `_inputFavoriteChangeHandler`,
-      `change`
+        handler,
+        this.getElement().querySelector(`.event__favorite-checkbox`),
+        `_inputFavoriteChangeHandler`,
+        `change`
     );
   }
 
   setDeleteButtonClickHandler(handler) {
     this._setHandler(
-      handler,
-      this.getElement().querySelector(`.event__reset-btn`),
-      `_deleteButtonClickHandler`,
-      `click`
+        handler,
+        this.getElement().querySelector(`.event__reset-btn`),
+        `_deleteButtonClickHandler`,
+        `click`
     );
   }
 
@@ -305,8 +305,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
   recoveryListeners() {
     this._addListeners();
     this._flatpickrRange.rerender(
-      this.getElement().querySelector(`#event-start-time`),
-      this.getElement().querySelector(`#event-end-time`),
+        this.getElement().querySelector(`#event-start-time`),
+        this.getElement().querySelector(`#event-end-time`)
     );
 
     this.setRollupButtonClickHandler();
@@ -335,45 +335,43 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   getStartValidity(value) {
     if (value === null) {
-      return `Необходимо ввести дату начала события`
+      return `Необходимо ввести дату начала события`;
     }
 
     if (getDataRange(value, this._disabledRanges)) {
-      return `Событие может начинаться после окончения предыдущего события`
-    };
+      return `Событие может начинаться после окончения предыдущего события`;
+    }
 
     if (this._eventItem.finish && (+value > +this._eventItem.finish)) {
-      return `Дата начала события должна быть меньше даты окончания события`
-    };
+      return `Дата начала события должна быть меньше даты окончания события`;
+    }
 
     // if ()
 
-    return ``
+    return ``;
   }
 
   getFinishValidity(value) {
     if (value === null) {
-      return `Необходимо ввести дату окончания события`
+      return `Необходимо ввести дату окончания события`;
     }
 
     if (getDataRange(value, this._disabledRanges)) {
-      return `Событие должно оканчиваться до начала следующего события`
-    };
+      return `Событие должно оканчиваться до начала следующего события`;
+    }
 
     // if ()
 
-    return ``
+    return ``;
   }
 
   getCostValidity(value) {
     switch (true) {
       case isNaN(value):
         return `Значение стоимости должно быть числом`;
-        break;
 
       case Math.round(value) !== value:
         return `Значение стоимости должно быть целым числом`;
-        break;
 
       default:
         return ``;
@@ -382,8 +380,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   getDestinationValidity(value) {
     if (value === ``) {
-      return `Необходимо выбрать место назначения`
-    };
+      return `Необходимо выбрать место назначения`;
+    }
 
     return ``;
   }

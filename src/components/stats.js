@@ -2,7 +2,7 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { EventTypeProperties, PlaceholderParticle, MovingType } from '../const.js';
+import {EventTypeProperties, PlaceholderParticle, MovingType} from '../const.js';
 
 const BAR_HEIGHT = 50;
 const MIN_HEIGHT = 3;
@@ -11,11 +11,11 @@ const getChartConfig = (labels, data, title, generatorLabel) => {
   return {
     maintainAspectRatio: false,
     plugins: [ChartDataLabels],
-    type: 'horizontalBar',
+    type: `horizontalBar`,
     data: {
-      labels: labels,
+      labels,
       datasets: [{
-        data: data,
+        data,
         backgroundColor: `#ffffff`
       }]
     },
@@ -40,8 +40,8 @@ const getChartConfig = (labels, data, title, generatorLabel) => {
 
       plugins: {
         datalabels: {
-          formatter: function(value, context) {
-            return generatorLabel(value)
+          formatter(value) {
+            return generatorLabel(value);
           },
           font: {
             size: 15
@@ -90,8 +90,8 @@ const getChartConfig = (labels, data, title, generatorLabel) => {
       }
     }
 
-  }
-}
+  };
+};
 
 const getTimeSpendData = (eventList) => {
   const eventListSorted = eventList.slice().sort((a, b) => +a.start - b.start);
@@ -104,7 +104,7 @@ const getTimeSpendData = (eventList) => {
       duration = `${Math.round(moment.duration(it).asMinutes())}M`;
     } else {
       duration = `${duration}H`;
-    };
+    }
 
     return duration;
   });
@@ -114,10 +114,10 @@ const getTimeSpendData = (eventList) => {
     const particle = PlaceholderParticle[movingType];
     const destination = it.destination;
 
-    return [movingType, particle, destination].join(' ');
+    return [movingType, particle, destination].join(` `);
   });
 
-  return { data, labels, legends };
+  return {data, labels, legends};
 };
 
 const getMoneyData = (eventList) => {
@@ -127,7 +127,7 @@ const getMoneyData = (eventList) => {
   eventListSorted.forEach((it) => {
     if (!dictionary[it.type]) {
       dictionary[it.type] = 0;
-    };
+    }
 
     dictionary[it.type] += it.cost;
   });
@@ -136,7 +136,7 @@ const getMoneyData = (eventList) => {
   const data = Object.values(dictionary);
   const legends = data.map((it) => `€ ${it}`);
 
-  return { data, labels, legends };
+  return {data, labels, legends};
 };
 
 const getTransportData = (eventList) => {
@@ -145,12 +145,12 @@ const getTransportData = (eventList) => {
 
   eventListSorted.forEach((it) => {
     if (EventTypeProperties[it.type].movingType === MovingType.STAYING) {
-      return
-    };
+      return;
+    }
 
     if (!dictionary[it.type]) {
       dictionary[it.type] = 0;
-    };
+    }
 
     dictionary[it.type] += 1;
   });
@@ -159,7 +159,7 @@ const getTransportData = (eventList) => {
   const data = Object.values(dictionary);
   const legends = data.map((it) => `x ${it}`);
 
-  return { data, labels, legends };
+  return {data, labels, legends};
 };
 
 class StatisticsComponent extends AbstractSmartComponent {
@@ -190,13 +190,13 @@ class StatisticsComponent extends AbstractSmartComponent {
           <div class="statistics__item statistics__item--time-spend">
             <canvas class="statistics__chart  statistics__chart--time" width="900"></canvas>
           </div>
-        </section>`
+        </section>`;
   }
 
   render(eventList) {
     if (this.needRerender) {
-      this.rerender(eventList)
-    };
+      this.rerender(eventList);
+    }
   }
 
   rerender(eventList) {
@@ -217,61 +217,61 @@ class StatisticsComponent extends AbstractSmartComponent {
 
   _renderMoneyChart() {
     const moneyCanvas = this.getElement().querySelector(`.statistics__chart--money`);
-    moneyCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._moneyData.data.length? MIN_HEIGHT : this._moneyData.data.length);
+    moneyCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._moneyData.data.length ? MIN_HEIGHT : this._moneyData.data.length);
 
 
     return new Chart(
-      moneyCanvas.getContext('2d'), 
-      getChartConfig(
-        this._moneyData.labels, 
-        this._moneyData.data, 
-        `MONEY`,
-        (value) => `€ ${value}`));
+        moneyCanvas.getContext(`2d`),
+        getChartConfig(
+            this._moneyData.labels,
+            this._moneyData.data,
+            `MONEY`,
+            (value) => `€ ${value}`));
   }
 
   _renderTransportChart() {
     const transportCanvas = this.getElement().querySelector(`.statistics__chart--transport`);
-    transportCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._transportData.data.length? MIN_HEIGHT : this._transportData.data.length);
+    transportCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._transportData.data.length ? MIN_HEIGHT : this._transportData.data.length);
 
 
     return new Chart(
-      transportCanvas.getContext('2d'), 
-      getChartConfig(
-        this._transportData.labels, 
-        this._transportData.data, 
-        `TRANSPORT`,
-        (value) => `x${value}`));
+        transportCanvas.getContext(`2d`),
+        getChartConfig(
+            this._transportData.labels,
+            this._transportData.data,
+            `TRANSPORT`,
+            (value) => `x${value}`));
   }
 
   _renderTimeSpendChart() {
     const timeSpentCanvas = this.getElement().querySelector(`.statistics__chart--time`);
-    timeSpentCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._timeSpentData.data.length? MIN_HEIGHT : this._timeSpentData.data.length);
+    timeSpentCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._timeSpentData.data.length ? MIN_HEIGHT : this._timeSpentData.data.length);
 
 
     return new Chart(
-      timeSpentCanvas.getContext('2d'), 
-      getChartConfig(
-        this._timeSpentData.labels, 
-        this._timeSpentData.data, 
-        `TIME SPEND`,
-        (value) => `${value}H`));
+        timeSpentCanvas.getContext(`2d`),
+        getChartConfig(
+            this._timeSpentData.labels,
+            this._timeSpentData.data,
+            `TIME SPEND`,
+            (value) => `${value}H`));
   }
 
   _resetCharts() {
     if (this._moneyChart) {
       this._moneyChart.destroy();
       this._moneyChart = null;
-    };
+    }
 
     if (this._transportChart) {
       this._transportChart.destroy();
       this._transportChart = null;
-    };
+    }
 
     if (this._timeSpentChart) {
       this._timeSpentChart.destroy();
       this._timeSpentChart = null;
-    };
+    }
   }
 
   recoveryListeners() {}
@@ -279,6 +279,6 @@ class StatisticsComponent extends AbstractSmartComponent {
   dataChangeHandler() {
     this.needRerender = true;
   }
-};
+}
 
 export default StatisticsComponent;

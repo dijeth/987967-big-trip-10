@@ -1,12 +1,12 @@
-import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
-import { flatDataRanges } from '../utils/common.js';
-import { SortOptions, SortType } from '../utils/sort.js';
+import {RenderPosition, renderComponent, replaceComponent, removeComponent} from '../utils/render.js';
+import {flatDataRanges} from '../utils/common.js';
+import {SortOptions, SortType} from '../utils/sort.js';
 import DayListComponent from '../components/day-list.js';
 import SortComponent from '../components/sort.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
-import { EventMode, EVENT_DEFAULT, TripMode } from '../const.js';
+import {EventMode, EVENT_DEFAULT, TripMode} from '../const.js';
 
 export default class TripController {
   constructor(container, eventsModel) {
@@ -40,8 +40,8 @@ export default class TripController {
   _renderSort(activeSortType) {
     const sortItems = Object.entries(SortOptions).map((it) => {
       const [type, options] = it;
-      const { name, showDirection } = options;
-      return { type, name, showDirection, checked: type === activeSortType };
+      const {name, showDirection} = options;
+      return {type, name, showDirection, checked: type === activeSortType};
     });
 
     const sortComponent = new SortComponent(sortItems);
@@ -61,7 +61,7 @@ export default class TripController {
       this._setMode(TripMode.EMPTY);
       this._sortComponent.hide();
       return;
-    };
+    }
 
     this._setMode(TripMode.DEFAULT);
     this._sortComponent.show();
@@ -102,10 +102,10 @@ export default class TripController {
     const container = this._sortComponent === null ? this._container.children[0] : this._sortComponent.getElement();
 
     const newEvent = new EventController(
-      container,
-      this._dataChangeHandler,
-      this._viewChangeHandler,
-      flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null))
+        container,
+        this._dataChangeHandler,
+        this._viewChangeHandler,
+        flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null))
     );
 
     newEvent.setDestroyHandler(this._eventDestroyHandler);
@@ -122,10 +122,10 @@ export default class TripController {
     return eventList.map((it) => {
       const mode = this._editingEventID !== null && it.id === this._editingEventID ? TripMode.EDITING : TripMode.DEFAULT;
       return new EventController(
-        container,
-        this._dataChangeHandler,
-        this._viewChangeHandler,
-        flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start))
+          container,
+          this._dataChangeHandler,
+          this._viewChangeHandler,
+          flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start))
       ).render(it, mode);
     });
   }
@@ -201,7 +201,7 @@ export default class TripController {
         rangers.push({
           from: it.start,
           to: it.finish
-        })
+        });
       }
     });
 
