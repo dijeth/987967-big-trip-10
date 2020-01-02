@@ -1,8 +1,4 @@
-import {
-  RenderPosition,
-  renderComponent,
-  removeComponent
-} from './utils/render.js';
+import {RenderPosition, renderComponent, removeComponent} from './utils/render.js';
 import NoPointsComponent from './components/no-points.js';
 import MenuComponent from './components/menu.js';
 import StatisticComponent from './components/stats.js';
@@ -11,9 +7,7 @@ import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import Events from './models/events.js';
 import TripInfoController from './controllers/trip-info-controller.js';
-import { TripMode, MenuMode } from './const.js';
-
-import moment from 'moment';
+import {TripMode, MenuMode} from './const.js';
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripEventsElement = document.querySelector(`.trip-events`);
@@ -162,7 +156,7 @@ tripController.setModeChangeHandler((mode) => {
   if (mode === TripMode.EMPTY) {
     renderComponent(tripEventsElement, RenderPosition.BEFORE_END, noPointsComponent);
   } else {
-    removeComponent(noPointsComponent)
+    removeComponent(noPointsComponent);
   }
 });
 
@@ -173,12 +167,12 @@ menuComponent.setModeChangeHandler((mode) => {
     case MenuMode.TABLE:
       statisticsComponent.hide();
       tripController.show();
-      filterController.show()
+      filterController.show();
       break;
 
     case MenuMode.STATS:
       tripController.hide();
-      filterController.hide()
+      filterController.hide();
       statisticsComponent.show();
       statisticsComponent.render(events.get().slice());
 

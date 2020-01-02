@@ -1,6 +1,6 @@
 import TripInfoComponent from '../components/trip-info.js';
-import { getShortDate } from '../utils/common.js';
-import { replaceComponent, renderComponent, RenderPosition } from '../utils/render.js';
+import {getShortDate} from '../utils/common.js';
+import {replaceComponent, renderComponent, RenderPosition} from '../utils/render.js';
 
 class TripInfoController {
   constructor(container, eventsModel) {
@@ -16,9 +16,9 @@ class TripInfoController {
     if (this._eventsModel.get().length) {
       const eventList = this._eventsModel.get().slice().sort((a, b) => +a.start - b.start);
       const tripInfoComponent = new TripInfoComponent(
-        this._getDateTitle(eventList),
-        this._getShortTrip(eventList),
-        this._getInfoCost(eventList)
+          this._getDateTitle(eventList),
+          this._getShortTrip(eventList),
+          this._getInfoCost(eventList)
       );
 
       if (this._tripInfoComponent) {
@@ -32,7 +32,7 @@ class TripInfoController {
       if (this._tripInfoComponent) {
         this._tripInfoComponent.hide();
       }
-    };
+    }
   }
 
   _dataChangeHandler() {
@@ -43,15 +43,18 @@ class TripInfoController {
     const tripStart = eventList[0].start;
     const tripFinish = eventList.length > 1 ? eventList[eventList.length - 1].finish : eventList[0].finish;
 
-    return `${getShortDate(tripStart)}&nbsp;&mdash;&nbsp;${getShortDate(tripFinish)}`
+    return `${getShortDate(tripStart)}&nbsp;&mdash;&nbsp;${getShortDate(tripFinish)}`;
   }
 
   _getShortTrip(eventList) {
     switch (true) {
       case eventList.length === 1:
         return [eventList[0].destination];
+
       case eventList.length === 2:
         return [eventList[0].destination, eventList[1].destination];
+
+      default:
       case eventList.length > 2:
         return [eventList[0].destination, `...`, eventList[eventList.length - 1].destination];
     }

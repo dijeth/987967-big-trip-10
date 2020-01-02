@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { TimeValue, MIN_EVENT_DURATION } from '../const.js';
+import {TimeValue, MIN_EVENT_DURATION} from '../const.js';
 
 export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
 
@@ -45,23 +45,23 @@ export const formatDate = (date1, date2) => {
 export const getShortDate = (date) => date ? moment(date).format(`D MMM`) : ``;
 
 export const isDataInRange = (data, range) => {
-  return data >= range.start && data <= range.finish
-}
+  return data >= range.start && data <= range.finish;
+};
 
 export const getDataRange = (data, ranges) => {
   for (let i = 0; i < ranges.length; i++) {
     if (isDataInRange(data, ranges[i])) {
-      return ranges[i]
+      return ranges[i];
     }
-  };
+  }
 
   return null;
-}
+};
 
 export const flatDataRanges = (ranges) => {
   if (!ranges.length) {
-    return []
-  };
+    return [];
+  }
 
   let sortedRanges = ranges.slice().sort((a, b) => +a.from - b.from);
   let range = sortedRanges[0];
@@ -69,14 +69,14 @@ export const flatDataRanges = (ranges) => {
 
   for (let i = 1; i < sortedRanges.length; i++) {
     if (+sortedRanges[i].from - range.to < MIN_EVENT_DURATION) {
-      range.to = sortedRanges[i].to
+      range.to = sortedRanges[i].to;
     } else {
       flatedRanges.push(range);
-      range = sortedRanges[i]
+      range = sortedRanges[i];
     }
-  };
+  }
 
   flatedRanges.push(range);
 
-  return flatedRanges
-}
+  return flatedRanges;
+};

@@ -30,19 +30,19 @@ export default class FlatpickrRange {
     this._disabledDates = disabledRanges ? this._getDisabledDates(disabledRanges) : [];
 
     this._startFlatpickr = this._createFlatpickr(
-      this._inputStart,
-      this._dateStart,
-      this._disabledDates,
-      this._limitTimes,
-      this._startFlatpickrCloseHandler
+        this._inputStart,
+        this._dateStart,
+        this._disabledDates,
+        this._limitTimes,
+        this._startFlatpickrCloseHandler
     );
 
     this._finishFlatpickr = this._createFlatpickr(
-      this._inputFinish,
-      this._dateFinish,
-      this._disabledDates,
-      this._limitTimes,
-      this._finishFlatpickrCloseHandler
+        this._inputFinish,
+        this._dateFinish,
+        this._disabledDates,
+        this._limitTimes,
+        this._finishFlatpickrCloseHandler
     );
 
     this._flatpickrMode = FlatpickrMode.DEFAULT;
@@ -57,8 +57,8 @@ export default class FlatpickrRange {
   }
 
   rerender(inputStart, inputFinish) {
-  	inputStart = inputStart || this._inputStart;
-  	inputFinish = inputFinish || this._inputFinish;
+    inputStart = inputStart || this._inputStart;
+    inputFinish = inputFinish || this._inputFinish;
 
     this._rerenderStart(inputStart);
     this._rerenderFinish(inputFinish);
@@ -86,7 +86,7 @@ export default class FlatpickrRange {
         disabledDates.push({
           from: moment(start).startOf(`day`).toDate(),
           to: moment(finish).endOf(`day`).toDate()
-        })
+        });
       }
     });
 
@@ -122,7 +122,7 @@ export default class FlatpickrRange {
       dateFormat: `y/m/d H:i`,
       enableTime: true,
       [`time_24hr`]: true,
-      defaultDate: defaultDate,
+      defaultDate,
       disable: disabledDates,
       onClose: closeHandler,
       plugins: [
@@ -138,7 +138,7 @@ export default class FlatpickrRange {
   _getRangeByFinish() {
     const dateStartCandidates = this._disabledRanges.slice()
       .sort((a, b) => {
-        return (+this._dateFinish - a.to) - (+this._dateFinish - b.to)
+        return (+this._dateFinish - a.to) - (+this._dateFinish - b.to);
       })
       .filter((it) => +this._dateFinish - it.to >= 0);
 
@@ -158,7 +158,7 @@ export default class FlatpickrRange {
   _getRangeByStart() {
     const dateFinishCandidates = this._disabledRanges.slice()
       .sort((a, b) => {
-        return (+a.from - this._dateStart) - (+b.from - this._dateStart)
+        return (+a.from - this._dateStart) - (+b.from - this._dateStart);
       })
       .filter((it) => +it.from - this._dateStart >= 0);
 
@@ -179,11 +179,11 @@ export default class FlatpickrRange {
 
     switch (this._flatpickrMode) {
       case FlatpickrMode.DEFAULT:
-        this._flatpickrMode = FlatpickrMode.FINISH
+        this._flatpickrMode = FlatpickrMode.FINISH;
         break;
 
       case FlatpickrMode.START:
-        this._flatpickrMode = FlatpickrMode.DEFAULT
+        this._flatpickrMode = FlatpickrMode.DEFAULT;
         break;
     }
 
@@ -196,11 +196,11 @@ export default class FlatpickrRange {
 
     switch (this._flatpickrMode) {
       case FlatpickrMode.DEFAULT:
-        this._flatpickrMode = FlatpickrMode.START
+        this._flatpickrMode = FlatpickrMode.START;
         break;
 
       case FlatpickrMode.FINISH:
-        this._flatpickrMode = FlatpickrMode.DEFAULT
+        this._flatpickrMode = FlatpickrMode.DEFAULT;
         break;
     }
 
@@ -218,11 +218,11 @@ export default class FlatpickrRange {
       case FlatpickrMode.DEFAULT:
 
         this._startFlatpickr = this._createFlatpickr(
-          this._inputStart,
-          this._dateStart,
-          this._disabledDates,
-          this._limitTimes,
-          this._startFlatpickrCloseHandler
+            this._inputStart,
+            this._dateStart,
+            this._disabledDates,
+            this._limitTimes,
+            this._startFlatpickrCloseHandler
         );
 
         break;
@@ -235,11 +235,11 @@ export default class FlatpickrRange {
 
         this._startFlatpickr.destroy();
         this._startFlatpickr = this._createFlatpickr(
-          this._inputStart,
-          this._dateStart,
-          finishDisabledDates,
-          finishLimitTimes,
-          this._startFlatpickrCloseHandler
+            this._inputStart,
+            this._dateStart,
+            finishDisabledDates,
+            finishLimitTimes,
+            this._startFlatpickrCloseHandler
         );
 
         break;
@@ -255,11 +255,11 @@ export default class FlatpickrRange {
       case FlatpickrMode.DEFAULT:
 
         this._finishFlatpickr = this._createFlatpickr(
-          this._inputFinish,
-          this._dateFinish,
-          this._disabledDates,
-          this._limitTimes,
-          this._finishFlatpickrCloseHandler
+            this._inputFinish,
+            this._dateFinish,
+            this._disabledDates,
+            this._limitTimes,
+            this._finishFlatpickrCloseHandler
         );
 
         break;
@@ -267,16 +267,16 @@ export default class FlatpickrRange {
       case FlatpickrMode.START:
 
         const startDisabledRanges = this._getRangeByStart();
-        const startDisabledDates = this._getDisabledDates(startDisabledRanges)
+        const startDisabledDates = this._getDisabledDates(startDisabledRanges);
         const startLimitTimes = this._getLimitTimes(startDisabledRanges);
 
         this._finishFlatpickr.destroy();
         this._finishFlatpickr = this._createFlatpickr(
-          this._inputFinish,
-          this._dateFinish,
-          startDisabledDates,
-          startLimitTimes,
-          this._finishFlatpickrCloseHandler
+            this._inputFinish,
+            this._dateFinish,
+            startDisabledDates,
+            startLimitTimes,
+            this._finishFlatpickrCloseHandler
         );
 
         break;
@@ -284,11 +284,10 @@ export default class FlatpickrRange {
   }
 
   _setRange() {
-  	debugger;
 
-  	let disabledRanges;
-  	let disabledDates;
-  	let limitTimes;
+    let disabledRanges;
+    let disabledDates;
+    let limitTimes;
 
     switch (this._flatpickrMode) {
       case FlatpickrMode.DEFAULT:
@@ -304,7 +303,7 @@ export default class FlatpickrRange {
       case FlatpickrMode.FINISH:
 
         disabledRanges = this._getRangeByFinish();
-        disabledDates = this._getDisabledDates(disabledRanges)
+        disabledDates = this._getDisabledDates(disabledRanges);
         limitTimes = this._getLimitTimes(disabledRanges);
 
         this._startFlatpickr.config.disable = disabledDates;
@@ -313,7 +312,7 @@ export default class FlatpickrRange {
         this._finishFlatpickr.config.disable = this._disabledDates;
         this._finishFlatpickr.config.plugins = [new MinMaxTimePlugin({table: this._limitTimes})];
 
-      	break;
+        break;
 
       case FlatpickrMode.START:
 
@@ -321,14 +320,14 @@ export default class FlatpickrRange {
         this._startFlatpickr.config.plugins = [new MinMaxTimePlugin({table: this._limitTimes})];
 
         disabledRanges = this._getRangeByStart();
-        disabledDates = this._getDisabledDates(disabledRanges)
+        disabledDates = this._getDisabledDates(disabledRanges);
         limitTimes = this._getLimitTimes(disabledRanges);
 
         this._finishFlatpickr.config.disable = disabledDates;
         this._finishFlatpickr.config.plugins = [new MinMaxTimePlugin({table: limitTimes})];
 
         break;
-    };
+    }
 
     this._startFlatpickr.redraw();
     this._finishFlatpickr.redraw();
