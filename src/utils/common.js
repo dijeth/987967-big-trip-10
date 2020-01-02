@@ -59,6 +59,10 @@ export const getDataRange = (data, ranges) => {
 }
 
 export const flatDataRanges = (ranges) => {
+  if (!ranges.length) {
+    return []
+  };
+
   let sortedRanges = ranges.slice().sort((a, b) => +a.from - b.from);
   let range = sortedRanges[0];
   const flatedRanges = [];

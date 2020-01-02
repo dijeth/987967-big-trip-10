@@ -3,9 +3,10 @@ import flatpickr from 'flatpickr';
 import MinMaxTimePlugin from '../../node_modules/flatpickr/dist/plugins/MinMaxTimePlugin.js';
 import moment from 'moment';
 
-const FlatpickrType = {
+const FlatpickrMode = {
   START: `start`,
-  FINISH: `finish`
+  FINISH: `finish`,
+  DEFAULT: `default`
 };
 
 const MIN_DATE = new Date(0);
@@ -44,7 +45,7 @@ export default class FlatpickrRange {
       this._finishFlatpickrChangeHandler
     );
 
-    this._changedInput = null;
+    this._flatpickrMode = FlatpickrMode.DEFAULT;
   }
 
   getStartDate() {
@@ -172,13 +173,15 @@ export default class FlatpickrRange {
   }
 
   _finishFlatpickrChangeHandler(dates) {
-    switch (this._changedInput) {
-      case null:
-        this._changedInput = FlatpickrType.FINISH
+  	debugger;
+  	
+    switch (this._flatpickrMode) {
+      case FlatpickrMode.DEFAULT:
+        this._flatpickrMode = FlatpickrMode.FINISH
         break;
 
-      case FlatpickrType.START:
-        this._changedInput = null
+      case FlatpickrMode.START:
+        this._flatpickrMode = FlatpickrMode.DEFAULT
         break;
     }
 
@@ -188,13 +191,15 @@ export default class FlatpickrRange {
   }
 
   _startFlatpickrChangeHandler(dates) {
-    switch (this._changedInput) {
-      case null:
-        this._changedInput = FlatpickrType.START
+  	debugger;
+  	
+    switch (this._flatpickrMode) {
+      case FlatpickrMode.DEFAULT:
+        this._flatpickrMode = FlatpickrMode.START
         break;
 
-      case FlatpickrType.FINISH:
-        this._changedInput = null
+      case FlatpickrMode.FINISH:
+        this._flatpickrMode = FlatpickrMode.DEFAULT
         break;
     }
 
@@ -207,9 +212,9 @@ export default class FlatpickrRange {
     this._startFlatpickr.destroy();
     this._inputStart = inputStart;
 
-    switch (this._changedInput) {
-      case FlatpickrType.START:
-      case null:
+    switch (this._flatpickrMode) {
+      case FlatpickrMode.START:
+      case FlatpickrMode.DEFAULT:
 
         this._startFlatpickr = this._createFlatpickr(
           this._inputStart,
@@ -221,7 +226,7 @@ export default class FlatpickrRange {
 
         break;
 
-      case FlatpickrType.FINISH:
+      case FlatpickrMode.FINISH:
 
         const finishDisabledRanges = this._getRangeByFinish();
         const finishDisabledDates = this._getDisabledDates(finishDisabledRanges);
@@ -244,9 +249,9 @@ export default class FlatpickrRange {
     this._finishFlatpickr.destroy();
     this._inputFinish = inputFinish;
 
-    switch (this._changedInput) {
-      case FlatpickrType.FINISH:
-      case null:
+    switch (this._flatpickrMode) {
+      case FlatpickrMode.FINISH:
+      case FlatpickrMode.DEFAULT:
 
         this._finishFlatpickr = this._createFlatpickr(
           this._inputFinish,
@@ -258,7 +263,7 @@ export default class FlatpickrRange {
 
         break;
 
-      case FlatpickrType.START:
+      case FlatpickrMode.START:
 
         const startDisabledRanges = this._getRangeByStart();
         const startDisabledDates = this._getDisabledDates(startDisabledRanges)
