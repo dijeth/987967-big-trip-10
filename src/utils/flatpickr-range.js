@@ -2,6 +2,7 @@ import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
 import MinMaxTimePlugin from '../../node_modules/flatpickr/dist/plugins/MinMaxTimePlugin.js';
 import moment from 'moment';
+import {isDataInRanges} from './common.js';
 
 const FlatpickrMode = {
   START: `start`,
@@ -189,6 +190,8 @@ export default class FlatpickrRange {
 
     this._dateFinish = dates[0];
 
+    debugger;
+
     this._rerenderStart(this._inputStart);
   }
 
@@ -233,7 +236,10 @@ export default class FlatpickrRange {
         const finishDisabledDates = this._getDisabledDates(finishDisabledRanges);
         const finishLimitTimes = this._getLimitTimes(finishDisabledRanges);
 
-        this._startFlatpickr.destroy();
+        if (isDataInRanges(this._dateStart, finishDisabledRanges)) {
+          this._dateStart = null
+        };
+
         this._startFlatpickr = this._createFlatpickr(
             this._inputStart,
             this._dateStart,
@@ -270,7 +276,10 @@ export default class FlatpickrRange {
         const startDisabledDates = this._getDisabledDates(startDisabledRanges);
         const startLimitTimes = this._getLimitTimes(startDisabledRanges);
 
-        this._finishFlatpickr.destroy();
+        if (isDataInRanges(this._dateFinish, startDisabledRanges)) {
+          this._dateFinish = null
+        };
+
         this._finishFlatpickr = this._createFlatpickr(
             this._inputFinish,
             this._dateFinish,

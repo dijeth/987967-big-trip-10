@@ -1,7 +1,7 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {DestinationOptions} from '../mock/destination-data.js';
-import {generateOfferList} from '../mock/offer-data.js';
-import {EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import { DestinationOptions } from '../mock/destination-data.js';
+import { generateOfferList } from '../mock/offer-data.js';
+import { EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions } from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 
 const getCostValidity = (value) => {
@@ -201,20 +201,20 @@ export default class EventEditComponent extends AbstractSmartComponent {
     super();
     this._eventItem = eventItem;
     this._copyData = Object.assign({}, eventItem);
+    this._disabledRanges = disabledRanges;
 
     this._addListeners();
 
-    this._flatpickrRange = new FlatpickrRange(
-        this.getElement().querySelector(`#event-start-time`),
-        this.getElement().querySelector(`#event-end-time`),
-        this._eventItem.start,
-        this._eventItem.finish,
-        disabledRanges
-    );
+    this._flatpickrRange = this._createFlatpickrRange();
   }
 
   getTemplate() {
     return createForm(this._eventItem);
+  }
+
+  rerender() {
+    super.rerender();
+    this._flatpickrRange = this._createFlatpickrRange();
   }
 
   _setHandler(handler, element, handlerKeeperName, eventName) {
@@ -233,38 +233,38 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   setRollupButtonClickHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__rollup-btn`),
-        `_rollupButtonClickHandler`,
-        `click`
+      handler,
+      this.getElement().querySelector(`.event__rollup-btn`),
+      `_rollupButtonClickHandler`,
+      `click`
     );
   }
 
   setSubmitHandler(handler) {
     const form = this.getElement().tagName === `FORM` ? this.getElement() : this.getElement().querySelector(`form`);
     this._setHandler(
-        handler,
-        form,
-        `_submitHandler`,
-        `submit`
+      handler,
+      form,
+      `_submitHandler`,
+      `submit`
     );
   }
 
   setInputFavoriteChangeHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__favorite-checkbox`),
-        `_inputFavoriteChangeHandler`,
-        `change`
+      handler,
+      this.getElement().querySelector(`.event__favorite-checkbox`),
+      `_inputFavoriteChangeHandler`,
+      `change`
     );
   }
 
   setDeleteButtonClickHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__reset-btn`),
-        `_deleteButtonClickHandler`,
-        `click`
+      handler,
+      this.getElement().querySelector(`.event__reset-btn`),
+      `_deleteButtonClickHandler`,
+      `click`
     );
   }
 
@@ -321,10 +321,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   recoveryListeners() {
     this._addListeners();
-    this._flatpickrRange.rerender(
-        this.getElement().querySelector(`#event-start-time`),
-        this.getElement().querySelector(`#event-end-time`)
-    );
 
     this.setRollupButtonClickHandler();
     this.setSubmitHandler();
@@ -332,14 +328,9 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   removeElement() {
-    if (this._startFlatpickr) {
-      this._startFlatpickr.destroy();
-      this._startFlatpickr = null;
-    }
-
-    if (this._finishFlatpickr) {
-      this._finishFlatpickr.destroy();
-      this._finishFlatpickr = null;
+    if (this._flatpickrRange) {
+      this._flatpickrRange.destroy();
+      this._flatpickrRange = null;
     }
 
     super.removeElement();
@@ -348,5 +339,16 @@ export default class EventEditComponent extends AbstractSmartComponent {
   reset() {
     this._eventItem = Object.assign({}, this._copyData);
     this.rerender();
+  }
+
+  _createFlatpickrRange() {
+    return new FlatpickrRange(
+      this.getElement().querySelector(`#event-start-time`),
+      this.getElement().querySelector(`#event-end-time`),
+      this._eventItem.start,
+      this._eventItem.finish,
+      this._disabledRanges
+    );
+
   }
 }
