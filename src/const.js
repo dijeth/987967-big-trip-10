@@ -29,8 +29,8 @@ export const OfferTypeOptions = {
 };
 
 export const MovingType = {
-  MOVING: `moving`,
-  STAYING: `staying`
+  MOVING: `Moving`,
+  STAYING: `Staying`
 };
 
 export const PlaceholderParticle = {
@@ -191,3 +191,5 @@ export const MenuMode = {
   TABLE: `table`,
   STATS: `stats`
 };
+
+export const MIN_EVENT_DURATION = TimeValue.HOUR;

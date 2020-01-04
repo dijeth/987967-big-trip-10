@@ -2,8 +2,31 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import {DestinationOptions} from '../mock/destination-data.js';
 import {generateOfferList} from '../mock/offer-data.js';
 import {EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
-import '../../node_modules/flatpickr/dist/flatpickr.css';
-import flatpickr from 'flatpickr';
+import FlatpickrRange from '../utils/flatpickr-range.js';
+
+const getCostValidity = (value) => {
+  switch (true) {
+    case isNaN(value):
+      return false;
+
+    case Math.round(value) !== value:
+      return false;
+
+    case value <= 0:
+      return false;
+
+    default:
+      return true;
+  }
+};
+
+const isFormValid = (eventItem) => {
+  return eventItem.destination && eventItem.start && eventItem.finish && getCostValidity(eventItem.cost);
+};
+
+const setSubmitDisableStatus = (formElement, eventItem) => {
+  formElement.querySelector(`.event__save-btn`).disabled = !isFormValid(eventItem);
+};
 
 const createEventTypeItem = (eventType) => {
   const eventTypeCode = eventType.toLowerCase();
@@ -98,6 +121,7 @@ const createForm = (eventItem) => {
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination;
   const destinationList = Object.keys(DestinationOptions).map((item) => `<option value="${item}"></option>`).join(`\n`);
+  const disableStatus = isFormValid(eventItem) ? `` : ` disabled`;
 
   const editFormButtons = `
                       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${eventItem.isFavorite ? `checked` : ``}>
@@ -157,7 +181,7 @@ const createForm = (eventItem) => {
                         <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${eventItem.cost}">
                       </div>
 
-                      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+                      <button class="event__save-btn  btn  btn--blue" type="submit"${disableStatus}>Save</button>
                       <button class="event__reset-btn" type="reset">${isNewEvent ? `Cancel` : `Delete`}</button>
                       ${isNewEvent ? `` : editFormButtons}
                     </header>
@@ -173,16 +197,20 @@ const createForm = (eventItem) => {
 };
 
 export default class EventEditComponent extends AbstractSmartComponent {
-  constructor(eventItem) {
+  constructor(eventItem, disabledRanges) {
     super();
     this._eventItem = eventItem;
     this._copyData = Object.assign({}, eventItem);
 
-    this._startFlatpickr = null;
-    this._finishFlatpickr = null;
-
     this._addListeners();
-    this._configFlatpickr();
+
+    this._flatpickrRange = new FlatpickrRange(
+        this.getElement().querySelector(`#event-start-time`),
+        this.getElement().querySelector(`#event-end-time`),
+        this._eventItem.start,
+        this._eventItem.finish,
+        disabledRanges
+    );
   }
 
   getTemplate() {
@@ -201,23 +229,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
     if (this[handlerKeeperName]) {
       element.addEventListener(eventName, this[handlerKeeperName]);
     }
-  }
-
-  _configFlatpickr() {
-
-    this._startFlatpickr = flatpickr(this.getElement().querySelector(`#event-start-time`), {
-      dateFormat: `y/m/d H:i`,
-      enableTime: true,
-      [`time_24hr`]: true,
-      defaultDate: this._eventItem.start
-    });
-
-    this._finishFlatpickr = flatpickr(this.getElement().querySelector(`#event-end-time`), {
-      dateFormat: `y/m/d H:i`,
-      enableTime: true,
-      [`time_24hr`]: true,
-      defaultDate: this._eventItem.finish
-    });
   }
 
   setRollupButtonClickHandler(handler) {
@@ -268,14 +279,17 @@ export default class EventEditComponent extends AbstractSmartComponent {
       this._eventItem.destination = evt.target.value;
 
       this.rerender();
+      setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
     element.querySelector(`#event-start-time`).addEventListener(`change`, () => {
-      this._eventItem.start = this._startFlatpickr.selectedDates[0];
+      this._eventItem.start = this._flatpickrRange.getStartDate();
+      setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
     element.querySelector(`#event-end-time`).addEventListener(`change`, () => {
-      this._eventItem.finish = this._finishFlatpickr.selectedDates[0];
+      this._eventItem.finish = this._flatpickrRange.getFinishDate();
+      setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
@@ -288,8 +302,9 @@ export default class EventEditComponent extends AbstractSmartComponent {
     });
 
     element.querySelector(`.event__input--price`).addEventListener(`change`, (evt) => {
-      const cost = +evt.target.value;
-      this._eventItem.cost = isNaN(cost) ? 0 : cost;
+      this._eventItem.cost = +evt.target.value;
+
+      setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
     const offersElement = element.querySelector(`.event__available-offers`);
@@ -306,7 +321,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   recoveryListeners() {
     this._addListeners();
-    this._configFlatpickr();
+    this._flatpickrRange.rerender(
+        this.getElement().querySelector(`#event-start-time`),
+        this.getElement().querySelector(`#event-end-time`)
+    );
 
     this.setRollupButtonClickHandler();
     this.setSubmitHandler();

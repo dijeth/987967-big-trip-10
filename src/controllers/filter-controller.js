@@ -32,6 +32,20 @@ class FilterController {
     } else {
       replaceComponent(filterComponent, this._filterComponent);
     }
+
+    this._filterComponent = filterComponent;
+  }
+
+  show() {
+    if (this._filterComponent) {
+      this._filterComponent.show();
+    }
+  }
+
+  hide() {
+    if (this._filterComponent) {
+      this._filterComponent.hide();
+    }
   }
 }
 
