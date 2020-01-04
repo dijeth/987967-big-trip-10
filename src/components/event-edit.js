@@ -2,8 +2,31 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import {DestinationOptions} from '../mock/destination-data.js';
 import {generateOfferList} from '../mock/offer-data.js';
 import {EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
-import {getDataRange} from '../utils/common.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
+
+const getCostValidity = (value) => {
+  switch (true) {
+    case isNaN(value):
+      return false;
+
+    case Math.round(value) !== value:
+      return false;
+
+    case value <= 0:
+      return false;
+
+    default:
+      return true;
+  }
+};
+
+const isFormValid = (eventItem) => {
+  return eventItem.destination && eventItem.start && eventItem.finish && getCostValidity(eventItem.cost);
+};
+
+const setSubmitDisableStatus = (formElement, eventItem) => {
+  formElement.querySelector(`.event__save-btn`).disabled = !isFormValid(eventItem);
+};
 
 const createEventTypeItem = (eventType) => {
   const eventTypeCode = eventType.toLowerCase();
@@ -98,6 +121,7 @@ const createForm = (eventItem) => {
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination;
   const destinationList = Object.keys(DestinationOptions).map((item) => `<option value="${item}"></option>`).join(`\n`);
+  const disableStatus = isFormValid(eventItem) ? `` : ` disabled`;
 
   const editFormButtons = `
                       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${eventItem.isFavorite ? `checked` : ``}>
@@ -157,7 +181,7 @@ const createForm = (eventItem) => {
                         <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${eventItem.cost}">
                       </div>
 
-                      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+                      <button class="event__save-btn  btn  btn--blue" type="submit"${disableStatus}>Save</button>
                       <button class="event__reset-btn" type="reset">${isNewEvent ? `Cancel` : `Delete`}</button>
                       ${isNewEvent ? `` : editFormButtons}
                     </header>
@@ -255,14 +279,17 @@ export default class EventEditComponent extends AbstractSmartComponent {
       this._eventItem.destination = evt.target.value;
 
       this.rerender();
+      setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
     element.querySelector(`#event-start-time`).addEventListener(`change`, () => {
       this._eventItem.start = this._flatpickrRange.getStartDate();
+      setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
     element.querySelector(`#event-end-time`).addEventListener(`change`, () => {
       this._eventItem.finish = this._flatpickrRange.getFinishDate();
+      setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
@@ -275,19 +302,9 @@ export default class EventEditComponent extends AbstractSmartComponent {
     });
 
     element.querySelector(`.event__input--price`).addEventListener(`change`, (evt) => {
-      const cost = +evt.target.value;
+      this._eventItem.cost = +evt.target.value;
 
-      switch (true) {
-        case isNaN(cost):
-          evt.target.setCustomValidity(`Значение стоимости должно быть числом`);
-          break;
-        case Math.round(cost) !== cost:
-          evt.target.setCustomValidity(`Значение стоимости должно быть целым числом`);
-          break;
-        default:
-          evt.target.setCustomValidity(``);
-          this._eventItem.cost = cost;
-      }
+      setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
     const offersElement = element.querySelector(`.event__available-offers`);
@@ -331,58 +348,5 @@ export default class EventEditComponent extends AbstractSmartComponent {
   reset() {
     this._eventItem = Object.assign({}, this._copyData);
     this.rerender();
-  }
-
-  getStartValidity(value) {
-    if (value === null) {
-      return `Необходимо ввести дату начала события`;
-    }
-
-    if (getDataRange(value, this._disabledRanges)) {
-      return `Событие может начинаться после окончения предыдущего события`;
-    }
-
-    if (this._eventItem.finish && (+value > +this._eventItem.finish)) {
-      return `Дата начала события должна быть меньше даты окончания события`;
-    }
-
-    // if ()
-
-    return ``;
-  }
-
-  getFinishValidity(value) {
-    if (value === null) {
-      return `Необходимо ввести дату окончания события`;
-    }
-
-    if (getDataRange(value, this._disabledRanges)) {
-      return `Событие должно оканчиваться до начала следующего события`;
-    }
-
-    // if ()
-
-    return ``;
-  }
-
-  getCostValidity(value) {
-    switch (true) {
-      case isNaN(value):
-        return `Значение стоимости должно быть числом`;
-
-      case Math.round(value) !== value:
-        return `Значение стоимости должно быть целым числом`;
-
-      default:
-        return ``;
-    }
-  }
-
-  getDestinationValidity(value) {
-    if (value === ``) {
-      return `Необходимо выбрать место назначения`;
-    }
-
-    return ``;
   }
 }

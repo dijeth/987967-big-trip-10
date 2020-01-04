@@ -1,12 +1,8 @@
-import {
-  RenderPosition,
-  renderComponent,
-  removeComponent
-} from './utils/render.js';
+import {RenderPosition, renderComponent, removeComponent} from './utils/render.js';
 import NoPointsComponent from './components/no-points.js';
 import MenuComponent from './components/menu.js';
 import StatisticComponent from './components/stats.js';
-import generateEventList from './mock/event-data.js';
+// import generateEventList from './mock/event-data.js';
 import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import Events from './models/events.js';
@@ -18,8 +14,8 @@ const tripEventsElement = document.querySelector(`.trip-events`);
 const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 const createEventElement = tripMainElement.querySelector(`.trip-main__event-add-btn`);
 
-// const events = new Events([]);
-const events = new Events(generateEventList());
+const events = new Events([]);
+// const events = new Events(generateEventList());
 // const events = new Events(
 //   [{
 //       "id": null,
