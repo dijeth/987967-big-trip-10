@@ -203,6 +203,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._copyData = Object.assign({}, eventItem);
     this._disabledRanges = disabledRanges;
 
+    this._dateRangeChangeHandler = this._dateRangeChangeHandler.bind(this);
+
     this._addListeners();
 
     this._flatpickrRange = this._createFlatpickrRange();
@@ -282,12 +284,12 @@ export default class EventEditComponent extends AbstractSmartComponent {
       setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
-    element.querySelector(`#event-start-time`).addEventListener(`change`, () => {
+    element.querySelector(`#event-start-time`).addEventListener(`input`, () => {
       this._eventItem.start = this._flatpickrRange.getStartDate();
       setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
-    element.querySelector(`#event-end-time`).addEventListener(`change`, () => {
+    element.querySelector(`#event-end-time`).addEventListener(`input`, () => {
       this._eventItem.finish = this._flatpickrRange.getFinishDate();
       setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
@@ -347,8 +349,14 @@ export default class EventEditComponent extends AbstractSmartComponent {
       this.getElement().querySelector(`#event-end-time`),
       this._eventItem.start,
       this._eventItem.finish,
-      this._disabledRanges
+      this._disabledRanges,
+      this._dateRangeChangeHandler
     );
+  }
 
+  _dateRangeChangeHandler(dateStart, dateFinish) {
+    this._eventItem.start = dateStart;
+    this._eventItem.finish = dateFinish;
+    setSubmitDisableStatus(this.getElement(), this._eventItem)
   }
 }
