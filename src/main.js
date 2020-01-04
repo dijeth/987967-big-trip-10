@@ -1,4 +1,4 @@
-import {RenderPosition, renderComponent, removeComponent} from './utils/render.js';
+import { RenderPosition, renderComponent, removeComponent } from './utils/render.js';
 import NoPointsComponent from './components/no-points.js';
 import MenuComponent from './components/menu.js';
 import StatisticComponent from './components/stats.js';
@@ -7,7 +7,19 @@ import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import Events from './models/events.js';
 import TripInfoController from './controllers/trip-info-controller.js';
-import {TripMode, MenuMode} from './const.js';
+import { TripMode, MenuMode } from './const.js';
+import API from './api.js'
+
+const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip/`;
+const AUTORIZATION = `Basic er883jdzbdw`;
+const api = new API(END_POINT, AUTORIZATION);
+
+api.getData().then((values) => {
+  const [events, offers, destinations] = values;
+  console.log(events);
+  console.log(offers);
+  console.log(destinations);
+})
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripEventsElement = document.querySelector(`.trip-events`);
@@ -15,9 +27,7 @@ const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`
 const createEventElement = tripMainElement.querySelector(`.trip-main__event-add-btn`);
 
 const events = new Events();
-
 const tripInfoController = new TripInfoController(tripMainElement, events);
-
 const filterController = new FilterController(tripControlElements[1], events);
 
 const tripController = new TripController(tripEventsElement, events);
