@@ -14,8 +14,8 @@ const tripEventsElement = document.querySelector(`.trip-events`);
 const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
 const createEventElement = tripMainElement.querySelector(`.trip-main__event-add-btn`);
 
-// const events = new Events([]);
-const events = new Events(generateEventList());
+const events = new Events([]);
+// const events = new Events(generateEventList());
 // const events = new Events(
 //   [{
 //       "id": null,
