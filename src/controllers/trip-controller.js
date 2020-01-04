@@ -35,6 +35,8 @@ export default class TripController {
 
     this._eventsModel.setFilterChangeHandler(this._filterChangeHandler);
     this._eventsModel.setDataChangeHandler(this._modelDataChangeHandler);
+
+    this._renderSort(this._activeSortType);
   }
 
   _renderSort(activeSortType) {

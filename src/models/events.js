@@ -26,6 +26,8 @@ export default class Events {
       it.id = this._generateID();
       return it;
     });
+    
+    this._dataChangeHandlers.forEach((it) => it());
   }
 
   update(id, newEventData) {

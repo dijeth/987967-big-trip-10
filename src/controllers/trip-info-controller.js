@@ -1,6 +1,6 @@
 import TripInfoComponent from '../components/trip-info.js';
-import {getShortDate} from '../utils/common.js';
-import {replaceComponent, renderComponent, RenderPosition} from '../utils/render.js';
+import { getShortDate } from '../utils/common.js';
+import { replaceComponent, renderComponent, RenderPosition } from '../utils/render.js';
 
 class TripInfoController {
   constructor(container, eventsModel) {
@@ -12,34 +12,32 @@ class TripInfoController {
     this._eventsModel.setDataChangeHandler(this._dataChangeHandler);
   }
 
-  render() {
-    if (this._eventsModel.get().length) {
-      const eventList = this._eventsModel.get().slice().sort((a, b) => +a.start - b.start);
-      const tripInfoComponent = new TripInfoComponent(
-          this._getDateTitle(eventList),
-          this._getShortTrip(eventList),
-          this._getInfoCost(eventList)
-      );
+  _render() {
+    const eventList = this._eventsModel.get().slice().sort((a, b) => +a.start - b.start);
+    const tripInfoComponent = new TripInfoComponent(
+      this._getDateTitle(eventList),
+      this._getShortTrip(eventList),
+      this._getInfoCost(eventList)
+    );
 
-      if (this._tripInfoComponent) {
-        replaceComponent(tripInfoComponent, this._tripInfoComponent);
-      } else {
-        renderComponent(this._container, RenderPosition.AFTER_BEGIN, tripInfoComponent);
-      }
-
-      this._tripInfoComponent = tripInfoComponent;
+    if (this._tripInfoComponent) {
+      replaceComponent(tripInfoComponent, this._tripInfoComponent);
     } else {
-      if (this._tripInfoComponent) {
-        this._tripInfoComponent.hide();
-      }
+      renderComponent(this._container, RenderPosition.AFTER_BEGIN, tripInfoComponent);
     }
+
+    this._tripInfoComponent = tripInfoComponent;
   }
 
   _dataChangeHandler() {
-    this.render();
+    this._render();
   }
 
   _getDateTitle(eventList) {
+    if (!eventList.length) {
+      return ``
+    };
+
     const tripStart = eventList[0].start;
     const tripFinish = eventList.length > 1 ? eventList[eventList.length - 1].finish : eventList[0].finish;
 
@@ -47,15 +45,16 @@ class TripInfoController {
   }
 
   _getShortTrip(eventList) {
-    switch (true) {
-      case eventList.length === 1:
-        return [eventList[0].destination];
+    switch (eventList.length) {
+      case 0:
+        return ``;
 
-      case eventList.length === 2:
-        return [eventList[0].destination, eventList[1].destination];
+      case 1:
+      case 2:
+      case 3:
+        return eventList.map((it) => it.destination);
 
       default:
-      case eventList.length > 2:
         return [eventList[0].destination, `...`, eventList[eventList.length - 1].destination];
     }
   }
