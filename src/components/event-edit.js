@@ -197,12 +197,13 @@ const createForm = (eventItem, destinations) => {
 };
 
 export default class EventEditComponent extends AbstractSmartComponent {
-  constructor(eventItem, disabledRanges, destinations) {
+  constructor(eventItem, disabledRanges, destinations, offers) {
     super();
     this._eventItem = eventItem;
     this._copyData = Object.assign({}, eventItem);
     this._disabledRanges = disabledRanges;
     this._destinations = destinations;
+    this._offers = offers;
 
     this._dateRangeChangeHandler = this._dateRangeChangeHandler.bind(this);
 
@@ -298,7 +299,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
       it.addEventListener(`change`, (evt) => {
         this._eventItem.type = EventType[evt.target.value.toUpperCase()];
-        this._eventItem.offers = generateOfferList(this._eventItem.type);
+        this._eventItem.offers = this._offers[this._eventItem.type];
 
         this.rerender();
       });

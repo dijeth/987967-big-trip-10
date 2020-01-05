@@ -26,18 +26,19 @@ export default class API {
     return this._load({ url: `destinations` }).then((response) => response.json())
   }
 
+  getOffers() {
+    return this._load({ url: `offers` })
+      .then((response) => response.json())
+      .then((offerData) => new Offers(offerData))
+  }
+
   getEvents() {
     return Promise.all([
       this._load({ url: `points` }).then((response) => response.json()),
-      this._load({ url: `offers` })
-      .then((response) => response.json())
-      .then((offerData) => new Offers(offerData))
+      this.getOffers()
     ]).then((values) => {
       const [eventList, offerList] = values;
-      const eventData = EventModel.parseEvents(eventList, offerList);
-      return new Promise((resolve) => {
-        resolve(eventData)
-      })
+      return EventModel.parseEvents(eventList, offerList);
     });
   }
 

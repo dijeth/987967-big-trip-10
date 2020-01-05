@@ -24,6 +24,7 @@ export default class TripController {
     this._showenEvents = [];
     this._modeChangeHandlers = [];
     this._destinations = [];
+    this._offers = [];
 
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
     this._viewChangeHandler = this._viewChangeHandler.bind(this);
@@ -55,7 +56,8 @@ export default class TripController {
         this._dataChangeHandler,
         this._viewChangeHandler,
         flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null)),
-        this._destinations
+        this._destinations,
+        this._offers
     );
 
     newEvent.setDestroyHandler(this._eventDestroyHandler);
@@ -82,6 +84,10 @@ export default class TripController {
 
   setDestinations(destinations) {
     this._destinations = destinations;
+  }
+
+  setOffers(offers) {
+    this._offers = offers;
   }
 
   _renderSort(activeSortType) {
@@ -146,7 +152,8 @@ export default class TripController {
           this._dataChangeHandler,
           this._viewChangeHandler,
           flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
-          this._destinations
+          this._destinations,
+          this._offers
       ).render(it, mode);
     });
   }

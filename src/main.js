@@ -68,4 +68,5 @@ createEventElement.addEventListener(`click`, () => {
 statisticsComponent.hide();
 
 api.getDestinations().then((data) => tripController.setDestinations(data));
+api.getOffers().then((data) => tripController.setOffers(data));
 api.getEvents().then((eventData) => events.set(eventData));
