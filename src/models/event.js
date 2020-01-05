@@ -38,8 +38,9 @@ export default class EventModel {
     eventTypeOffers.map((it) => eventTypeOffersDict[it.title] = { cost: it.price, checked: false });
 
     const joinedEventOffers = Object.assign({}, eventTypeOffersDict, eventOffersDict);
+    const resultOffers = Object.entries(joinedEventOffers).map((it) => Object.assign({title: it[0]}, it[1]));
 
-    return Array.from(joinedEventOffers);
+    return resultOffers;
   }
 
   static parseEvents(data, offers) {

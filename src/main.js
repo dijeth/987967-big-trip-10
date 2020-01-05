@@ -72,13 +72,8 @@ statisticsComponent.hide();
 // events.set(generateEventList());
 api.getData().then((values) => {
   const [eventList, offerList, destinationList] = values;
-  console.log(eventList);
-  console.log(offerList);
-  console.log(destinationList);
 
   const eventData = EventModel.parseEvents(eventList, offerList);
-
-  console.log(eventData)
 
   tripController.setDestinations(destinationList);
   events.set(eventData);

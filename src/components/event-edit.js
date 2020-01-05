@@ -62,12 +62,11 @@ const createEventTypeList = () => {
 };
 
 const createEventOffer = (offer, index) => {
-  const offerOptions = OfferTypeOptions[offer.type];
   return `
                           <div class="event__offer-selector">
-                            <input data-offer-index="${index}" class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}" type="checkbox" name="event-offer-${offer.type}" ${offer.checked ? `checked` : ``}>
-                            <label class="event__offer-label" for="event-offer-${offer.type}">
-                              <span class="event__offer-title">${offerOptions.name}</span>
+                            <input data-offer-index="${index}" class="event__offer-checkbox  visually-hidden" id="event-offer-${index}" type="checkbox" name="event-offer-${index}" ${offer.checked ? `checked` : ``}>
+                            <label class="event__offer-label" for="event-offer-${index}">
+                              <span class="event__offer-title">${offer.title}</span>
                               &plus;
                               &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
                             </label>
@@ -122,7 +121,8 @@ const createForm = (eventItem, destinations) => {
   const destination = eventItem.destination;
   const destinationList = destinations.map((item) => `<option value="${item.name}"></option>`).join(`\n`);
   const disableStatus = isFormValid(eventItem) ? `` : ` disabled`;
-  const destinationHtml = createDestinationHtml(eventItem.destination, destinations)
+  const destinationHtml = createDestinationHtml(eventItem.destination, destinations);
+  const offersHtml = createEventOffers(eventItem.offers);
 
   const editFormButtons = `
                       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${eventItem.isFavorite ? `checked` : ``}>
@@ -189,7 +189,7 @@ const createForm = (eventItem, destinations) => {
 
                     <section class="event__details">
 
-                      ${createEventOffers(eventItem.offers)}
+                      ${offersHtml}
                       ${destinationHtml}
 
                     </section>
