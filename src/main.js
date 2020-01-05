@@ -4,7 +4,6 @@ import MenuComponent from './components/menu.js';
 import StatisticComponent from './components/stats.js';
 import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
-import EventModel from './models/event.js';
 import Events from './models/events.js';
 import TripInfoController from './controllers/trip-info-controller.js';
 import { TripMode, MenuMode } from './const.js';
@@ -68,12 +67,5 @@ createEventElement.addEventListener(`click`, () => {
 
 statisticsComponent.hide();
 
-// events.set(generateEventList());
-api.getData().then((values) => {
-  const [eventList, offerList, destinationList] = values;
-
-  const eventData = EventModel.parseEvents(eventList, offerList);
-
-  tripController.setDestinations(destinationList);
-  events.set(eventData);
-})
+api.getDestinations().then((data) => tripController.setDestinations(data));
+api.getEvents().then((eventData) => events.set(eventData));

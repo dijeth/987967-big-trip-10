@@ -1,4 +1,5 @@
 import Offers from './models/offers.js';
+import EventModel from './models/event.js';
 
 const Method = {
   GET: `GET`,
@@ -21,14 +22,23 @@ export default class API {
     this._authorization = authorization;
   }
 
-  getData() {
+  getDestinations() {
+    return this._load({ url: `destinations` }).then((response) => response.json())
+  }
+
+  getEvents() {
     return Promise.all([
       this._load({ url: `points` }).then((response) => response.json()),
       this._load({ url: `offers` })
-      	.then((response) => response.json())
-      	.then((offerData) => new Offers(offerData)),
-      this._load({ url: `destinations` }).then((response) => response.json())
-    ]);
+      .then((response) => response.json())
+      .then((offerData) => new Offers(offerData))
+    ]).then((values) => {
+      const [eventList, offerList] = values;
+      const eventData = EventModel.parseEvents(eventList, offerList);
+      return new Promise((resolve) => {
+        resolve(eventData)
+      })
+    });
   }
 
   _load({ url, method = Method.GET, body = null, headers = new Headers() }) {
