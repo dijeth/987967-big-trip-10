@@ -2,7 +2,6 @@ import { RenderPosition, renderComponent, removeComponent } from './utils/render
 import NoPointsComponent from './components/no-points.js';
 import MenuComponent from './components/menu.js';
 import StatisticComponent from './components/stats.js';
-import generateEventList from './mock/event-data.js';
 import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import EventModel from './models/event.js';

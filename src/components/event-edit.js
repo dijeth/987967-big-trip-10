@@ -1,5 +1,4 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import { generateOfferList } from '../mock/offer-data.js';
 import { EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions } from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 
