@@ -1,3 +1,5 @@
+import Offers from './models/offers.js';
+
 const Method = {
   GET: `GET`,
   POST: `POST`,
@@ -22,7 +24,9 @@ export default class API {
   getData() {
     return Promise.all([
       this._load({ url: `points` }).then((response) => response.json()),
-      this._load({ url: `offers` }).then((response) => this._createOfferList(response.json())),
+      this._load({ url: `offers` })
+      	.then((response) => response.json())
+      	.then((offerData) => new Offers(offerData)),
       this._load({ url: `destinations` }).then((response) => response.json())
     ]);
   }
@@ -35,11 +39,5 @@ export default class API {
       .catch((err) => {
         throw err;
       });
-  }
-
-  _createOfferList(offerData) {
-  	const offerList = {};
-  	offerData.forEach((it) => offerList[it.type] = it.offers);
-  	return offerList;
   }
 }
