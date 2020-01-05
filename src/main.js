@@ -22,7 +22,7 @@ const events = new Events();
 const tripInfoController = new TripInfoController(tripMainElement, events);
 const filterController = new FilterController(tripControlElements[1], events);
 
-const tripController = new TripController(tripEventsElement, events);
+const tripController = new TripController(tripEventsElement, events, api);
 tripController.setModeChangeHandler((mode) => {
   createEventElement.disabled = mode === TripMode.ADDING;
 });

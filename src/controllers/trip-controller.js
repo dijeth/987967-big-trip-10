@@ -9,9 +9,10 @@ import EventController from './event-controller.js';
 import {EventMode, EVENT_DEFAULT, TripMode} from '../const.js';
 
 export default class TripController {
-  constructor(container, eventsModel) {
+  constructor(container, eventsModel, api) {
     this._container = container;
     this._eventsModel = eventsModel;
+    this._api = api;
     this._noPointsComponent = null;
     this._sortComponent = null;
     this._dayListComponent = null;
@@ -176,7 +177,8 @@ export default class TripController {
 
   _dataChangeHandler(id, newEventData, keepInEditMode) {
     this._editingEventID = keepInEditMode ? id : null;
-    this._eventsModel.update(id, newEventData);
+
+    this._api.updateEvent(id, newEventData).then((data) => this._eventsModel.update(id, data));
   }
 
   _viewChangeHandler() {
