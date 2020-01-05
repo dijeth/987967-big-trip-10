@@ -5,6 +5,7 @@ import StatisticComponent from './components/stats.js';
 import generateEventList from './mock/event-data.js';
 import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
+import EventModel from './models/event.js';
 import Events from './models/events.js';
 import TripInfoController from './controllers/trip-info-controller.js';
 import { TripMode, MenuMode } from './const.js';
@@ -75,6 +76,10 @@ api.getData().then((values) => {
   console.log(offerList);
   console.log(destinationList);
 
+  const eventData = EventModel.parseEvents(eventList, offerList);
+
+  console.log(eventData)
+
   tripController.setDestinations(destinationList);
-  events.set([]);
+  events.set(eventData);
 })
