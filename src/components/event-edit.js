@@ -1,5 +1,4 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import { DestinationOptions } from '../mock/destination-data.js';
 import { generateOfferList } from '../mock/offer-data.js';
 import { EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions } from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
@@ -92,18 +91,19 @@ const createEventOffers = (offers) => {
                       </section>`;
 };
 
-const createDestinationHtml = (destination) => {
-  if (!DestinationOptions[destination]) {
+const createDestinationHtml = (destination, destinations) => {
+  const destinationData = destinations.find((it) => it.name === destination);
+  if (!destinationData) {
     return ``;
   }
 
-  const photoList = DestinationOptions[destination].photoList.map((item) => `
-                                <img class="event__photo" src="${item}" alt="Event photo">`).join(`\n`);
+  const photoList = destinationData.pictures.map((it) => `
+                                <img class="event__photo" src="${it.src}" alt="${it.description}">`).join(`\n`);
 
   return `
                       <section class="event__section  event__section--destination">
                         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                        <p class="event__destination-description">${DestinationOptions[destination].description}</p>
+                        <p class="event__destination-description">${destinationData.description}</p>
 
                         <div class="event__photos-container">
                           <div class="event__photos-tape">
@@ -113,15 +113,16 @@ const createDestinationHtml = (destination) => {
                       </section>`;
 };
 
-const createForm = (eventItem) => {
+const createForm = (eventItem, destinations) => {
   const isNewEvent = eventItem.id === null;
 
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination;
-  const destinationList = Object.keys(DestinationOptions).map((item) => `<option value="${item}"></option>`).join(`\n`);
+  const destinationList = destinations.map((item) => `<option value="${item.name}"></option>`).join(`\n`);
   const disableStatus = isFormValid(eventItem) ? `` : ` disabled`;
+  const destinationHtml = createDestinationHtml(eventItem.destination, destinations)
 
   const editFormButtons = `
                       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${eventItem.isFavorite ? `checked` : ``}>
@@ -189,7 +190,7 @@ const createForm = (eventItem) => {
                     <section class="event__details">
 
                       ${createEventOffers(eventItem.offers)}
-                      ${createDestinationHtml(eventItem.destination)}
+                      ${destinationHtml}
 
                     </section>
                   </form>
@@ -197,11 +198,12 @@ const createForm = (eventItem) => {
 };
 
 export default class EventEditComponent extends AbstractSmartComponent {
-  constructor(eventItem, disabledRanges) {
+  constructor(eventItem, disabledRanges, destinations) {
     super();
     this._eventItem = eventItem;
     this._copyData = Object.assign({}, eventItem);
     this._disabledRanges = disabledRanges;
+    this._destinations = destinations;
 
     this._dateRangeChangeHandler = this._dateRangeChangeHandler.bind(this);
 
@@ -211,7 +213,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createForm(this._eventItem);
+    return createForm(this._eventItem, this._destinations);
   }
 
   rerender() {

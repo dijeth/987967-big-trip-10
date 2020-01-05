@@ -4,11 +4,12 @@ import EventEditComponent from '../components/event-edit.js';
 import {EventMode} from '../const.js';
 
 export default class EventController {
-  constructor(container, dataChangeHandler, viewChangeHandler, disabledRanges) {
+  constructor(container, dataChangeHandler, viewChangeHandler, disabledRanges, destinations) {
     this._container = container;
     this._dataChangeHandler = dataChangeHandler;
     this._viewChangeHandler = viewChangeHandler;
     this._disabledRanges = disabledRanges;
+    this._destinations = destinations;
 
     this._eventComponent = null;
     this._eventEditComponent = null;
@@ -62,7 +63,7 @@ export default class EventController {
   render(eventData, mode = EventMode.DEFAULT) {
 
     const eventComponent = new EventComponent(Object.assign({}, eventData));
-    const eventEditComponent = new EventEditComponent(Object.assign({}, eventData), this._disabledRanges);
+    const eventEditComponent = new EventEditComponent(Object.assign({}, eventData), this._disabledRanges, this._destinations);
 
     eventComponent.setRollupButtonClickHandler(() => {
       this._eventToEdit();

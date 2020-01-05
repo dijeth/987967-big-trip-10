@@ -14,13 +14,6 @@ const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip/`;
 const AUTORIZATION = `Basic er883jdzbdw`;
 const api = new API(END_POINT, AUTORIZATION);
 
-api.getData().then((values) => {
-  const [events, offers, destinations] = values;
-  console.log(events);
-  console.log(offers);
-  console.log(destinations);
-})
-
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 const tripControlElements = tripMainElement.querySelectorAll(`.trip-controls h2`);
@@ -76,4 +69,12 @@ createEventElement.addEventListener(`click`, () => {
 statisticsComponent.hide();
 
 // events.set(generateEventList());
-events.set([]);
+api.getData().then((values) => {
+  const [eventList, offerList, destinationList] = values;
+  console.log(eventList);
+  console.log(offerList);
+  console.log(destinationList);
+
+  tripController.setDestinations(destinationList);
+  events.set([]);
+})

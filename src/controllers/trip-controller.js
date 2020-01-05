@@ -23,6 +23,7 @@ export default class TripController {
     this._eventControllers = [];
     this._showenEvents = [];
     this._modeChangeHandlers = [];
+    this._destinations = [];
 
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
     this._viewChangeHandler = this._viewChangeHandler.bind(this);
@@ -37,6 +38,50 @@ export default class TripController {
     this._eventsModel.setDataChangeHandler(this._modelDataChangeHandler);
 
     this._renderSort(this._activeSortType);
+  }
+
+  render() {
+    this._showenEvents = this._eventsModel.get().slice();
+
+    this._renderSort(this._activeSortType);
+    this._renderEvents(this._showenEvents);
+  }
+
+  createEvent() {
+    const container = this._sortComponent === null ? this._container.children[0] : this._sortComponent.getElement();
+
+    const newEvent = new EventController(
+        container,
+        this._dataChangeHandler,
+        this._viewChangeHandler,
+        flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null)),
+        this._destinations
+    );
+
+    newEvent.setDestroyHandler(this._eventDestroyHandler);
+    newEvent.setEventCancelHandler(this._newEventCancelHandler);
+
+    newEvent.render(EVENT_DEFAULT, EventMode.ADDING);
+
+    this._eventControllers.push(newEvent);
+
+    this._setMode(TripMode.ADDING);
+  }
+
+  setModeChangeHandler(handler) {
+    this._modeChangeHandlers.push(handler);
+  }
+
+  hide() {
+    this._container.classList.add(`visually-hidden`);
+  }
+
+  show() {
+    this._container.classList.remove(`visually-hidden`);
+  }
+
+  setDestinations(destinations) {
+    this._destinations = destinations;
   }
 
   _renderSort(activeSortType) {
@@ -93,33 +138,6 @@ export default class TripController {
     this._editingEventID = null;
   }
 
-  render() {
-    this._showenEvents = this._eventsModel.get().slice();
-
-    this._renderSort(this._activeSortType);
-    this._renderEvents(this._showenEvents);
-  }
-
-  createEvent() {
-    const container = this._sortComponent === null ? this._container.children[0] : this._sortComponent.getElement();
-
-    const newEvent = new EventController(
-        container,
-        this._dataChangeHandler,
-        this._viewChangeHandler,
-        flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null))
-    );
-
-    newEvent.setDestroyHandler(this._eventDestroyHandler);
-    newEvent.setEventCancelHandler(this._newEventCancelHandler);
-
-    newEvent.render(EVENT_DEFAULT, EventMode.ADDING);
-
-    this._eventControllers.push(newEvent);
-
-    this._setMode(TripMode.ADDING);
-  }
-
   _renderDayEvents(container, eventList) {
     return eventList.map((it) => {
       const mode = this._editingEventID !== null && it.id === this._editingEventID ? TripMode.EDITING : TripMode.DEFAULT;
@@ -127,7 +145,8 @@ export default class TripController {
           container,
           this._dataChangeHandler,
           this._viewChangeHandler,
-          flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start))
+          flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
+          this._destinations
       ).render(it, mode);
     });
   }
@@ -208,17 +227,5 @@ export default class TripController {
     });
 
     return rangers;
-  }
-
-  setModeChangeHandler(handler) {
-    this._modeChangeHandlers.push(handler);
-  }
-
-  hide() {
-    this._container.classList.add(`visually-hidden`);
-  }
-
-  show() {
-    this._container.classList.remove(`visually-hidden`);
   }
 }
