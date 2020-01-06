@@ -1,18 +1,18 @@
 import AbstractComponent from './abstract-component.js';
 import {getDateTime, getTime, formatDate} from '../utils/common.js';
-import {EventTypeProperties, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import {EventTypeProperties, PlaceholderParticle} from '../const.js';
 
 const createOffersHtml = (offerData) => {
-  const selected = offerData.filter((item) => item.checked).slice(0, 3);
+  const selected = offerData.slice(0, 3);
   if (!selected.length) {
     return ``;
   }
 
   const offers = selected.map((item) => `
                       <li class="event__offer">
-                        <span class="event__offer-title">${OfferTypeOptions[item.type].name}</span>
+                        <span class="event__offer-title">${item.title}</span>
                         &plus;
-                        &euro;&nbsp;<span class="event__offer-price">${item.cost}</span>
+                        &euro;&nbsp;<span class="event__offer-price">${item.price}</span>
                        </li>`);
 
   return `
@@ -25,7 +25,7 @@ const createOffersHtml = (offerData) => {
 const createEventHtml = (eventItem) => {
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
-  const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]} ${eventItem.destination}`;
+  const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]} ${eventItem.destination.name}`;
   const offersHtml = createOffersHtml(eventItem.offers);
 
   return `

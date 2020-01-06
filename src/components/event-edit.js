@@ -1,7 +1,5 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {DestinationOptions} from '../mock/destination-data.js';
-import {generateOfferList} from '../mock/offer-data.js';
-import {EventType, EventTypeProperties, MovingType, PlaceholderParticle, OfferTypeOptions} from '../const.js';
+import {EventType, EventTypeProperties, MovingType, PlaceholderParticle} from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 
 const getCostValidity = (value) => {
@@ -62,23 +60,44 @@ const createEventTypeList = () => {
                         </div>`;
 };
 
+const joinOffers = (eventOffers, eventTypeOffers) => {
+  const eventOffersDict = {};
+  const eventTypeOffersDict = {};
+
+  eventOffers.forEach((it) => {
+    eventOffersDict[it.title] = Object.assign({}, it);
+    eventOffersDict[it.title].checked = true;
+  });
+
+  eventTypeOffers.forEach((it) => {
+    eventTypeOffersDict[it.title] = Object.assign({}, it);
+    eventTypeOffersDict[it.title].checked = false;
+  });
+
+  const joinedEventOffers = Object.assign({}, eventTypeOffersDict, eventOffersDict);
+  const resultOffers = Object.values(joinedEventOffers);
+
+  return resultOffers;
+};
+
 const createEventOffer = (offer, index) => {
-  const offerOptions = OfferTypeOptions[offer.type];
   return `
                           <div class="event__offer-selector">
-                            <input data-offer-index="${index}" class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.type}" type="checkbox" name="event-offer-${offer.type}" ${offer.checked ? `checked` : ``}>
-                            <label class="event__offer-label" for="event-offer-${offer.type}">
-                              <span class="event__offer-title">${offerOptions.name}</span>
+                            <input data-offer-index="${index}" class="event__offer-checkbox  visually-hidden" id="event-offer-${index}" type="checkbox" name="event-offer-${index}" ${offer.checked ? `checked` : ``}>
+                            <label class="event__offer-label" for="event-offer-${index}">
+                              <span class="event__offer-title">${offer.title}</span>
                               &plus;
-                              &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
+                              &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
                             </label>
                           </div>`;
 };
 
-const createEventOffers = (offers) => {
-  if (!offers.length) {
+const createEventOffers = (eventOffers, eventTypeOffers) => {
+  if (!eventOffers.length) {
     return ``;
   }
+
+  const offers = joinOffers(eventOffers, eventTypeOffers);
 
   const eventOffersHtml = offers.map((it, i) => createEventOffer(it, i)).join(`\n`);
 
@@ -93,17 +112,17 @@ const createEventOffers = (offers) => {
 };
 
 const createDestinationHtml = (destination) => {
-  if (!DestinationOptions[destination]) {
+  if (!destination) {
     return ``;
   }
 
-  const photoList = DestinationOptions[destination].photoList.map((item) => `
-                                <img class="event__photo" src="${item}" alt="Event photo">`).join(`\n`);
+  const photoList = destination.pictures.map((it) => `
+                                <img class="event__photo" src="${it.src}" alt="${it.description}">`).join(`\n`);
 
   return `
                       <section class="event__section  event__section--destination">
-                        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                        <p class="event__destination-description">${DestinationOptions[destination].description}</p>
+                        <h3 class="event__section-title  event__section-title--destination">${destination.name}</h3>
+                        <p class="event__destination-description">${destination.description}</p>
 
                         <div class="event__photos-container">
                           <div class="event__photos-tape">
@@ -113,15 +132,17 @@ const createDestinationHtml = (destination) => {
                       </section>`;
 };
 
-const createForm = (eventItem) => {
+const createForm = (eventItem, destinations, offers) => {
   const isNewEvent = eventItem.id === null;
 
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
-  const destination = eventItem.destination;
-  const destinationList = Object.keys(DestinationOptions).map((item) => `<option value="${item}"></option>`).join(`\n`);
+  const destination = eventItem.destination.name;
+  const destinationList = destinations.map((item) => `<option value="${item.name}"></option>`).join(`\n`);
   const disableStatus = isFormValid(eventItem) ? `` : ` disabled`;
+  const destinationHtml = createDestinationHtml(eventItem.destination);
+  const offersHtml = createEventOffers(eventItem.offers, offers[eventItem.type]);
 
   const editFormButtons = `
                       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${eventItem.isFavorite ? `checked` : ``}>
@@ -188,8 +209,8 @@ const createForm = (eventItem) => {
 
                     <section class="event__details">
 
-                      ${createEventOffers(eventItem.offers)}
-                      ${createDestinationHtml(eventItem.destination)}
+                      ${offersHtml}
+                      ${destinationHtml}
 
                     </section>
                   </form>
@@ -197,24 +218,28 @@ const createForm = (eventItem) => {
 };
 
 export default class EventEditComponent extends AbstractSmartComponent {
-  constructor(eventItem, disabledRanges) {
+  constructor(eventItem, disabledRanges, destinations, offers) {
     super();
     this._eventItem = eventItem;
-    this._copyData = Object.assign({}, eventItem);
+    this._copyData = eventItem.clone();
+    this._disabledRanges = disabledRanges;
+    this._destinations = destinations;
+    this._offers = offers;
+
+    this._dateRangeChangeHandler = this._dateRangeChangeHandler.bind(this);
 
     this._addListeners();
 
-    this._flatpickrRange = new FlatpickrRange(
-        this.getElement().querySelector(`#event-start-time`),
-        this.getElement().querySelector(`#event-end-time`),
-        this._eventItem.start,
-        this._eventItem.finish,
-        disabledRanges
-    );
+    this._flatpickrRange = this._createFlatpickrRange();
   }
 
   getTemplate() {
-    return createForm(this._eventItem);
+    return createForm(this._eventItem, this._destinations, this._offers);
+  }
+
+  rerender() {
+    super.rerender();
+    this._flatpickrRange = this._createFlatpickrRange();
   }
 
   _setHandler(handler, element, handlerKeeperName, eventName) {
@@ -276,18 +301,19 @@ export default class EventEditComponent extends AbstractSmartComponent {
     const element = this.getElement();
 
     element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
-      this._eventItem.destination = evt.target.value;
+      const destination = this._destinations.find((it) => it.name === evt.target.value);
+      this._eventItem.destination = destination || this._eventItem.destination;
 
       this.rerender();
       setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
-    element.querySelector(`#event-start-time`).addEventListener(`change`, () => {
+    element.querySelector(`#event-start-time`).addEventListener(`input`, () => {
       this._eventItem.start = this._flatpickrRange.getStartDate();
       setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
 
-    element.querySelector(`#event-end-time`).addEventListener(`change`, () => {
+    element.querySelector(`#event-end-time`).addEventListener(`input`, () => {
       this._eventItem.finish = this._flatpickrRange.getFinishDate();
       setSubmitDisableStatus(this.getElement(), this._eventItem);
     });
@@ -295,7 +321,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
       it.addEventListener(`change`, (evt) => {
         this._eventItem.type = EventType[evt.target.value.toUpperCase()];
-        this._eventItem.offers = generateOfferList(this._eventItem.type);
+        this._eventItem.offers = this._offers[this._eventItem.type];
 
         this.rerender();
       });
@@ -321,10 +347,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   recoveryListeners() {
     this._addListeners();
-    this._flatpickrRange.rerender(
-        this.getElement().querySelector(`#event-start-time`),
-        this.getElement().querySelector(`#event-end-time`)
-    );
 
     this.setRollupButtonClickHandler();
     this.setSubmitHandler();
@@ -332,21 +354,33 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   removeElement() {
-    if (this._startFlatpickr) {
-      this._startFlatpickr.destroy();
-      this._startFlatpickr = null;
-    }
-
-    if (this._finishFlatpickr) {
-      this._finishFlatpickr.destroy();
-      this._finishFlatpickr = null;
+    if (this._flatpickrRange) {
+      this._flatpickrRange.destroy();
+      this._flatpickrRange = null;
     }
 
     super.removeElement();
   }
 
   reset() {
-    this._eventItem = Object.assign({}, this._copyData);
+    this._eventItem = this._copyData.clone();
     this.rerender();
+  }
+
+  _createFlatpickrRange() {
+    return new FlatpickrRange(
+        this.getElement().querySelector(`#event-start-time`),
+        this.getElement().querySelector(`#event-end-time`),
+        this._eventItem.start,
+        this._eventItem.finish,
+        this._disabledRanges,
+        this._dateRangeChangeHandler
+    );
+  }
+
+  _dateRangeChangeHandler(dateStart, dateFinish) {
+    this._eventItem.start = dateStart;
+    this._eventItem.finish = dateFinish;
+    setSubmitDisableStatus(this.getElement(), this._eventItem);
   }
 }

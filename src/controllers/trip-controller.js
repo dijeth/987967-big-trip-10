@@ -9,9 +9,10 @@ import EventController from './event-controller.js';
 import {EventMode, EVENT_DEFAULT, TripMode} from '../const.js';
 
 export default class TripController {
-  constructor(container, eventsModel) {
+  constructor(container, eventsModel, api) {
     this._container = container;
     this._eventsModel = eventsModel;
+    this._api = api;
     this._noPointsComponent = null;
     this._sortComponent = null;
     this._dayListComponent = null;
@@ -23,6 +24,8 @@ export default class TripController {
     this._eventControllers = [];
     this._showenEvents = [];
     this._modeChangeHandlers = [];
+    this._destinations = [];
+    this._offers = [];
 
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
     this._viewChangeHandler = this._viewChangeHandler.bind(this);
@@ -35,6 +38,57 @@ export default class TripController {
 
     this._eventsModel.setFilterChangeHandler(this._filterChangeHandler);
     this._eventsModel.setDataChangeHandler(this._modelDataChangeHandler);
+
+    this._renderSort(this._activeSortType);
+  }
+
+  render() {
+    this._showenEvents = this._eventsModel.get().slice();
+
+    this._renderSort(this._activeSortType);
+    this._renderEvents(this._showenEvents);
+  }
+
+  createEvent() {
+    const container = this._sortComponent === null ? this._container.children[0] : this._sortComponent.getElement();
+
+    const newEvent = new EventController(
+        container,
+        this._dataChangeHandler,
+        this._viewChangeHandler,
+        flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null)),
+        this._destinations,
+        this._offers
+    );
+
+    newEvent.setDestroyHandler(this._eventDestroyHandler);
+    newEvent.setEventCancelHandler(this._newEventCancelHandler);
+
+    newEvent.render(EVENT_DEFAULT, EventMode.ADDING);
+
+    this._eventControllers.push(newEvent);
+
+    this._setMode(TripMode.ADDING);
+  }
+
+  setModeChangeHandler(handler) {
+    this._modeChangeHandlers.push(handler);
+  }
+
+  hide() {
+    this._container.classList.add(`visually-hidden`);
+  }
+
+  show() {
+    this._container.classList.remove(`visually-hidden`);
+  }
+
+  setDestinations(destinations) {
+    this._destinations = destinations;
+  }
+
+  setOffers(offers) {
+    this._offers = offers;
   }
 
   _renderSort(activeSortType) {
@@ -91,33 +145,6 @@ export default class TripController {
     this._editingEventID = null;
   }
 
-  render() {
-    this._showenEvents = this._eventsModel.get().slice();
-
-    this._renderSort(this._activeSortType);
-    this._renderEvents(this._showenEvents);
-  }
-
-  createEvent() {
-    const container = this._sortComponent === null ? this._container.children[0] : this._sortComponent.getElement();
-
-    const newEvent = new EventController(
-        container,
-        this._dataChangeHandler,
-        this._viewChangeHandler,
-        flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null))
-    );
-
-    newEvent.setDestroyHandler(this._eventDestroyHandler);
-    newEvent.setEventCancelHandler(this._newEventCancelHandler);
-
-    newEvent.render(EVENT_DEFAULT, EventMode.ADDING);
-
-    this._eventControllers.push(newEvent);
-
-    this._setMode(TripMode.ADDING);
-  }
-
   _renderDayEvents(container, eventList) {
     return eventList.map((it) => {
       const mode = this._editingEventID !== null && it.id === this._editingEventID ? TripMode.EDITING : TripMode.DEFAULT;
@@ -125,7 +152,9 @@ export default class TripController {
           container,
           this._dataChangeHandler,
           this._viewChangeHandler,
-          flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start))
+          flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
+          this._destinations,
+          this._offers
       ).render(it, mode);
     });
   }
@@ -148,7 +177,8 @@ export default class TripController {
 
   _dataChangeHandler(id, newEventData, keepInEditMode) {
     this._editingEventID = keepInEditMode ? id : null;
-    this._eventsModel.update(id, newEventData);
+
+    this._api.updateEvent(id, newEventData).then((data) => this._eventsModel.update(id, data));
   }
 
   _viewChangeHandler() {
@@ -206,17 +236,5 @@ export default class TripController {
     });
 
     return rangers;
-  }
-
-  setModeChangeHandler(handler) {
-    this._modeChangeHandlers.push(handler);
-  }
-
-  hide() {
-    this._container.classList.add(`visually-hidden`);
-  }
-
-  show() {
-    this._container.classList.remove(`visually-hidden`);
   }
 }
