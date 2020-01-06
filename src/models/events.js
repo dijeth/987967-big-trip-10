@@ -23,7 +23,7 @@ export default class Events {
 
   set(eventList) {
     this._events = eventList.map((it) => {
-      it.id = this._generateID();
+      // it.id = this._generateID();
       return it;
     });
     

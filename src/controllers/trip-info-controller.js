@@ -52,15 +52,15 @@ class TripInfoController {
       case 1:
       case 2:
       case 3:
-        return eventList.map((it) => it.destination);
+        return eventList.map((it) => it.destination.name);
 
       default:
-        return [eventList[0].destination, `...`, eventList[eventList.length - 1].destination];
+        return [eventList[0].destination.name, `...`, eventList[eventList.length - 1].destination.name];
     }
   }
 
   _getInfoCost(eventList) {
-    const sumOffers = (offerList) => offerList.reduce((accum, current) => accum + current.checked * current.cost, 0);
+    const sumOffers = (offerList) => offerList.reduce((accum, current) => accum + current.checked * current.price, 0);
 
     return eventList.reduce((accum, current) => accum + current.cost + sumOffers(current.offers), 0);
   }

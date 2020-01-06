@@ -12,7 +12,7 @@ const createOffersHtml = (offerData) => {
                       <li class="event__offer">
                         <span class="event__offer-title">${item.title}</span>
                         &plus;
-                        &euro;&nbsp;<span class="event__offer-price">${item.cost}</span>
+                        &euro;&nbsp;<span class="event__offer-price">${item.price}</span>
                        </li>`);
 
   return `
@@ -25,7 +25,7 @@ const createOffersHtml = (offerData) => {
 const createEventHtml = (eventItem) => {
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
-  const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]} ${eventItem.destination}`;
+  const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]} ${eventItem.destination.name}`;
   const offersHtml = createOffersHtml(eventItem.offers);
 
   return `

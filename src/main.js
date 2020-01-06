@@ -9,8 +9,8 @@ import TripInfoController from './controllers/trip-info-controller.js';
 import { TripMode, MenuMode } from './const.js';
 import API from './api.js'
 
-const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip/`;
-const AUTORIZATION = `Basic er883jdzbdw`;
+const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
+const AUTORIZATION = `Basic JethroTull`;
 const api = new API(END_POINT, AUTORIZATION);
 
 const tripMainElement = document.querySelector(`.trip-main`);
@@ -67,6 +67,8 @@ createEventElement.addEventListener(`click`, () => {
 
 statisticsComponent.hide();
 
-api.getDestinations().then((data) => tripController.setDestinations(data));
-api.getOffers().then((data) => tripController.setOffers(data));
-api.getEvents().then((eventData) => events.set(eventData));
+api.getData().then((data) => {
+  tripController.setDestinations(data.destinations);
+  tripController.setOffers(data.offers);
+  events.set(data.events);
+});

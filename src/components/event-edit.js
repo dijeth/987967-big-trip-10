@@ -67,7 +67,7 @@ const createEventOffer = (offer, index) => {
                             <label class="event__offer-label" for="event-offer-${index}">
                               <span class="event__offer-title">${offer.title}</span>
                               &plus;
-                              &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
+                              &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
                             </label>
                           </div>`;
 };
@@ -89,19 +89,18 @@ const createEventOffers = (offers) => {
                       </section>`;
 };
 
-const createDestinationHtml = (destination, destinations) => {
-  const destinationData = destinations.find((it) => it.name === destination);
-  if (!destinationData) {
+const createDestinationHtml = (destination) => {
+  if (!destination) {
     return ``;
   }
 
-  const photoList = destinationData.pictures.map((it) => `
+  const photoList = destination.pictures.map((it) => `
                                 <img class="event__photo" src="${it.src}" alt="${it.description}">`).join(`\n`);
 
   return `
                       <section class="event__section  event__section--destination">
-                        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                        <p class="event__destination-description">${destinationData.description}</p>
+                        <h3 class="event__section-title  event__section-title--destination">${destination.name}</h3>
+                        <p class="event__destination-description">${destination.description}</p>
 
                         <div class="event__photos-container">
                           <div class="event__photos-tape">
@@ -117,10 +116,10 @@ const createForm = (eventItem, destinations) => {
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
-  const destination = eventItem.destination;
+  const destination = eventItem.destination.name;
   const destinationList = destinations.map((item) => `<option value="${item.name}"></option>`).join(`\n`);
   const disableStatus = isFormValid(eventItem) ? `` : ` disabled`;
-  const destinationHtml = createDestinationHtml(eventItem.destination, destinations);
+  const destinationHtml = createDestinationHtml(eventItem.destination);
   const offersHtml = createEventOffers(eventItem.offers);
 
   const editFormButtons = `
@@ -200,10 +199,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
   constructor(eventItem, disabledRanges, destinations, offers) {
     super();
     this._eventItem = eventItem;
-    this._copyData = Object.assign({}, eventItem);
+    this._copyData = eventItem.clone();
     this._disabledRanges = disabledRanges;
     this._destinations = destinations;
-    this._offers = offers;
+    this._offers = offers;debugger;
 
     this._dateRangeChangeHandler = this._dateRangeChangeHandler.bind(this);
 
@@ -280,7 +279,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
     const element = this.getElement();
 
     element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
-      this._eventItem.destination = evt.target.value;
+      const destination = this._destinations.find((it) => it.name === evt.target.value);
+      this._eventItem.destination = destination || this._eventItem.destination;
 
       this.rerender();
       setSubmitDisableStatus(this.getElement(), this._eventItem);
@@ -341,7 +341,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   reset() {
-    this._eventItem = Object.assign({}, this._copyData);
+    this._eventItem = this._copyData.clone();
     this.rerender();
   }
 

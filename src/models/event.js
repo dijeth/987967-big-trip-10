@@ -1,41 +1,45 @@
 export default class EventModel {
   constructor(data, eventTypeOffers) {
-    this.id = Number(data.id);
+    this.id = data.id;
     this.type = data.type;
     this.start = new Date(data.date_from);
     this.finish = new Date(data.date_to);
-    this.destination = data.destination.name;
+    this.destination = data.destination;
     this.cost = data.base_price;
     this.isFavorite = data.is_favorite;
     this.offers = EventModel.joinOffers(data.offers, eventTypeOffers);
   }
 
-  toRAW(destinations) {
+  toRAW() {
     return {
       id: this.id,
       base_price: this.cost,
       date_from: this.start.toISOString(),
       date_to: this.finish.toISOString(),
-      destination: destinations.find((it) => it.name === this.destination),
+      destination: this.destination,
       is_favorite: this.isFavorite,
       offers: this.offers.filter((it) => it.checked).map((it) => {
-        delete(it.checked);
-        return it;
+        const offer = Object.assign({}, it);
+        delete(offer.checked);
+        return offer;
       }),
       type: this.type
     }
   }
 
-  clone(destinations, eventTypeOffers) {
-    return new EventModel(this.toRAW(destinations), eventTypeOffers);
+  clone() {
+    const offers = this.offers.slice();
+    const eventClone = new EventModel(this.toRAW(), offers);
+
+    return eventClone;
   }
 
   static joinOffers(eventOffers, eventTypeOffers) {
     const eventOffersDict = {};
     const eventTypeOffersDict = {};
 
-    eventOffers.map((it) => eventOffersDict[it.title] = { cost: it.price, checked: true });
-    eventTypeOffers.map((it) => eventTypeOffersDict[it.title] = { cost: it.price, checked: false });
+    eventOffers.forEach((it) => eventOffersDict[it.title] = { price: it.price, checked: true });
+    eventTypeOffers.forEach((it) => eventTypeOffersDict[it.title] = { price: it.price, checked: false });
 
     const joinedEventOffers = Object.assign({}, eventTypeOffersDict, eventOffersDict);
     const resultOffers = Object.entries(joinedEventOffers).map((it) => Object.assign({title: it[0]}, it[1]));

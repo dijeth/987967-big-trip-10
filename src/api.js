@@ -32,13 +32,18 @@ export default class API {
       .then((offerData) => new Offers(offerData))
   }
 
-  getEvents() {
+  getData() {
     return Promise.all([
       this._load({ url: `points` }).then((response) => response.json()),
-      this.getOffers()
+      this.getOffers(),
+      this.getDestinations()
     ]).then((values) => {
-      const [eventList, offerList] = values;
-      return EventModel.parseEvents(eventList, offerList);
+      const [eventList, offerList, destinations] = values;
+      return {
+        events: EventModel.parseEvents(eventList, offerList),
+        offers: offerList,
+        destinations: destinations
+      };
     });
   }
 

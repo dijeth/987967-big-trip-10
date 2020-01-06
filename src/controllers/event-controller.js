@@ -62,10 +62,9 @@ export default class EventController {
   }
 
   render(eventData, mode = EventMode.DEFAULT) {
-
-    const eventComponent = new EventComponent(Object.assign({}, eventData));
+    const eventComponent = new EventComponent(eventData.clone());
     const eventEditComponent = new EventEditComponent(
-      Object.assign({}, eventData), 
+      eventData.clone(), 
       this._disabledRanges, 
       this._destinations,
       this._offers
@@ -93,7 +92,9 @@ export default class EventController {
 
       const keepInEditing = true;
 
-      this._dataChangeHandler(eventData.id, Object.assign({}, eventData, {isFavorite: !eventData.isFavorite}), keepInEditing);
+      eventData.isFavorite = !eventData.isFavorite;
+
+      this._dataChangeHandler(eventData.id, eventData, keepInEditing);
     });
 
     eventEditComponent.setDeleteButtonClickHandler((evt) => {
