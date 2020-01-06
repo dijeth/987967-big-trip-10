@@ -64,11 +64,11 @@ export default class EventController {
   render(eventData, mode = EventMode.DEFAULT) {
     const eventComponent = new EventComponent(eventData.clone());
     const eventEditComponent = new EventEditComponent(
-      eventData.clone(), 
-      this._disabledRanges, 
-      this._destinations,
-      this._offers
-      );
+        eventData.clone(),
+        this._disabledRanges,
+        this._destinations,
+        this._offers
+    );
 
     eventComponent.setRollupButtonClickHandler(() => {
       this._eventToEdit();

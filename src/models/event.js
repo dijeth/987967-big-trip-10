@@ -13,14 +13,14 @@ export default class EventModel {
   toRAW() {
     return {
       id: this.id,
-      base_price: this.cost,
-      date_from: this.start.toISOString(),
-      date_to: this.finish.toISOString(),
+      [`base_price`]: this.cost,
+      [`date_from`]: this.start.toISOString(),
+      [`date_to`]: this.finish.toISOString(),
       destination: this.destination,
-      is_favorite: this.isFavorite,
+      [`is_favorite`]: this.isFavorite,
       offers: this.offers,
       type: this.type
-    }
+    };
   }
 
   clone() {
@@ -28,6 +28,6 @@ export default class EventModel {
   }
 
   static parseEvents(data) {
-    return data.map((it) => new EventModel(it))
+    return data.map((it) => new EventModel(it));
   }
 }

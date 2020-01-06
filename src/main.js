@@ -1,4 +1,4 @@
-import { RenderPosition, renderComponent, removeComponent } from './utils/render.js';
+import {RenderPosition, renderComponent, removeComponent} from './utils/render.js';
 import NoPointsComponent from './components/no-points.js';
 import MenuComponent from './components/menu.js';
 import StatisticComponent from './components/stats.js';
@@ -6,8 +6,8 @@ import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import Events from './models/events.js';
 import TripInfoController from './controllers/trip-info-controller.js';
-import { TripMode, MenuMode } from './const.js';
-import API from './api.js'
+import {TripMode, MenuMode} from './const.js';
+import API from './api.js';
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 const AUTORIZATION = `Basic JethroTull`;
@@ -20,6 +20,7 @@ const createEventElement = tripMainElement.querySelector(`.trip-main__event-add-
 
 const events = new Events();
 const tripInfoController = new TripInfoController(tripMainElement, events);
+tripInfoController.init();
 const filterController = new FilterController(tripControlElements[1], events);
 
 const tripController = new TripController(tripEventsElement, events, api);

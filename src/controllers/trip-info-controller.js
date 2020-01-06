@@ -1,6 +1,6 @@
 import TripInfoComponent from '../components/trip-info.js';
-import { getShortDate } from '../utils/common.js';
-import { replaceComponent, renderComponent, RenderPosition } from '../utils/render.js';
+import {getShortDate} from '../utils/common.js';
+import {replaceComponent, renderComponent, RenderPosition} from '../utils/render.js';
 
 class TripInfoController {
   constructor(container, eventsModel) {
@@ -9,15 +9,18 @@ class TripInfoController {
     this._tripInfoComponent = null;
 
     this._dataChangeHandler = this._dataChangeHandler.bind(this);
+  }
+
+  init() {
     this._eventsModel.setDataChangeHandler(this._dataChangeHandler);
   }
 
   _render() {
     const eventList = this._eventsModel.get().slice().sort((a, b) => +a.start - b.start);
     const tripInfoComponent = new TripInfoComponent(
-      this._getDateTitle(eventList),
-      this._getShortTrip(eventList),
-      this._getInfoCost(eventList)
+        this._getDateTitle(eventList),
+        this._getShortTrip(eventList),
+        this._getInfoCost(eventList)
     );
 
     if (this._tripInfoComponent) {
@@ -35,8 +38,8 @@ class TripInfoController {
 
   _getDateTitle(eventList) {
     if (!eventList.length) {
-      return ``
-    };
+      return ``;
+    }
 
     const tripStart = eventList[0].start;
     const tripFinish = eventList.length > 1 ? eventList[eventList.length - 1].finish : eventList[0].finish;

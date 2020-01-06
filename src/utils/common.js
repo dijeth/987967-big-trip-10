@@ -49,7 +49,7 @@ export const isDataInRange = (data, range) => {
 };
 
 export const isDataInRanges = (data, ranges) => {
-  return ranges.some((it) => isDataInRange(data, it))
+  return ranges.some((it) => isDataInRange(data, it));
 };
 
 export const flatDataRanges = (ranges) => {

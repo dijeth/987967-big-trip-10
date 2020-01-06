@@ -1,5 +1,7 @@
 export default class Offers {
   constructor(data) {
-    data.forEach((it) => this[it.type] = it.offers)
+    data.forEach((it) => {
+      this[it.type] = it.offers;
+    });
   }
 }

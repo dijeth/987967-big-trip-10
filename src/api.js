@@ -23,18 +23,18 @@ export default class API {
   }
 
   getDestinations() {
-    return this._load({ url: `destinations` }).then((response) => response.json())
+    return this._load({url: `destinations`}).then((response) => response.json());
   }
 
   getOffers() {
-    return this._load({ url: `offers` })
+    return this._load({url: `offers`})
       .then((response) => response.json())
-      .then((offerData) => new Offers(offerData))
+      .then((offerData) => new Offers(offerData));
   }
 
   getData() {
     return Promise.all([
-      this._load({ url: `points` }).then((response) => response.json()),
+      this._load({url: `points`}).then((response) => response.json()),
       this.getOffers(),
       this.getDestinations()
     ]).then((values) => {
@@ -42,42 +42,42 @@ export default class API {
       return {
         events: EventModel.parseEvents(eventList),
         offers: offerList,
-        destinations: destinations
+        destinations
       };
     });
   }
 
   createEvent(eventModel) {
     return this._load({
-        url: `points`,
-        method: Method.POST,
-        body: JSON.stringify(eventModel.toRAW()),
-        headers: new Headers({ 'Content-Type': `application/json` })
-      })
+      url: `points`,
+      method: Method.POST,
+      body: JSON.stringify(eventModel.toRAW()),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
       .then((response) => response.json())
       .then((data) => new EventModel(data));
   }
 
   updateEvent(id, data) {
     return this._load({
-        url: `points/${id}`,
-        method: Method.PUT,
-        body: JSON.stringify(data.toRAW()),
-        headers: new Headers({ 'Content-Type': `application/json` })
-      })
+      url: `points/${id}`,
+      method: Method.PUT,
+      body: JSON.stringify(data.toRAW()),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
       .then((response) => response.json())
-      .then((data) => new EventModel(data));
+      .then((eventData) => new EventModel(eventData));
   }
 
   deleteEvent(id) {
-    return this._load({ url: `points/${id}`, method: Method.DELETE });
+    return this._load({url: `points/${id}`, method: Method.DELETE});
   }
 
 
-  _load({ url, method = Method.GET, body = null, headers = new Headers() }) {
+  _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);
 
-    return fetch(`${this._endPoint}/${url}`, { method, body, headers })
+    return fetch(`${this._endPoint}/${url}`, {method, body, headers})
       .then(checkStatus)
       .catch((err) => {
         throw err;
