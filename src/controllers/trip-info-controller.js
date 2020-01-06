@@ -60,7 +60,7 @@ class TripInfoController {
   }
 
   _getInfoCost(eventList) {
-    const sumOffers = (offerList) => offerList.reduce((accum, current) => accum + current.checked * current.price, 0);
+    const sumOffers = (offerList) => offerList.reduce((accum, current) => accum + current.price, 0);
 
     return eventList.reduce((accum, current) => accum + current.cost + sumOffers(current.offers), 0);
   }

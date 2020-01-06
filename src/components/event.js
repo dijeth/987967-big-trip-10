@@ -3,7 +3,7 @@ import {getDateTime, getTime, formatDate} from '../utils/common.js';
 import {EventTypeProperties, PlaceholderParticle, OfferTypeOptions} from '../const.js';
 
 const createOffersHtml = (offerData) => {
-  const selected = offerData.filter((item) => item.checked).slice(0, 3);
+  const selected = offerData.slice(0, 3);
   if (!selected.length) {
     return ``;
   }

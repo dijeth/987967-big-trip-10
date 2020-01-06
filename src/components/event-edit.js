@@ -60,6 +60,26 @@ const createEventTypeList = () => {
                         </div>`;
 };
 
+const joinOffers = (eventOffers, eventTypeOffers) => {
+  const eventOffersDict = {};
+  const eventTypeOffersDict = {};
+
+  eventOffers.forEach((it) => {
+    eventOffersDict[it.title] = Object.assign({}, it);
+    eventOffersDict[it.title].checked = true;
+  });
+
+  eventTypeOffers.forEach((it) => {
+    eventTypeOffersDict[it.title] = Object.assign({}, it);
+    eventTypeOffersDict[it.title].checked = false;
+  });
+
+  const joinedEventOffers = Object.assign({}, eventTypeOffersDict, eventOffersDict);
+  const resultOffers = Object.values(joinedEventOffers);
+
+  return resultOffers;
+}
+
 const createEventOffer = (offer, index) => {
   return `
                           <div class="event__offer-selector">
@@ -72,10 +92,12 @@ const createEventOffer = (offer, index) => {
                           </div>`;
 };
 
-const createEventOffers = (offers) => {
-  if (!offers.length) {
+const createEventOffers = (eventOffers, eventTypeOffers) => {
+  if (!eventOffers.length) {
     return ``;
-  }
+  };
+
+  const offers = joinOffers(eventOffers, eventTypeOffers);
 
   const eventOffersHtml = offers.map((it, i) => createEventOffer(it, i)).join(`\n`);
 
@@ -110,7 +132,7 @@ const createDestinationHtml = (destination) => {
                       </section>`;
 };
 
-const createForm = (eventItem, destinations) => {
+const createForm = (eventItem, destinations, offers) => {
   const isNewEvent = eventItem.id === null;
 
   const eventProperty = EventTypeProperties[eventItem.type];
@@ -120,7 +142,7 @@ const createForm = (eventItem, destinations) => {
   const destinationList = destinations.map((item) => `<option value="${item.name}"></option>`).join(`\n`);
   const disableStatus = isFormValid(eventItem) ? `` : ` disabled`;
   const destinationHtml = createDestinationHtml(eventItem.destination);
-  const offersHtml = createEventOffers(eventItem.offers);
+  const offersHtml = createEventOffers(eventItem.offers, offers[eventItem.type]);
 
   const editFormButtons = `
                       <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${eventItem.isFavorite ? `checked` : ``}>
@@ -202,7 +224,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._copyData = eventItem.clone();
     this._disabledRanges = disabledRanges;
     this._destinations = destinations;
-    this._offers = offers;debugger;
+    this._offers = offers;
 
     this._dateRangeChangeHandler = this._dateRangeChangeHandler.bind(this);
 
@@ -212,7 +234,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createForm(this._eventItem, this._destinations);
+    return createForm(this._eventItem, this._destinations, this._offers);
   }
 
   rerender() {

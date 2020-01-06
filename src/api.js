@@ -40,7 +40,7 @@ export default class API {
     ]).then((values) => {
       const [eventList, offerList, destinations] = values;
       return {
-        events: EventModel.parseEvents(eventList, offerList),
+        events: EventModel.parseEvents(eventList),
         offers: offerList,
         destinations: destinations
       };
