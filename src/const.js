@@ -39,17 +39,16 @@ export const PlaceholderParticle = {
 };
 
 export const EventType = {
-  "TAXI": `taxi`,
-  "BUS": `bus`,
-  "TRAIN": `train`,
-  "SHIP": `ship`,
-  "TRANSPORT": `transport`,
-  "DRIVE": `drive`,
-  "FLIGHT": `flight`,
+  'TAXI': `taxi`,
+  'BUS': `bus`,
+  'TRAIN': `train`,
+  'SHIP': `ship`,
+  'TRANSPORT': `transport`,
+  'DRIVE': `drive`,
+  'FLIGHT': `flight`,
   'CHECK-IN': `check-in`,
-  "SIGHTSEEING": `sightseeing`,
-  "RESTAURANT": `restaurant`,
-  "TRIP": `trip`
+  'SIGHTSEEING': `sightseeing`,
+  'RESTAURANT': `restaurant`
 };
 
 export const EventTypeProperties = {
@@ -144,12 +143,6 @@ export const EventTypeProperties = {
     name: `Restaurant`,
     icon: `restaurant.png`,
     movingType: MovingType.STAYING
-  },
-
-  [EventType.TRIP]: {
-    name: `Trip`,
-    icon: `trip.png`,
-    movingType: MovingType.MOVING
   }
 };
 
@@ -169,7 +162,7 @@ export const EVENT_DEFAULT = {
   type: EventType.FLIGHT,
   [`date_from`]: null,
   [`date_to`]: null,
-  destination: ``,
+  destination: null,
   [`base_price`]: 0,
   [`is_favorite`]: false,
   offers: []

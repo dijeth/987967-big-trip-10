@@ -26,25 +26,24 @@ const setSubmitDisableStatus = (formElement, eventItem) => {
   formElement.querySelector(`.event__save-btn`).disabled = !isFormValid(eventItem);
 };
 
-const createEventTypeItem = (eventType) => {
+const createEventTypeItem = (eventType, checked) => {
   const eventTypeCode = eventType.toLowerCase();
+  const eventTypeName = EventTypeProperties[eventType].name;
   return `
-                            <div class="event__type-item">
-                              <input id="event-type-${eventTypeCode}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventTypeCode}">
-                              <label class="event__type-label  event__type-label--${eventTypeCode}" for="event-type-${eventTypeCode}">${eventType}</label>
-                            </div>`;
+  <div class="event__type-item">
+    <input id="event-type-${eventTypeCode}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventTypeCode}"${checked ? ` checked` : ``}>
+    <label class="event__type-label  event__type-label--${eventTypeCode}" for="event-type-${eventTypeCode}">${eventTypeName}</label>
+  </div>`;
 };
 
-const createEventTypeList = () => {
+const createEventTypeList = (eventType) => {
   const transferEvents = Object.entries(EventTypeProperties)
     .filter((item) => item[1].movingType === MovingType.MOVING)
-    .map((item) => item[0])
-    .map((item) => createEventTypeItem(item)).join(`\n`);
+    .map((item) => createEventTypeItem(item[0], item[0] === eventType)).join(`\n`);
 
   const activityEvents = Object.entries(EventTypeProperties)
     .filter((item) => item[1].movingType === MovingType.STAYING)
-    .map((item) => item[0])
-    .map((item) => createEventTypeItem(item)).join(`\n`);
+    .map((item) => createEventTypeItem(item[0], item[0] === eventType)).join(`\n`);
 
   return `
                           <div class="event__type-list">
@@ -138,7 +137,7 @@ const createForm = (eventItem, destinations, offers) => {
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
-  const destination = eventItem.destination.name;
+  const destination = eventItem.destination ? eventItem.destination.name : ``;
   const destinationList = destinations.map((item) => `<option value="${item.name}"></option>`).join(`\n`);
   const disableStatus = isFormValid(eventItem) ? `` : ` disabled`;
   const destinationHtml = createDestinationHtml(eventItem.destination);
@@ -169,7 +168,7 @@ const createForm = (eventItem, destinations, offers) => {
                         </label>
                         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
-                        ${createEventTypeList()}
+                        ${createEventTypeList(eventItem.type)}
                       </div>
 
                       <div class="event__field-group  event__field-group--destination">

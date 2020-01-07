@@ -74,3 +74,8 @@ export const flatDataRanges = (ranges) => {
 
   return flatedRanges;
 };
+
+
+export const toSentenceCase = (string) => {
+  return string.substr(0, 1).toUpperCase() + string.substr(1);
+}
