@@ -167,11 +167,11 @@ export const TimeValue = {
 export const EVENT_DEFAULT = {
   id: null,
   type: EventType.FLIGHT,
-  start: null,
-  finish: null,
+  [`date_from`]: null,
+  [`date_to`]: null,
   destination: ``,
-  cost: 0,
-  isFavorite: false,
+  [`base_price`]: 0,
+  [`is_favorite`]: false,
   offers: []
 };
 

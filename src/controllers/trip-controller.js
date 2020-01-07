@@ -7,7 +7,7 @@ import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
 import { EventMode, EVENT_DEFAULT, TripMode } from '../const.js';
-import { EventModel } from './../models/event.js';
+import EventModel from './../models/event.js';
 
 export default class TripController {
   constructor(container, eventsModel, api) {
