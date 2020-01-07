@@ -67,7 +67,8 @@ export default class EventController {
         cachedEventData ? cachedEventData : eventData.clone(),
         this._disabledRanges,
         this._destinations,
-        this._offers
+        this._offers,
+        mode
     );
 
     eventComponent.setRollupButtonClickHandler(() => {

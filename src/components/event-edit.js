@@ -1,6 +1,11 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {EventType, EventTypeProperties, MovingType, PlaceholderParticle} from '../const.js';
+import { EventType, EventTypeProperties, MovingType, PlaceholderParticle, EventMode } from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
+
+const ButtonLabel = {
+  SAVING: `Saving...`,
+  DELETING: `Deleting...`
+};
 
 const getCostValidity = (value) => {
   switch (true) {
@@ -82,7 +87,7 @@ const joinOffers = (eventOffers, eventTypeOffers) => {
 const createEventOffer = (offer, index) => {
   return `
                           <div class="event__offer-selector">
-                            <input data-offer-index="${index}" class="event__offer-checkbox  visually-hidden" id="event-offer-${index}" type="checkbox" name="event-offer-${index}" ${offer.checked ? `checked` : ``}>
+                            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${index}" type="checkbox" name="event-offer-${index}" ${offer.checked ? `checked` : ``}>
                             <label class="event__offer-label" for="event-offer-${index}">
                               <span class="event__offer-title">${offer.title}</span>
                               &plus;
@@ -131,8 +136,8 @@ const createDestinationHtml = (destination) => {
                       </section>`;
 };
 
-const createForm = (eventItem, destinations, offers) => {
-  const isNewEvent = eventItem.id === null;
+const createForm = (eventItem, destinations, offers, mode) => {
+  const isNewEvent = mode === EventMode.ADDING;
 
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
@@ -217,13 +222,14 @@ const createForm = (eventItem, destinations, offers) => {
 };
 
 export default class EventEditComponent extends AbstractSmartComponent {
-  constructor(eventItem, disabledRanges, destinations, offers) {
+  constructor(eventItem, disabledRanges, destinations, offers, mode) {
     super();
     this._eventItem = eventItem;
     this._copyData = eventItem.clone();
     this._disabledRanges = disabledRanges;
     this._destinations = destinations;
     this._offers = offers;
+    this._mode = mode;
 
     this._dateRangeChangeHandler = this._dateRangeChangeHandler.bind(this);
 
@@ -233,12 +239,75 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createForm(this._eventItem, this._destinations, this._offers);
+    return createForm(this._eventItem, this._destinations, this._offers, this._mode);
   }
 
   rerender() {
     super.rerender();
     this._flatpickrRange = this._createFlatpickrRange();
+  }
+
+  setRollupButtonClickHandler(handler) {
+    this._setHandler(
+      handler,
+      this.getElement().querySelector(`.event__rollup-btn`),
+      `_rollupButtonClickHandler`,
+      `click`
+    );
+  }
+
+  setSubmitHandler(handler) {
+    const form = this._getFormElement();
+    this._setHandler(
+      handler,
+      form,
+      `_submitHandler`,
+      `submit`
+    );
+  }
+
+  setInputFavoriteChangeHandler(handler) {
+    this._setHandler(
+      handler,
+      this.getElement().querySelector(`.event__favorite-checkbox`),
+      `_inputFavoriteChangeHandler`,
+      `change`
+    );
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this._setHandler(
+      handler,
+      this.getElement().querySelector(`.event__reset-btn`),
+      `_deleteButtonClickHandler`,
+      `click`
+    );
+  }
+
+  getData() {
+    return this._eventItem;
+  }
+
+  recoveryListeners() {
+    this._addListeners();
+
+    this.setRollupButtonClickHandler();
+    this.setSubmitHandler();
+    this.setInputFavoriteChangeHandler();
+  }
+
+  removeElement() {
+    if (this._flatpickrRange) {
+      this._flatpickrRange.destroy();
+      this._flatpickrRange = null;
+    }
+
+    super.removeElement();
+  }
+
+  reset() {
+    this._eventItem = this._copyData.clone();
+    this.rerender();
   }
 
   _setHandler(handler, element, handlerKeeperName, eventName) {
@@ -253,47 +322,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
     if (this[handlerKeeperName]) {
       element.addEventListener(eventName, this[handlerKeeperName]);
     }
-  }
-
-  setRollupButtonClickHandler(handler) {
-    this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__rollup-btn`),
-        `_rollupButtonClickHandler`,
-        `click`
-    );
-  }
-
-  setSubmitHandler(handler) {
-    const form = this.getElement().tagName === `FORM` ? this.getElement() : this.getElement().querySelector(`form`);
-    this._setHandler(
-        handler,
-        form,
-        `_submitHandler`,
-        `submit`
-    );
-  }
-
-  setInputFavoriteChangeHandler(handler) {
-    this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__favorite-checkbox`),
-        `_inputFavoriteChangeHandler`,
-        `change`
-    );
-  }
-
-  setDeleteButtonClickHandler(handler) {
-    this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__reset-btn`),
-        `_deleteButtonClickHandler`,
-        `click`
-    );
-  }
-
-  getData() {
-    return this._eventItem;
   }
 
   _addListeners() {
@@ -321,7 +349,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
       it.addEventListener(`change`, (evt) => {
         this._eventItem.type = evt.target.value;
         // this._eventItem.type = EventType[evt.target.value.toUpperCase()];
-        this._eventItem.offers = [];//this._offers[this._eventItem.type];
+        this._eventItem.offers = []; //this._offers[this._eventItem.type];
 
         this.rerender();
       });
@@ -336,45 +364,47 @@ export default class EventEditComponent extends AbstractSmartComponent {
     const offersElement = element.querySelector(`.event__available-offers`);
     if (offersElement) {
       offersElement.addEventListener(`click`, (evt) => {
-        const offerIndex = parseInt(evt.target.dataset.offerIndex, 10);
+        if (evt.target.tagName !== `INPUT`) {
+          return
+        };
 
-        if (!isNaN(offerIndex)) {
-          this._eventItem.offers[offerIndex].checked = evt.target.checked;
+        const labelElement = evt.currentTarget.querySelector(`[for="${evt.target.id}"]`);
+        const offerTitle = labelElement.querySelector(`.event__offer-title`).textContent;
+        const offerPrice = Number(labelElement.querySelector(`.event__offer-price`).textContent);
+        const offerIndex = this._eventItem.offers.findIndex((it) => it.title === offerTitle && it.price === offerPrice);
+
+        if (offerIndex === -1) {
+          this._eventItem.offers.push({title: offerTitle, price: offerPrice})
+        } else {
+          this._eventItem.offers = this._eventItem.offers.filter((it) => it.title !== offerTitle && it.price !== offerPrice)
         }
       });
+    };
+
+    element.addEventListener(`submit`, (evt) => {
+      evt.preventDefault();
+
+      element.querySelector(`button[type=submit]`).textContent = ButtonLabel.SAVING;
+      this._disableForm();
+    });
+
+    if (this._mode !== EventMode.ADDING) {
+      element.querySelector(`.event__reset-btn`).addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+        evt.target.textContent = ButtonLabel.DELETING;
+        this._disableForm();
+      })
     }
-  }
-
-  recoveryListeners() {
-    this._addListeners();
-
-    this.setRollupButtonClickHandler();
-    this.setSubmitHandler();
-    this.setInputFavoriteChangeHandler();
-  }
-
-  removeElement() {
-    if (this._flatpickrRange) {
-      this._flatpickrRange.destroy();
-      this._flatpickrRange = null;
-    }
-
-    super.removeElement();
-  }
-
-  reset() {
-    this._eventItem = this._copyData.clone();
-    this.rerender();
   }
 
   _createFlatpickrRange() {
     return new FlatpickrRange(
-        this.getElement().querySelector(`#event-start-time`),
-        this.getElement().querySelector(`#event-end-time`),
-        this._eventItem.start,
-        this._eventItem.finish,
-        this._disabledRanges,
-        this._dateRangeChangeHandler
+      this.getElement().querySelector(`#event-start-time`),
+      this.getElement().querySelector(`#event-end-time`),
+      this._eventItem.start,
+      this._eventItem.finish,
+      this._disabledRanges,
+      this._dateRangeChangeHandler
     );
   }
 
@@ -382,5 +412,14 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._eventItem.start = dateStart;
     this._eventItem.finish = dateFinish;
     setSubmitDisableStatus(this.getElement(), this._eventItem);
+  }
+
+  _getFormElement() {
+    return this.getElement().tagName === `FORM` ? this.getElement() : this.getElement().querySelector(`form`);
+  }
+
+  _disableForm() {
+    Array.from(this._getFormElement().elements).forEach((it) => it.disabled = true);
+    this._getFormElement().classList.add(`event--disabled`);
   }
 }
