@@ -92,7 +92,7 @@ const createEventOffer = (offer, index) => {
 };
 
 const createEventOffers = (eventOffers, eventTypeOffers) => {
-  if (!eventOffers.length) {
+  if (!eventOffers.length && !eventTypeOffers.length) {
     return ``;
   }
 
@@ -319,8 +319,9 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
       it.addEventListener(`change`, (evt) => {
-        this._eventItem.type = EventType[evt.target.value.toUpperCase()];
-        this._eventItem.offers = this._offers[this._eventItem.type];
+        this._eventItem.type = evt.target.value;
+        // this._eventItem.type = EventType[evt.target.value.toUpperCase()];
+        this._eventItem.offers = [];//this._offers[this._eventItem.type];
 
         this.rerender();
       });
