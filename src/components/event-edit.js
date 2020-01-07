@@ -136,7 +136,7 @@ const createDestinationHtml = (destination) => {
                       </section>`;
 };
 
-const createForm = (eventItem, destinations, offers, mode) => {
+const createForm = (eventItem, destinations, offers, mode, errorState) => {
   const isNewEvent = mode === EventMode.ADDING;
 
   const eventProperty = EventTypeProperties[eventItem.type];
@@ -164,7 +164,7 @@ const createForm = (eventItem, destinations, offers, mode) => {
 
   return `
                 ${isNewEvent ? `` : `<li class="trip-events__item">`}
-                  <form class="${isNewEvent ? `trip-events__item ` : ``}event  event--edit" action="#" method="post">
+                  <form class="${isNewEvent ? `trip-events__item ` : ``}event  event--edit${errorState ? ` event--error` : ``}" action="#" method="post">
                     <header class="event__header">
                       <div class="event__type-wrapper">
                         <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -236,10 +236,12 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._addListeners();
 
     this._flatpickrRange = this._createFlatpickrRange();
+
+    this._errorState = false;
   }
 
   getTemplate() {
-    return createForm(this._eventItem, this._destinations, this._offers, this._mode);
+    return createForm(this._eventItem, this._destinations, this._offers, this._mode, this._errorState);
   }
 
   rerender() {
@@ -308,6 +310,13 @@ export default class EventEditComponent extends AbstractSmartComponent {
   reset() {
     this._eventItem = this._copyData.clone();
     this.rerender();
+  }
+
+  setErrorState() {
+    this._enableForm();
+    this._getFormElement().classList.add(`shake`);
+    this._errorState = true;
+    setTimeout(this.rerender.bind(this), 600);
   }
 
   _setHandler(handler, element, handlerKeeperName, eventName) {
@@ -421,5 +430,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
   _disableForm() {
     Array.from(this._getFormElement().elements).forEach((it) => it.disabled = true);
     this._getFormElement().classList.add(`event--disabled`);
+  }
+
+  _enableForm() {
+    Array.from(this._getFormElement().elements).forEach((it) => it.disabled = false);
+    this._getFormElement().classList.remove(`event--disabled`);
   }
 }

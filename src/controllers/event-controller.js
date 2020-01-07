@@ -83,7 +83,7 @@ export default class EventController {
       evt.preventDefault();
       document.removeEventListener(`keydown`, this._documentKeyDownHandler);
 
-      this._dataChangeHandler(eventData.id, eventEditComponent.getData());
+      this._dataChangeHandler(this, eventData.id, eventEditComponent.getData());
     });
 
     eventEditComponent.setInputFavoriteChangeHandler(() => {
@@ -95,7 +95,7 @@ export default class EventController {
 
       eventData.isFavorite = !eventData.isFavorite;
 
-      this._dataChangeHandler(eventData.id, eventData, keepInEditing);
+      this._dataChangeHandler(this, eventData.id, eventData, keepInEditing);
     });
 
     eventEditComponent.setDeleteButtonClickHandler((evt) => {
@@ -104,7 +104,7 @@ export default class EventController {
       if (this._mode === EventMode.ADDING) {
         this._eventCancelHandler();
       } else {
-        this._dataChangeHandler(eventData.id, null);
+        this._dataChangeHandler(this, eventData.id, null);
       }
     });
 
@@ -177,5 +177,9 @@ export default class EventController {
     removeComponent(this._eventComponent);
     removeComponent(this._eventEditComponent);
     document.removeEventListener(`keydown`, this._documentKeyDownHandler);
+  }
+
+  setErrorState() {
+    this._eventEditComponent.setErrorState()
   }
 }

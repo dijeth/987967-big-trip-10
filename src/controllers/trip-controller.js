@@ -177,20 +177,32 @@ export default class TripController {
     return eventControllers;
   }
 
-  _dataChangeHandler(id, newEventData, keepInEditMode) {
+  _dataChangeHandler(eventController, id, newEventData, keepInEditMode) {
     this._editingEvent = keepInEditMode ? keepInEditMode : null;
-
+debugger;
     switch (true) {
       case id === null:
-        this._api.createEvent(newEventData).then((data) => this._eventsModel.create(data));
+        this._api.createEvent(newEventData)
+          .then((data) => this._eventsModel.create(data))
+          .catch(() => {
+            eventController.setErrorState()
+          });
         break;
 
       case newEventData === null:
-        this._api.deleteEvent(id).then((data) => this._eventsModel.delete(id));
+        this._api.deleteEvent(id)
+          .then((data) => this._eventsModel.delete(id))
+          .catch(() => {
+            eventController.setErrorState()
+          });
         break;
 
       default:
-        this._api.updateEvent(id, newEventData).then((data) => this._eventsModel.update(id, data));
+        this._api.updateEvent(id, newEventData)
+          .then((data) => this._eventsModel.update(id, data))
+          .catch(() => {
+            eventController.setErrorState()
+          });
     }
   }
 
