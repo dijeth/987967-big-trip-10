@@ -1,4 +1,4 @@
-import {FilterType, FilterOptions} from '../utils/filter.js';
+import { FilterType, FilterOptions } from '../utils/filter.js';
 
 export default class Events {
   constructor(eventList) {
@@ -22,41 +22,25 @@ export default class Events {
   }
 
   set(eventList) {
-    this._events = eventList.map((it) => {
-      // it.id = this._generateID();
-      return it;
-    });
-
+    this._events = eventList;
     this._dataChangeHandlers.forEach((it) => it());
   }
 
   update(id, newEventData) {
     const index = this._events.findIndex((it) => it.id === id);
-
-    switch (true) {
-      case id === null:
-        newEventData.id = this._generateID();
-        this._events = [newEventData].concat(this._events);
-        break;
-
-      case index === -1:
-        return;
-
-      case newEventData === null:
-        this._events = this._events.slice(0, index).concat(this._events.slice(index + 1, this._events.length));
-        break;
-
-      default:
-        this._events[index] = newEventData;
-        newEventData.id = id;
-    }
-
+    this._events[index] = newEventData;
     this._dataChangeHandlers.forEach((it) => it());
   }
 
-  _generateID() {
-    this._idCounter += 1;
-    return this._idCounter;
+  delete(id) {
+    const index = this._events.findIndex((it) => it.id === id);
+    this._events = this._events.slice(0, index).concat(this._events.slice(index + 1, this._events.length));
+    this._dataChangeHandlers.forEach((it) => it());
+  }
+
+  create(newEventData) {
+    this._events = [newEventData].concat(this._events);
+    this._dataChangeHandlers.forEach((it) => it());
   }
 
   setFilter(filter) {
