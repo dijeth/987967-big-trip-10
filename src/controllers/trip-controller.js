@@ -17,7 +17,7 @@ export default class TripController {
     this._noPointsComponent = null;
     this._sortComponent = null;
     this._dayListComponent = null;
-    this._editingEventID = null;
+    this._editingEvent = null;
     this._mode = TripMode.DEFAULT;
 
     this._activeSortType = SortType.DEFAULT;
@@ -143,12 +143,12 @@ export default class TripController {
   _updateEvents(events) {
     this._removeEvents();
     this._renderEvents(events);
-    this._editingEventID = null;
+    this._editingEvent = null;
   }
 
   _renderDayEvents(container, eventList) {
     return eventList.map((it) => {
-      const isEventEditing = this._editingEventID !== null && it.id === this._editingEventID;
+      const isEventEditing = this._editingEvent !== null && it.id === this._editingEvent.id;
       const mode = isEventEditing ? EventMode.EDITING : EventMode.DEFAULT;
       return new EventController(
         container,
@@ -157,7 +157,7 @@ export default class TripController {
         flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
         this._destinations,
         this._offers
-      ).render(it, mode);
+      ).render(it, mode, this._editingEvent);
     });
   }
 
@@ -178,7 +178,7 @@ export default class TripController {
   }
 
   _dataChangeHandler(id, newEventData, keepInEditMode) {
-    this._editingEventID = keepInEditMode ? id : null;
+    this._editingEvent = keepInEditMode ? keepInEditMode : null;
 
     switch (true) {
       case id === null:
