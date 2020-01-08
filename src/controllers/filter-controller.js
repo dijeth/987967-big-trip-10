@@ -7,10 +7,15 @@ class FilterController {
     this._container = container;
     this._eventsModel = eventsModel;
     this._filterComponent = null;
-    this._render();
+
+    this.render = this.render.bind(this);
+
+    this._eventsModel.setDataChangeHandler(this.render)
+
+    // this.render();
   }
 
-  _render() {
+  render() {
     const checkedFilterType = this._eventsModel.getFilter();
     const filterItems = Object.entries(FilterOptions).map((it) => {
       const [type, options] = it;
@@ -18,7 +23,8 @@ class FilterController {
       return {
         type,
         name: options.name,
-        checked: checkedFilterType === type
+        checked: checkedFilterType === type,
+        disabled: this._eventsModel.get().filter((it) => options.check(it)).length === 0
       };
     });
 

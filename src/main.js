@@ -1,5 +1,5 @@
 import { RenderPosition, renderComponent, removeComponent } from './utils/render.js';
-import NoPointsComponent from './components/no-points.js';
+import NoPointsController from './controllers/no-points-controller.js';
 import MenuComponent from './components/menu.js';
 import StatisticComponent from './components/stats.js';
 import TripController from './controllers/trip-controller.js';
@@ -10,7 +10,7 @@ import { TripMode, MenuMode } from './const.js';
 import API from './api.js';
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
-const AUTORIZATION = `Basic Jethro_Tull`;
+const AUTORIZATION = `Basic JethroTull`;
 const api = new API(END_POINT, AUTORIZATION);
 
 const tripMainElement = document.querySelector(`.trip-main`);
@@ -32,15 +32,8 @@ const statisticsComponent = new StatisticComponent();
 renderComponent(tripEventsElement, RenderPosition.AFTER_END, statisticsComponent);
 events.setDataChangeHandler(statisticsComponent.dataChangeHandler);
 
-const noPointsComponent = new NoPointsComponent();
-renderComponent(tripEventsElement, RenderPosition.BEFORE_END, noPointsComponent);
-tripController.setModeChangeHandler((mode) => {
-  if (mode === TripMode.EMPTY) {
-    renderComponent(tripEventsElement, RenderPosition.BEFORE_END, noPointsComponent);
-  } else {
-    removeComponent(noPointsComponent);
-  }
-});
+const noPointsController = new NoPointsController(tripEventsElement, tripController);
+noPointsController.render();
 
 const menuComponent = new MenuComponent();
 renderComponent(tripControlElements[0], RenderPosition.AFTER_END, menuComponent);
@@ -70,7 +63,6 @@ createEventElement.addEventListener(`click`, () => {
 statisticsComponent.hide();
 
 api.getData().then((data) => {
-  noPointsComponent.setNoPointsMessage();
   tripController.setDestinations(data.destinations);
   tripController.setOffers(data.offers);
   events.set(data.events);

@@ -3,10 +3,10 @@ import AbstractComponent from './abstract-component.js';
 const FILTER_PREFIX = `filter-`;
 
 const createFilterItemHtml = (filterItem) => `
-              <div class="trip-filters__filter">
-                <input id="filter-${filterItem.name.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name.toLowerCase()}" ${filterItem.checked ? `checked` : ``}>
-                <label class="trip-filters__filter-label" for="filter-${filterItem.name.toLowerCase()}">${filterItem.name}</label>
-              </div>`;
+  <div class="trip-filters__filter${filterItem.disabled ? ` trip-filters__filter--disabled` : ``}">
+    <input id="filter-${filterItem.name.toLowerCase()}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${name.toLowerCase()}"${filterItem.checked ? ` checked` : ``}${filterItem.disabled ? ` disabled` : ``}>
+    <label class="trip-filters__filter-label" for="filter-${filterItem.name.toLowerCase()}">${filterItem.name}</label>
+  </div>`;
 
 const createFilterHtml = (filterItems) => {
   const filterItemsHtml = filterItems.map((item) => createFilterItemHtml(item)).join(`\n`);
