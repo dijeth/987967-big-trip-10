@@ -3,6 +3,7 @@ import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {EventTypeProperties, PlaceholderParticle, MovingType} from '../const.js';
+import {toSentenceCase} from './../utils/common.js';
 
 const BAR_HEIGHT = 50;
 const MIN_HEIGHT = 3;
@@ -112,7 +113,7 @@ const getTimeSpendData = (eventList) => {
   const labels = eventListSorted.map((it) => {
     const movingType = EventTypeProperties[it.type].movingType;
     const particle = PlaceholderParticle[movingType];
-    const destination = it.destination;
+    const destination = it.destination.name;
 
     return [movingType, particle, destination].join(` `);
   });
@@ -132,7 +133,7 @@ const getMoneyData = (eventList) => {
     dictionary[it.type] += it.cost;
   });
 
-  const labels = Object.keys(dictionary);
+  const labels = Object.keys(dictionary).map((it) => toSentenceCase(it));
   const data = Object.values(dictionary);
   const legends = data.map((it) => `€ ${it}`);
 
@@ -155,7 +156,7 @@ const getTransportData = (eventList) => {
     dictionary[it.type] += 1;
   });
 
-  const labels = Object.keys(dictionary);
+  const labels = Object.keys(dictionary).map((it) => toSentenceCase(it));
   const data = Object.values(dictionary);
   const legends = data.map((it) => `x ${it}`);
 

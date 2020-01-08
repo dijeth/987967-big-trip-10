@@ -39,17 +39,16 @@ export const PlaceholderParticle = {
 };
 
 export const EventType = {
-  "TAXI": `taxi`,
-  "BUS": `bus`,
-  "TRAIN": `train`,
-  "SHIP": `ship`,
-  "TRANSPORT": `transport`,
-  "DRIVE": `drive`,
-  "FLIGHT": `flight`,
+  'TAXI': `taxi`,
+  'BUS': `bus`,
+  'TRAIN': `train`,
+  'SHIP': `ship`,
+  'TRANSPORT': `transport`,
+  'DRIVE': `drive`,
+  'FLIGHT': `flight`,
   'CHECK-IN': `check-in`,
-  "SIGHTSEEING": `sightseeing`,
-  "RESTAURANT": `restaurant`,
-  "TRIP": `trip`
+  'SIGHTSEEING': `sightseeing`,
+  'RESTAURANT': `restaurant`
 };
 
 export const EventTypeProperties = {
@@ -144,12 +143,6 @@ export const EventTypeProperties = {
     name: `Restaurant`,
     icon: `restaurant.png`,
     movingType: MovingType.STAYING
-  },
-
-  [EventType.TRIP]: {
-    name: `Trip`,
-    icon: `trip.png`,
-    movingType: MovingType.MOVING
   }
 };
 
@@ -167,11 +160,11 @@ export const TimeValue = {
 export const EVENT_DEFAULT = {
   id: null,
   type: EventType.FLIGHT,
-  start: null,
-  finish: null,
-  destination: ``,
-  cost: 0,
-  isFavorite: false,
+  [`date_from`]: null,
+  [`date_to`]: null,
+  destination: null,
+  [`base_price`]: 0,
+  [`is_favorite`]: false,
   offers: []
 };
 
@@ -193,3 +186,9 @@ export const MenuMode = {
 };
 
 export const MIN_EVENT_DURATION = TimeValue.HOUR;
+
+export const ProcessingState = {
+  SAVING: `Saving...`,
+  DELETING: `Deleting...`,
+  CHANGING_FAVORITE: `Changing favorite`
+};

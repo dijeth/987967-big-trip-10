@@ -1,5 +1,5 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {EventType, EventTypeProperties, MovingType, PlaceholderParticle} from '../const.js';
+import {EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState} from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 
 const getCostValidity = (value) => {
@@ -26,25 +26,24 @@ const setSubmitDisableStatus = (formElement, eventItem) => {
   formElement.querySelector(`.event__save-btn`).disabled = !isFormValid(eventItem);
 };
 
-const createEventTypeItem = (eventType) => {
+const createEventTypeItem = (eventType, checked) => {
   const eventTypeCode = eventType.toLowerCase();
+  const eventTypeName = EventTypeProperties[eventType].name;
   return `
-                            <div class="event__type-item">
-                              <input id="event-type-${eventTypeCode}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventTypeCode}">
-                              <label class="event__type-label  event__type-label--${eventTypeCode}" for="event-type-${eventTypeCode}">${eventType}</label>
-                            </div>`;
+  <div class="event__type-item">
+    <input id="event-type-${eventTypeCode}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventTypeCode}"${checked ? ` checked` : ``}>
+    <label class="event__type-label  event__type-label--${eventTypeCode}" for="event-type-${eventTypeCode}">${eventTypeName}</label>
+  </div>`;
 };
 
-const createEventTypeList = () => {
+const createEventTypeList = (eventType) => {
   const transferEvents = Object.entries(EventTypeProperties)
     .filter((item) => item[1].movingType === MovingType.MOVING)
-    .map((item) => item[0])
-    .map((item) => createEventTypeItem(item)).join(`\n`);
+    .map((item) => createEventTypeItem(item[0], item[0] === eventType)).join(`\n`);
 
   const activityEvents = Object.entries(EventTypeProperties)
     .filter((item) => item[1].movingType === MovingType.STAYING)
-    .map((item) => item[0])
-    .map((item) => createEventTypeItem(item)).join(`\n`);
+    .map((item) => createEventTypeItem(item[0], item[0] === eventType)).join(`\n`);
 
   return `
                           <div class="event__type-list">
@@ -83,7 +82,7 @@ const joinOffers = (eventOffers, eventTypeOffers) => {
 const createEventOffer = (offer, index) => {
   return `
                           <div class="event__offer-selector">
-                            <input data-offer-index="${index}" class="event__offer-checkbox  visually-hidden" id="event-offer-${index}" type="checkbox" name="event-offer-${index}" ${offer.checked ? `checked` : ``}>
+                            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${index}" type="checkbox" name="event-offer-${index}" ${offer.checked ? `checked` : ``}>
                             <label class="event__offer-label" for="event-offer-${index}">
                               <span class="event__offer-title">${offer.title}</span>
                               &plus;
@@ -93,7 +92,7 @@ const createEventOffer = (offer, index) => {
 };
 
 const createEventOffers = (eventOffers, eventTypeOffers) => {
-  if (!eventOffers.length) {
+  if (!eventOffers.length && !eventTypeOffers.length) {
     return ``;
   }
 
@@ -132,13 +131,13 @@ const createDestinationHtml = (destination) => {
                       </section>`;
 };
 
-const createForm = (eventItem, destinations, offers) => {
-  const isNewEvent = eventItem.id === null;
+const createForm = (eventItem, destinations, offers, mode, errorState) => {
+  const isNewEvent = mode === EventMode.ADDING;
 
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
-  const destination = eventItem.destination.name;
+  const destination = eventItem.destination ? eventItem.destination.name : ``;
   const destinationList = destinations.map((item) => `<option value="${item.name}"></option>`).join(`\n`);
   const disableStatus = isFormValid(eventItem) ? `` : ` disabled`;
   const destinationHtml = createDestinationHtml(eventItem.destination);
@@ -160,7 +159,7 @@ const createForm = (eventItem, destinations, offers) => {
 
   return `
                 ${isNewEvent ? `` : `<li class="trip-events__item">`}
-                  <form class="${isNewEvent ? `trip-events__item ` : ``}event  event--edit" action="#" method="post">
+                  <form class="${isNewEvent ? `trip-events__item ` : ``}event  event--edit${errorState ? ` event--error` : ``}" action="#" method="post">
                     <header class="event__header">
                       <div class="event__type-wrapper">
                         <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -169,7 +168,7 @@ const createForm = (eventItem, destinations, offers) => {
                         </label>
                         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
-                        ${createEventTypeList()}
+                        ${createEventTypeList(eventItem.type)}
                       </div>
 
                       <div class="event__field-group  event__field-group--destination">
@@ -218,42 +217,30 @@ const createForm = (eventItem, destinations, offers) => {
 };
 
 export default class EventEditComponent extends AbstractSmartComponent {
-  constructor(eventItem, disabledRanges, destinations, offers) {
+  constructor(eventItem, disabledRanges, destinations, offers, mode) {
     super();
     this._eventItem = eventItem;
-    this._copyData = eventItem.clone();
     this._disabledRanges = disabledRanges;
     this._destinations = destinations;
     this._offers = offers;
+    this._mode = mode;
 
     this._dateRangeChangeHandler = this._dateRangeChangeHandler.bind(this);
 
     this._addListeners();
 
     this._flatpickrRange = this._createFlatpickrRange();
+
+    this._errorState = false;
   }
 
   getTemplate() {
-    return createForm(this._eventItem, this._destinations, this._offers);
+    return createForm(this._eventItem, this._destinations, this._offers, this._mode, this._errorState);
   }
 
   rerender() {
     super.rerender();
     this._flatpickrRange = this._createFlatpickrRange();
-  }
-
-  _setHandler(handler, element, handlerKeeperName, eventName) {
-    if (!element) {
-      return;
-    }
-
-    if (handler) {
-      this[handlerKeeperName] = handler;
-    }
-
-    if (this[handlerKeeperName]) {
-      element.addEventListener(eventName, this[handlerKeeperName]);
-    }
   }
 
   setRollupButtonClickHandler(handler) {
@@ -266,7 +253,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   setSubmitHandler(handler) {
-    const form = this.getElement().tagName === `FORM` ? this.getElement() : this.getElement().querySelector(`form`);
+    const form = this._getFormElement();
     this._setHandler(
         handler,
         form,
@@ -297,6 +284,73 @@ export default class EventEditComponent extends AbstractSmartComponent {
     return this._eventItem;
   }
 
+  recoveryListeners() {
+    this._addListeners();
+
+    this.setRollupButtonClickHandler();
+    this.setSubmitHandler();
+    this.setInputFavoriteChangeHandler();
+    this.setDeleteButtonClickHandler();
+  }
+
+  removeElement() {
+    if (this._flatpickrRange) {
+      this._flatpickrRange.destroy();
+      this._flatpickrRange = null;
+    }
+
+    super.removeElement();
+  }
+
+  reset(eventItem) {
+    this._eventItem = eventItem.clone();
+    this.rerender();
+  }
+
+  setErrorState() {
+    this._enableForm();
+    this._getFormElement().classList.add(`shake`);
+    this._errorState = true;
+    setTimeout(this.rerender.bind(this), 600);
+  }
+
+  setState(processingState) {
+    let buttonElement;
+
+    switch (processingState) {
+      case ProcessingState.DELETING:
+        buttonElement = this.getElement().querySelector(`button[type=reset]`);
+        break;
+
+      default:
+      case ProcessingState.SAVING:
+        buttonElement = this.getElement().querySelector(`button[type=submit]`);
+    }
+
+    this._resetErrorState();
+    buttonElement.textContent = processingState;
+    this._disableForm();
+  }
+
+  _resetErrorState() {
+    this._errorState = false;
+    this._getFormElement().classList.remove(`event--error`);
+  }
+
+  _setHandler(handler, element, handlerKeeperName, eventName) {
+    if (!element) {
+      return;
+    }
+
+    if (handler) {
+      this[handlerKeeperName] = handler;
+    }
+
+    if (this[handlerKeeperName]) {
+      element.addEventListener(eventName, this[handlerKeeperName]);
+    }
+  }
+
   _addListeners() {
     const element = this.getElement();
 
@@ -320,8 +374,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
       it.addEventListener(`change`, (evt) => {
-        this._eventItem.type = EventType[evt.target.value.toUpperCase()];
-        this._eventItem.offers = this._offers[this._eventItem.type];
+        this._eventItem.type = evt.target.value;
+        this._eventItem.offers = [];
 
         this.rerender();
       });
@@ -336,35 +390,22 @@ export default class EventEditComponent extends AbstractSmartComponent {
     const offersElement = element.querySelector(`.event__available-offers`);
     if (offersElement) {
       offersElement.addEventListener(`click`, (evt) => {
-        const offerIndex = parseInt(evt.target.dataset.offerIndex, 10);
+        if (evt.target.tagName !== `INPUT`) {
+          return;
+        }
 
-        if (!isNaN(offerIndex)) {
-          this._eventItem.offers[offerIndex].checked = evt.target.checked;
+        const labelElement = evt.currentTarget.querySelector(`[for="${evt.target.id}"]`);
+        const offerTitle = labelElement.querySelector(`.event__offer-title`).textContent;
+        const offerPrice = Number(labelElement.querySelector(`.event__offer-price`).textContent);
+        const offerIndex = this._eventItem.offers.findIndex((it) => it.title === offerTitle && it.price === offerPrice);
+
+        if (offerIndex === -1) {
+          this._eventItem.offers.push({title: offerTitle, price: offerPrice});
+        } else {
+          this._eventItem.offers = this._eventItem.offers.filter((it) => it.title !== offerTitle && it.price !== offerPrice);
         }
       });
     }
-  }
-
-  recoveryListeners() {
-    this._addListeners();
-
-    this.setRollupButtonClickHandler();
-    this.setSubmitHandler();
-    this.setInputFavoriteChangeHandler();
-  }
-
-  removeElement() {
-    if (this._flatpickrRange) {
-      this._flatpickrRange.destroy();
-      this._flatpickrRange = null;
-    }
-
-    super.removeElement();
-  }
-
-  reset() {
-    this._eventItem = this._copyData.clone();
-    this.rerender();
   }
 
   _createFlatpickrRange() {
@@ -382,5 +423,24 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._eventItem.start = dateStart;
     this._eventItem.finish = dateFinish;
     setSubmitDisableStatus(this.getElement(), this._eventItem);
+  }
+
+  _getFormElement() {
+    return this.getElement().tagName === `FORM` ? this.getElement() : this.getElement().querySelector(`form`);
+  }
+
+  _disableForm() {
+    Array.from(this._getFormElement().elements).forEach((it) => {
+      it.disabled = true;
+    });
+    this._getFormElement().classList.add(`event--disabled`);
+  }
+
+  _enableForm() {
+    // this.rerender()
+    Array.from(this._getFormElement().elements).forEach((it) => {
+      it.disabled = false;
+    });
+    this._getFormElement().classList.remove(`event--disabled`);
   }
 }

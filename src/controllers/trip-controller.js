@@ -6,7 +6,8 @@ import SortComponent from '../components/sort.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
-import {EventMode, EVENT_DEFAULT, TripMode} from '../const.js';
+import {EventMode, EVENT_DEFAULT, TripMode, ProcessingState} from '../const.js';
+import EventModel from './../models/event.js';
 
 export default class TripController {
   constructor(container, eventsModel, api) {
@@ -16,7 +17,7 @@ export default class TripController {
     this._noPointsComponent = null;
     this._sortComponent = null;
     this._dayListComponent = null;
-    this._editingEventID = null;
+    this._editingEvent = null;
     this._mode = TripMode.DEFAULT;
 
     this._activeSortType = SortType.DEFAULT;
@@ -64,7 +65,7 @@ export default class TripController {
     newEvent.setDestroyHandler(this._eventDestroyHandler);
     newEvent.setEventCancelHandler(this._newEventCancelHandler);
 
-    newEvent.render(EVENT_DEFAULT, EventMode.ADDING);
+    newEvent.render(new EventModel(EVENT_DEFAULT), EventMode.ADDING);
 
     this._eventControllers.push(newEvent);
 
@@ -142,12 +143,13 @@ export default class TripController {
   _updateEvents(events) {
     this._removeEvents();
     this._renderEvents(events);
-    this._editingEventID = null;
+    this._editingEvent = null;
   }
 
   _renderDayEvents(container, eventList) {
     return eventList.map((it) => {
-      const mode = this._editingEventID !== null && it.id === this._editingEventID ? TripMode.EDITING : TripMode.DEFAULT;
+      const isEventEditing = this._editingEvent !== null && it.id === this._editingEvent.id;
+      const mode = isEventEditing ? EventMode.EDITING : EventMode.DEFAULT;
       return new EventController(
           container,
           this._dataChangeHandler,
@@ -155,7 +157,7 @@ export default class TripController {
           flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
           this._destinations,
           this._offers
-      ).render(it, mode);
+      ).render(it, mode, this._editingEvent);
     });
   }
 
@@ -175,10 +177,39 @@ export default class TripController {
     return eventControllers;
   }
 
-  _dataChangeHandler(id, newEventData, keepInEditMode) {
-    this._editingEventID = keepInEditMode ? id : null;
+  _dataChangeHandler(eventController, id, newEventData, keepInEditMode) {
+    this._editingEvent = keepInEditMode ? keepInEditMode : null;
 
-    this._api.updateEvent(id, newEventData).then((data) => this._eventsModel.update(id, data));
+    switch (true) {
+      case id === null:
+        Promise.resolve(ProcessingState.SAVING)
+          .then(eventController.setState.bind(eventController))
+          .then(() => {
+            return this._api.createEvent(newEventData);
+          })
+          .then((data) => this._eventsModel.create(data))
+          .catch(eventController.setErrorState.bind(eventController));
+        break;
+
+      case newEventData === null:
+        Promise.resolve(ProcessingState.DELETING)
+          .then(eventController.setState.bind(eventController))
+          .then(() => {
+            return this._api.deleteEvent(id);
+          })
+          .then(() => this._eventsModel.delete(id))
+          .catch(eventController.setErrorState.bind(eventController));
+        break;
+
+      default:
+        Promise.resolve(ProcessingState.SAVING)
+          .then(eventController.setState.bind(eventController))
+          .then(() => {
+            return this._api.updateEvent(id, newEventData);
+          })
+          .then((data) => this._eventsModel.update(id, data))
+          .catch(eventController.setErrorState.bind(eventController));
+    }
   }
 
   _viewChangeHandler() {

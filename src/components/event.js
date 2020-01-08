@@ -25,7 +25,8 @@ const createOffersHtml = (offerData) => {
 const createEventHtml = (eventItem) => {
   const eventProperty = EventTypeProperties[eventItem.type];
   const icon = eventProperty.icon;
-  const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]} ${eventItem.destination.name}`;
+  const destination = eventItem.destination ? eventItem.destination.name : ``;
+  const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]} ${destination}`;
   const offersHtml = createOffersHtml(eventItem.offers);
 
   return `
