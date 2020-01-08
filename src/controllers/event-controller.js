@@ -69,8 +69,8 @@ export default class EventController {
     if (editEventData) {
       editEventData.isFavorite = eventData.isFavorite;
     } else {
-      editEventData = eventData.clone() 
-    };
+      editEventData = eventData.clone();
+    }
 
     const eventComponent = new EventComponent(eventData.clone());
     const eventEditComponent = new EventEditComponent(
@@ -99,7 +99,7 @@ export default class EventController {
     eventEditComponent.setInputFavoriteChangeHandler(() => {
       if (this._mode === EventMode.ADDING) {
         return;
-      };
+      }
 
       const keepInEditing = eventEditComponent.getData();
 
@@ -190,10 +190,10 @@ export default class EventController {
   }
 
   setErrorState() {
-    this._eventEditComponent.setErrorState()
+    this._eventEditComponent.setErrorState();
   }
 
   setState(processingState) {
-    this._eventEditComponent.setState(processingState)
+    this._eventEditComponent.setState(processingState);
   }
 }

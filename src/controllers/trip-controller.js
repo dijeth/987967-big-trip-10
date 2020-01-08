@@ -1,12 +1,12 @@
-import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
-import { flatDataRanges } from '../utils/common.js';
-import { SortOptions, SortType } from '../utils/sort.js';
+import {RenderPosition, renderComponent, replaceComponent, removeComponent} from '../utils/render.js';
+import {flatDataRanges} from '../utils/common.js';
+import {SortOptions, SortType} from '../utils/sort.js';
 import DayListComponent from '../components/day-list.js';
 import SortComponent from '../components/sort.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
-import { EventMode, EVENT_DEFAULT, TripMode, ProcessingState } from '../const.js';
+import {EventMode, EVENT_DEFAULT, TripMode, ProcessingState} from '../const.js';
 import EventModel from './../models/event.js';
 
 export default class TripController {
@@ -54,12 +54,12 @@ export default class TripController {
     const container = this._sortComponent === null ? this._container.children[0] : this._sortComponent.getElement();
 
     const newEvent = new EventController(
-      container,
-      this._dataChangeHandler,
-      this._viewChangeHandler,
-      flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null)),
-      this._destinations,
-      this._offers
+        container,
+        this._dataChangeHandler,
+        this._viewChangeHandler,
+        flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null)),
+        this._destinations,
+        this._offers
     );
 
     newEvent.setDestroyHandler(this._eventDestroyHandler);
@@ -95,8 +95,8 @@ export default class TripController {
   _renderSort(activeSortType) {
     const sortItems = Object.entries(SortOptions).map((it) => {
       const [type, options] = it;
-      const { name, showDirection } = options;
-      return { type, name, showDirection, checked: type === activeSortType };
+      const {name, showDirection} = options;
+      return {type, name, showDirection, checked: type === activeSortType};
     });
 
     const sortComponent = new SortComponent(sortItems);
@@ -151,12 +151,12 @@ export default class TripController {
       const isEventEditing = this._editingEvent !== null && it.id === this._editingEvent.id;
       const mode = isEventEditing ? EventMode.EDITING : EventMode.DEFAULT;
       return new EventController(
-        container,
-        this._dataChangeHandler,
-        this._viewChangeHandler,
-        flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
-        this._destinations,
-        this._offers
+          container,
+          this._dataChangeHandler,
+          this._viewChangeHandler,
+          flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
+          this._destinations,
+          this._offers
       ).render(it, mode, this._editingEvent);
     });
   }
@@ -185,7 +185,7 @@ export default class TripController {
         Promise.resolve(ProcessingState.SAVING)
           .then(eventController.setState.bind(eventController))
           .then(() => {
-            return this._api.createEvent(newEventData)
+            return this._api.createEvent(newEventData);
           })
           .then((data) => this._eventsModel.create(data))
           .catch(eventController.setErrorState.bind(eventController));
@@ -195,9 +195,9 @@ export default class TripController {
         Promise.resolve(ProcessingState.DELETING)
           .then(eventController.setState.bind(eventController))
           .then(() => {
-            return this._api.deleteEvent(id)
+            return this._api.deleteEvent(id);
           })
-          .then((data) => this._eventsModel.delete(id))
+          .then(() => this._eventsModel.delete(id))
           .catch(eventController.setErrorState.bind(eventController));
         break;
 
@@ -205,7 +205,7 @@ export default class TripController {
         Promise.resolve(ProcessingState.SAVING)
           .then(eventController.setState.bind(eventController))
           .then(() => {
-            return this._api.updateEvent(id, newEventData)
+            return this._api.updateEvent(id, newEventData);
           })
           .then((data) => this._eventsModel.update(id, data))
           .catch(eventController.setErrorState.bind(eventController));

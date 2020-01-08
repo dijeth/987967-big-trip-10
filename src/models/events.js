@@ -1,4 +1,4 @@
-import { FilterType, FilterOptions } from '../utils/filter.js';
+import {FilterType, FilterOptions} from '../utils/filter.js';
 
 export default class Events {
   constructor(eventList) {
