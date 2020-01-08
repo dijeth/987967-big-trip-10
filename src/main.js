@@ -10,7 +10,7 @@ import { TripMode, MenuMode } from './const.js';
 import API from './api.js';
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
-const AUTORIZATION = `Basic JethroTull`;
+const AUTORIZATION = `Basic Jethro_Tull`;
 const api = new API(END_POINT, AUTORIZATION);
 
 const tripMainElement = document.querySelector(`.trip-main`);
