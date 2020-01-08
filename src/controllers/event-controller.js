@@ -35,7 +35,7 @@ export default class EventController {
     this._mode = EventMode.DEFAULT;
 
     replaceComponent(this._eventComponent, this._eventEditComponent);
-    this._eventEditComponent.reset();
+    this._eventEditComponent.reset(this._eventItem);
   }
 
   _documentKeyDownHandler(evt) {
@@ -62,6 +62,8 @@ export default class EventController {
   }
 
   render(eventData, mode = EventMode.DEFAULT, cachedEventData) {
+    this._eventItem = eventData;
+
     let editEventData = cachedEventData;
 
     if (editEventData) {

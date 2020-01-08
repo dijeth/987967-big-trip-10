@@ -225,7 +225,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
   constructor(eventItem, disabledRanges, destinations, offers, mode) {
     super();
     this._eventItem = eventItem;
-    this._copyData = eventItem.clone();
     this._disabledRanges = disabledRanges;
     this._destinations = destinations;
     this._offers = offers;
@@ -308,8 +307,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
     super.removeElement();
   }
 
-  reset() {
-    this._eventItem = this._copyData.clone();
+  reset(eventItem) {
+    this._eventItem = eventItem.clone();
     this.rerender();
   }
 
