@@ -103,9 +103,10 @@ export default class EventController {
 
       const keepInEditing = eventEditComponent.getData();
 
-      eventData.isFavorite = !eventData.isFavorite;
+      const newEventData = eventData.clone()
+      newEventData.isFavorite = !eventData.isFavorite;
 
-      this._dataChangeHandler(this, eventData.id, eventData, keepInEditing);
+      this._dataChangeHandler(this, newEventData.id, newEventData, keepInEditing);
     });
 
     eventEditComponent.setDeleteButtonClickHandler((evt) => {
