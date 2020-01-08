@@ -179,7 +179,7 @@ export default class TripController {
 
   _dataChangeHandler(eventController, id, newEventData, keepInEditMode) {
     this._editingEvent = keepInEditMode ? keepInEditMode : null;
-debugger;
+
     switch (true) {
       case id === null:
         this._api.createEvent(newEventData)

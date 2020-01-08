@@ -296,6 +296,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this.setRollupButtonClickHandler();
     this.setSubmitHandler();
     this.setInputFavoriteChangeHandler();
+    this.setDeleteButtonClickHandler();
   }
 
   removeElement() {
@@ -317,6 +318,11 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._getFormElement().classList.add(`shake`);
     this._errorState = true;
     setTimeout(this.rerender.bind(this), 600);
+  }
+
+  _resetErrorState() {
+    this._errorState = false;
+    this.rerender();
   }
 
   _setHandler(handler, element, handlerKeeperName, eventName) {
@@ -383,7 +389,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
         const offerIndex = this._eventItem.offers.findIndex((it) => it.title === offerTitle && it.price === offerPrice);
 
         if (offerIndex === -1) {
-          this._eventItem.offers.push({title: offerTitle, price: offerPrice})
+          this._eventItem.offers.push({ title: offerTitle, price: offerPrice })
         } else {
           this._eventItem.offers = this._eventItem.offers.filter((it) => it.title !== offerTitle && it.price !== offerPrice)
         }
@@ -393,6 +399,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     element.addEventListener(`submit`, (evt) => {
       evt.preventDefault();
 
+      this._resetErrorState();
       element.querySelector(`button[type=submit]`).textContent = ButtonLabel.SAVING;
       this._disableForm();
     });
@@ -400,6 +407,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
     if (this._mode !== EventMode.ADDING) {
       element.querySelector(`.event__reset-btn`).addEventListener(`click`, (evt) => {
         evt.preventDefault();
+
+        this._resetErrorState();
         evt.target.textContent = ButtonLabel.DELETING;
         this._disableForm();
       })
