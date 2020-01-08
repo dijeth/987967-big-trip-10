@@ -1,5 +1,5 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import { EventType, EventTypeProperties, MovingType, PlaceholderParticle, EventMode } from '../const.js';
+import { EventType, EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState } from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 
 const ButtonLabel = {
@@ -320,6 +320,24 @@ export default class EventEditComponent extends AbstractSmartComponent {
     setTimeout(this.rerender.bind(this), 600);
   }
 
+  setState(processingState) {
+    let buttonElement;
+
+    switch (processingState) {
+      case ProcessingState.DELETING:
+        buttonElement = this.getElement().querySelector(`button[type=reset]`);
+        break;
+
+      default:
+      case ProcessingState.SAVING:
+        buttonElement = this.getElement().querySelector(`button[type=submit]`);
+    };
+
+    this._resetErrorState();
+    buttonElement.textContent = processingState;
+    this._disableForm();
+  }
+
   _resetErrorState() {
     this._errorState = false;
     this._getFormElement().classList.remove(`event--error`);
@@ -363,8 +381,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
       it.addEventListener(`change`, (evt) => {
         this._eventItem.type = evt.target.value;
-        // this._eventItem.type = EventType[evt.target.value.toUpperCase()];
-        this._eventItem.offers = []; //this._offers[this._eventItem.type];
+        this._eventItem.offers = []; 
 
         this.rerender();
       });
@@ -395,28 +412,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
         }
       });
     };
-
-    element.addEventListener(`submit`, (evt) => {
-      evt.preventDefault();
-
-      this._resetErrorState();
-      element.querySelector(`button[type=submit]`).textContent = ButtonLabel.SAVING;
-      this._disableForm();
-    });
-
-    if (this._mode !== EventMode.ADDING) {
-      element.querySelector(`.event__reset-btn`).addEventListener(`click`, (evt) => {
-        evt.preventDefault();
-
-        this._resetErrorState();
-        evt.target.textContent = ButtonLabel.DELETING;
-        this._disableForm();
-      })
-    };
-
-    // element.querySelector(`.event__favorite-checkbox`).addEventListener(`click`, (evt) => {
-    //   this._resetErrorState();
-    // })
   }
 
   _createFlatpickrRange() {
@@ -446,6 +441,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   _enableForm() {
+    // this.rerender()
     Array.from(this._getFormElement().elements).forEach((it) => it.disabled = false);
     this._getFormElement().classList.remove(`event--disabled`);
   }

@@ -186,3 +186,9 @@ export const MenuMode = {
 };
 
 export const MIN_EVENT_DURATION = TimeValue.HOUR;
+
+export const ProcessingState = {
+  SAVING: `Saving...`,
+  DELETING: `Deleting...`,
+  CHANGING_FAVORITE: `Changing favorite`
+}

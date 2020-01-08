@@ -6,7 +6,7 @@ import SortComponent from '../components/sort.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
-import { EventMode, EVENT_DEFAULT, TripMode } from '../const.js';
+import { EventMode, EVENT_DEFAULT, TripMode, ProcessingState } from '../const.js';
 import EventModel from './../models/event.js';
 
 export default class TripController {
@@ -182,27 +182,33 @@ export default class TripController {
 
     switch (true) {
       case id === null:
-        this._api.createEvent(newEventData)
+        Promise.resolve(ProcessingState.SAVING)
+          .then(eventController.setState.bind(eventController))
+          .then(() => {
+            return this._api.createEvent(newEventData)
+          })
           .then((data) => this._eventsModel.create(data))
-          .catch(() => {
-            eventController.setErrorState()
-          });
+          .catch(eventController.setErrorState.bind(eventController));
         break;
 
       case newEventData === null:
-        this._api.deleteEvent(id)
+        Promise.resolve(ProcessingState.DELETING)
+          .then(eventController.setState.bind(eventController))
+          .then(() => {
+            return this._api.deleteEvent(id)
+          })
           .then((data) => this._eventsModel.delete(id))
-          .catch(() => {
-            eventController.setErrorState()
-          });
+          .catch(eventController.setErrorState.bind(eventController));
         break;
 
       default:
-        this._api.updateEvent(id, newEventData)
+        Promise.resolve(ProcessingState.SAVING)
+          .then(eventController.setState.bind(eventController))
+          .then(() => {
+            return this._api.updateEvent(id, newEventData)
+          })
           .then((data) => this._eventsModel.update(id, data))
-          .catch(() => {
-            eventController.setErrorState()
-          });
+          .catch(eventController.setErrorState.bind(eventController));
     }
   }
 

@@ -190,4 +190,8 @@ export default class EventController {
   setErrorState() {
     this._eventEditComponent.setErrorState()
   }
+
+  setState(processingState) {
+    this._eventEditComponent.setState(processingState)
+  }
 }
