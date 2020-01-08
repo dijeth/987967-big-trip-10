@@ -103,7 +103,7 @@ export default class EventController {
 
       const keepInEditing = eventEditComponent.getData();
 
-      const newEventData = eventData.clone()
+      const newEventData = eventData.clone();
       newEventData.isFavorite = !eventData.isFavorite;
 
       this._dataChangeHandler(this, newEventData.id, newEventData, keepInEditing);
