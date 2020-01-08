@@ -322,7 +322,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   _resetErrorState() {
     this._errorState = false;
-    this.rerender();
+    this._getFormElement().classList.remove(`event--error`);
   }
 
   _setHandler(handler, element, handlerKeeperName, eventName) {
@@ -412,7 +412,11 @@ export default class EventEditComponent extends AbstractSmartComponent {
         evt.target.textContent = ButtonLabel.DELETING;
         this._disableForm();
       })
-    }
+    };
+
+    // element.querySelector(`.event__favorite-checkbox`).addEventListener(`click`, (evt) => {
+    //   this._resetErrorState();
+    // })
   }
 
   _createFlatpickrRange() {

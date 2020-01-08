@@ -62,9 +62,17 @@ export default class EventController {
   }
 
   render(eventData, mode = EventMode.DEFAULT, cachedEventData) {
+    let editEventData = cachedEventData;
+
+    if (editEventData) {
+      editEventData.isFavorite = eventData.isFavorite;
+    } else {
+      editEventData = eventData.clone() 
+    };
+
     const eventComponent = new EventComponent(eventData.clone());
     const eventEditComponent = new EventEditComponent(
-        cachedEventData ? cachedEventData : eventData.clone(),
+        editEventData,
         this._disabledRanges,
         this._destinations,
         this._offers,
@@ -89,7 +97,7 @@ export default class EventController {
     eventEditComponent.setInputFavoriteChangeHandler(() => {
       if (this._mode === EventMode.ADDING) {
         return;
-      }
+      };
 
       const keepInEditing = eventEditComponent.getData();
 
