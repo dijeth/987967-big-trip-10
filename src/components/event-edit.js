@@ -20,7 +20,6 @@ const isCostValid = (value) => {
 };
 
 const isFormValid = (eventItem, disabledRanges, enabledRanges) => {
-  debugger;
   switch (true) {
     case !eventItem.destination:
       return false;
@@ -236,7 +235,7 @@ const createForm = (eventItem, destinations, offers, mode, errorState, disabledR
 export default class EventEditComponent extends AbstractSmartComponent {
   constructor(eventItem, disabledRanges, destinations, offers, mode) {
     super();
-    this._eventItem = eventItem;
+    this._eventItem = eventItem.clone();
     this._disabledRanges = disabledRanges;
     this._enabledRanges = this._getEnabledRanges(disabledRanges);
     this._destinations = destinations;
