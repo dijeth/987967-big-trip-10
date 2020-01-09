@@ -11,8 +11,6 @@ class FilterController {
     this.render = this.render.bind(this);
 
     this._eventsModel.setDataChangeHandler(this.render)
-
-    // this.render();
   }
 
   render() {

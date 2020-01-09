@@ -154,7 +154,11 @@ export const TimeValue = {
   DAY: 2 * 12 * 60 * 60 * 1000,
   TWO_DAYS: 2 * 2 * 12 * 60 * 60 * 1000,
   WEEK: 7 * 2 * 12 * 60 * 60 * 1000,
-  TWO_WEEKS: 14 * 2 * 12 * 60 * 60 * 1000
+  TWO_WEEKS: 14 * 2 * 12 * 60 * 60 * 1000,
+  MIN_DATE: new Date(0),
+  MAX_DATE: new Date(32535181001646),
+  MIN_TIME: `00:00`,
+  MAX_TIME: `23:59`
 };
 
 export const EVENT_DEFAULT = {

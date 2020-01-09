@@ -2,21 +2,10 @@ import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
 import MinMaxTimePlugin from '../../node_modules/flatpickr/dist/plugins/MinMaxTimePlugin.js';
 import moment from 'moment';
-import {isDataInRanges} from './common.js';
-
-const FlatpickrMode = {
-  START: `start`,
-  FINISH: `finish`,
-  DEFAULT: `default`
-};
-
-const MIN_DATE = new Date(0);
-const MAX_DATE = new Date(32535181001646);
-const MIN_TIME = `00:00`;
-const MAX_TIME = `23:59`;
+import { isDataInRanges, getDataRange, isRangesEqual } from './common.js';
 
 export default class FlatpickrRange {
-  constructor(inputStart, inputFinish, dateStart, dateFinish, disabledRanges, dateChangeHandler) {
+  constructor(inputStart, inputFinish, dateStart, dateFinish, disabledRanges, enabledRages, dateChangeHandler) {
 
     this._inputStart = inputStart;
     this._inputFinish = inputFinish;
@@ -27,27 +16,23 @@ export default class FlatpickrRange {
     this._finishFlatpickrChangeHandler = this._finishFlatpickrChangeHandler.bind(this);
     this._startFlatpickrChangeHandler = this._startFlatpickrChangeHandler.bind(this);
 
-    this._disabledRanges = disabledRanges ? disabledRanges : [];
-    this._limitTimes = disabledRanges ? this._getLimitTimes(disabledRanges) : {};
-    this._disabledDates = disabledRanges ? this._getDisabledDates(disabledRanges) : [];
+    this._disabledRanges = disabledRanges;
+    this._enabledRanges = enabledRages;
+    this._disabledDates = this._getDisabledDates(disabledRanges);
 
     this._startFlatpickr = this._createFlatpickr(
-        this._inputStart,
-        this._dateStart,
-        this._disabledDates,
-        this._limitTimes,
-        this._startFlatpickrChangeHandler
+      this._inputStart,
+      this._dateStart,
+      this._disabledDates,
+      this._startFlatpickrChangeHandler
     );
 
     this._finishFlatpickr = this._createFlatpickr(
-        this._inputFinish,
-        this._dateFinish,
-        this._disabledDates,
-        this._limitTimes,
-        this._finishFlatpickrChangeHandler
+      this._inputFinish,
+      this._dateFinish,
+      this._disabledDates,
+      this._finishFlatpickrChangeHandler
     );
-
-    this._flatpickrMode = FlatpickrMode.DEFAULT;
   }
 
   getStartDate() {
@@ -58,14 +43,6 @@ export default class FlatpickrRange {
     return this._finishFlatpickr.selectedDates[0];
   }
 
-  rerender(inputStart, inputFinish) {
-    inputStart = inputStart || this._inputStart;
-    inputFinish = inputFinish || this._inputFinish;
-
-    this._rerenderStart(inputStart);
-    this._rerenderFinish(inputFinish);
-  }
-
   destroy() {
     this._startFlatpickr.destroy();
     this._finishFlatpickr.destroy();
@@ -73,7 +50,7 @@ export default class FlatpickrRange {
     this._startFlatpickr = null;
     this._finishFlatpickr = null;
     this._disabledRanges = null;
-    this._limitTimes = null;
+    this._enabledRanges = null;
     this._disabledDates = null;
   }
 
@@ -95,201 +72,89 @@ export default class FlatpickrRange {
     return disabledDates;
   }
 
-  _getLimitTimes(disabledRanges) {
-    const limitTimes = {};
-
-    disabledRanges.forEach((it) => {
-      const formatedDateFrom = moment(it.from).format(`YYYY-MM-DD`);
-      const formatedDateTo = moment(it.to).format(`YYYY-MM-DD`);
-
-      limitTimes[formatedDateFrom] = limitTimes[formatedDateFrom] || {
-        minTime: MIN_TIME,
-        maxTime: MAX_TIME
-      };
-
-      limitTimes[formatedDateTo] = limitTimes[formatedDateTo] || {
-        minTime: MIN_TIME,
-        maxTime: MAX_TIME
-      };
-
-      limitTimes[formatedDateFrom].maxTime = moment(it.from).format(`H:mm`);
-      limitTimes[formatedDateTo].minTime = moment(it.to).format(`H:mm`);
-    });
-
-    return limitTimes;
-  }
-
-  _createFlatpickr(inputElement, defaultDate, disabledDates, limitTimes, changeHandler) {
+  _createFlatpickr(inputElement, defaultDate, disabledDates, changeHandler) {
     const config = {
       dateFormat: `y/m/d H:i`,
       enableTime: true,
       [`time_24hr`]: true,
       defaultDate,
       disable: disabledDates,
-      onChange: [changeHandler],
-      plugins: [
-        new MinMaxTimePlugin({
-          table: limitTimes
-        })
-      ]
+      onClose: [changeHandler],
+      onChange: () => {
+        if (this._startFlatpickr.selectedDates.length && this._finishFlatpickr.selectedDates.length) {
+          this._dateChangeHandler(this._startFlatpickr.selectedDates[0], this._finishFlatpickr.selectedDates[0])
+        }
+      }
     };
 
     return flatpickr(inputElement, config);
   }
 
-  _getRangeByFinish() {
-    const dateStartCandidates = this._disabledRanges.slice()
-      .sort((a, b) => {
-        return (+this._dateFinish - a.to) - (+this._dateFinish - b.to);
-      })
-      .filter((it) => +this._dateFinish - it.to >= 0);
+  _flatpickrChangeHandler(dates, isChangedStart) {
+    if (!dates.length) {
+      return
+    };
 
-    const dateStart = dateStartCandidates.length ? dateStartCandidates[0].to : MIN_DATE;
+    let changedFlatpickr = this._finishFlatpickr;
+    let changedDate = `_dateFinish`;
+    let dependentFlatpickr = this._startFlatpickr;
+    let dependentDate = `_dateStart`;
+    let dateStart = dependentDate;
+    let dateFinish = changedDate;
 
-    const disabledRanges = [{
-      from: MIN_DATE,
-      to: dateStart
-    }, {
-      from: this._dateFinish,
-      to: MAX_DATE
-    }];
+    if (isChangedStart) {
+      changedFlatpickr = this._startFlatpickr;
+      changedDate = `_dateStart`;
+      dependentFlatpickr = this._finishFlatpickr;
+      dependentDate = `_dateFinish`;
+      dateStart = changedDate;
+      dateFinish = dependentDate;
+    };
 
-    return disabledRanges;
-  }
+    const enableRange = getDataRange(dates[0], this._enabledRanges);
 
-  _getRangeByStart() {
-    const dateFinishCandidates = this._disabledRanges.slice()
-      .sort((a, b) => {
-        return (+a.from - this._dateStart) - (+b.from - this._dateStart);
-      })
-      .filter((it) => +it.from - this._dateStart >= 0);
+    if (!enableRange) {
+      const disableRange = getDataRange(dates[0], this._disabledRanges);
 
-    const dateFinish = dateFinishCandidates.length ? dateFinishCandidates[0].from : MAX_DATE;
+      alert(`Интервал даты с ${moment(disableRange.from).format(`LLL`)} до ${moment(disableRange.to).format(`LLL`)} занят другим событием`);
+      changedFlatpickr.clear();
+      this[changedDate] = null;
 
-    const disabledRanges = [{
-      from: MIN_DATE,
-      to: this._dateStart
-    }, {
-      from: dateFinish,
-      to: MAX_DATE
-    }];
+    } else {
 
-    return disabledRanges;
+      this[changedDate] = dates[0];
+
+      if (this[dependentDate]) {
+        const enableRangeDependent = getDataRange(this[dependentDate], this._enabledRanges);
+        let isDateError = false;
+
+        switch (true) {
+          case isRangesEqual(enableRange, enableRangeDependent) === false:
+            alert(`Начало и окончания события должны принадлежать одному доступному интервалу (с ${moment(enableRange.from).format(`LLL`)} до ${moment(enableRange.to).format(`LLL`)})`);
+            isDateError = true;
+            break;
+
+          case +this[dateFinish] - this[dateStart] <= 0:
+            alert(`Начало события должно быть раньше окончания`);
+            isDateError = true;
+            break;
+        };
+
+        if (isDateError) {
+          dependentFlatpickr.clear();
+          this[dependentDate] = null;
+        };
+      }
+    };
+
+    this._dateChangeHandler(this._dateStart, this._dateFinish);
   }
 
   _finishFlatpickrChangeHandler(dates) {
-
-    switch (this._flatpickrMode) {
-      case FlatpickrMode.DEFAULT:
-        this._flatpickrMode = FlatpickrMode.FINISH;
-        break;
-
-      case FlatpickrMode.START:
-        this._flatpickrMode = FlatpickrMode.DEFAULT;
-        break;
-    }
-
-    this._dateFinish = dates[0];
-
-    this._rerenderStart(this._inputStart);
-
-    this._dateChangeHandler(this._dateStart, this._dateFinish);
+    this._flatpickrChangeHandler(dates, false)
   }
 
   _startFlatpickrChangeHandler(dates) {
-
-    switch (this._flatpickrMode) {
-      case FlatpickrMode.DEFAULT:
-        this._flatpickrMode = FlatpickrMode.START;
-        break;
-
-      case FlatpickrMode.FINISH:
-        this._flatpickrMode = FlatpickrMode.DEFAULT;
-        break;
-    }
-
-    this._dateStart = dates[0];
-
-    this._rerenderFinish(this._inputFinish);
-
-    this._dateChangeHandler(this._dateStart, this._dateFinish);
-  }
-
-  _rerenderStart(inputStart) {
-    let disabledDates;
-    let limitTimes;
-
-    switch (this._flatpickrMode) {
-      case FlatpickrMode.START:
-      case FlatpickrMode.DEFAULT:
-
-        disabledDates = this._disabledDates;
-        limitTimes = this._limitTimes;
-
-        break;
-
-      case FlatpickrMode.FINISH:
-
-        const disabledRanges = this._getRangeByFinish();
-        disabledDates = this._getDisabledDates(disabledRanges);
-        limitTimes = this._getLimitTimes(disabledRanges);
-
-        if (isDataInRanges(this._dateStart, disabledRanges)) {
-          this._dateStart = null;
-        }
-
-        break;
-    }
-
-    this._inputStart = inputStart;
-
-    this._startFlatpickr.destroy();
-
-    this._startFlatpickr = this._createFlatpickr(
-        this._inputStart,
-        this._dateStart,
-        disabledDates,
-        limitTimes,
-        this._startFlatpickrChangeHandler
-    );
-  }
-
-  _rerenderFinish(inputFinish) {
-    let disabledDates;
-    let limitTimes;
-
-    switch (this._flatpickrMode) {
-      case FlatpickrMode.FINISH:
-      case FlatpickrMode.DEFAULT:
-
-        disabledDates = this._disabledDates;
-        limitTimes = this._limitTimes;
-
-        break;
-
-      case FlatpickrMode.START:
-
-        const disabledRanges = this._getRangeByStart();
-        disabledDates = this._getDisabledDates(disabledRanges);
-        limitTimes = this._getLimitTimes(disabledRanges);
-
-        if (isDataInRanges(this._dateFinish, disabledRanges)) {
-          this._dateFinish = null;
-        }
-
-        break;
-    }
-
-    this._inputFinish = inputFinish;
-
-    this._finishFlatpickr.destroy();
-
-    this._finishFlatpickr = this._createFlatpickr(
-        this._inputFinish,
-        this._dateFinish,
-        disabledDates,
-        limitTimes,
-        this._finishFlatpickrChangeHandler
-    );
+    this._flatpickrChangeHandler(dates, true)
   }
 }

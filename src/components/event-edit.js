@@ -1,8 +1,9 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState} from '../const.js';
+import { isDataInRanges, isRangesEqual, getDataRange } from '../utils/common.js';
+import { EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState, TimeValue } from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 
-const getCostValidity = (value) => {
+const isCostValid = (value) => {
   switch (true) {
     case isNaN(value):
       return false;
@@ -18,12 +19,28 @@ const getCostValidity = (value) => {
   }
 };
 
-const isFormValid = (eventItem) => {
-  return eventItem.destination && eventItem.start && eventItem.finish && getCostValidity(eventItem.cost);
-};
-
-const setSubmitDisableStatus = (formElement, eventItem) => {
-  formElement.querySelector(`.event__save-btn`).disabled = !isFormValid(eventItem);
+const isFormValid = (eventItem, disabledRanges, enabledRanges) => {
+  debugger;
+  switch (true) {
+    case !eventItem.destination:
+      return false;
+    case !eventItem.start:
+      return false;
+    case !eventItem.finish:
+      return false;
+    case !isCostValid(eventItem.cost):
+      return false;
+    case +eventItem.finish <= +eventItem.start:
+      return false;
+    case isDataInRanges(eventItem.start, disabledRanges):
+      return false;
+    case isDataInRanges(eventItem.finish, disabledRanges):
+      return false;
+    case !isRangesEqual(getDataRange(eventItem.start, enabledRanges), getDataRange(eventItem.finish, enabledRanges)):
+      return false;
+    default:
+      return true;
+  }
 };
 
 const createEventTypeItem = (eventType, checked) => {
@@ -131,7 +148,7 @@ const createDestinationHtml = (destination) => {
                       </section>`;
 };
 
-const createForm = (eventItem, destinations, offers, mode, errorState) => {
+const createForm = (eventItem, destinations, offers, mode, errorState, disabledRanges, enabledRanges) => {
   const isNewEvent = mode === EventMode.ADDING;
 
   const eventProperty = EventTypeProperties[eventItem.type];
@@ -139,7 +156,7 @@ const createForm = (eventItem, destinations, offers, mode, errorState) => {
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination ? eventItem.destination.name : ``;
   const destinationList = destinations.map((item) => `<option value="${item.name}"></option>`).join(`\n`);
-  const disableStatus = isFormValid(eventItem) ? `` : ` disabled`;
+  const disableStatus = isFormValid(eventItem, disabledRanges, enabledRanges) ? `` : ` disabled`;
   const destinationHtml = createDestinationHtml(eventItem.destination);
   const offersHtml = createEventOffers(eventItem.offers, offers[eventItem.type]);
 
@@ -221,6 +238,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     super();
     this._eventItem = eventItem;
     this._disabledRanges = disabledRanges;
+    this._enabledRanges = this._getEnabledRanges(disabledRanges);
     this._destinations = destinations;
     this._offers = offers;
     this._mode = mode;
@@ -235,7 +253,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createForm(this._eventItem, this._destinations, this._offers, this._mode, this._errorState);
+    return createForm(this._eventItem, this._destinations, this._offers, this._mode, this._errorState, this._disabledRanges, this._enabledRanges);
   }
 
   rerender() {
@@ -245,38 +263,38 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   setRollupButtonClickHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__rollup-btn`),
-        `_rollupButtonClickHandler`,
-        `click`
+      handler,
+      this.getElement().querySelector(`.event__rollup-btn`),
+      `_rollupButtonClickHandler`,
+      `click`
     );
   }
 
   setSubmitHandler(handler) {
     const form = this._getFormElement();
     this._setHandler(
-        handler,
-        form,
-        `_submitHandler`,
-        `submit`
+      handler,
+      form,
+      `_submitHandler`,
+      `submit`
     );
   }
 
   setInputFavoriteChangeHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__favorite-checkbox`),
-        `_inputFavoriteChangeHandler`,
-        `change`
+      handler,
+      this.getElement().querySelector(`.event__favorite-checkbox`),
+      `_inputFavoriteChangeHandler`,
+      `change`
     );
   }
 
   setDeleteButtonClickHandler(handler) {
     this._setHandler(
-        handler,
-        this.getElement().querySelector(`.event__reset-btn`),
-        `_deleteButtonClickHandler`,
-        `click`
+      handler,
+      this.getElement().querySelector(`.event__reset-btn`),
+      `_deleteButtonClickHandler`,
+      `click`
     );
   }
 
@@ -359,17 +377,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
       this._eventItem.destination = destination || this._eventItem.destination;
 
       this.rerender();
-      setSubmitDisableStatus(this.getElement(), this._eventItem);
-    });
-
-    element.querySelector(`#event-start-time`).addEventListener(`input`, () => {
-      this._eventItem.start = this._flatpickrRange.getStartDate();
-      setSubmitDisableStatus(this.getElement(), this._eventItem);
-    });
-
-    element.querySelector(`#event-end-time`).addEventListener(`input`, () => {
-      this._eventItem.finish = this._flatpickrRange.getFinishDate();
-      setSubmitDisableStatus(this.getElement(), this._eventItem);
+      this._setSubmitDisableStatus();
     });
 
     element.querySelectorAll(`.event__type-input`).forEach((it) => {
@@ -384,7 +392,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     element.querySelector(`.event__input--price`).addEventListener(`change`, (evt) => {
       this._eventItem.cost = +evt.target.value;
 
-      setSubmitDisableStatus(this.getElement(), this._eventItem);
+      this._setSubmitDisableStatus();
     });
 
     const offersElement = element.querySelector(`.event__available-offers`);
@@ -400,7 +408,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
         const offerIndex = this._eventItem.offers.findIndex((it) => it.title === offerTitle && it.price === offerPrice);
 
         if (offerIndex === -1) {
-          this._eventItem.offers.push({title: offerTitle, price: offerPrice});
+          this._eventItem.offers.push({ title: offerTitle, price: offerPrice });
         } else {
           this._eventItem.offers = this._eventItem.offers.filter((it) => it.title !== offerTitle && it.price !== offerPrice);
         }
@@ -410,19 +418,20 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   _createFlatpickrRange() {
     return new FlatpickrRange(
-        this.getElement().querySelector(`#event-start-time`),
-        this.getElement().querySelector(`#event-end-time`),
-        this._eventItem.start,
-        this._eventItem.finish,
-        this._disabledRanges,
-        this._dateRangeChangeHandler
+      this.getElement().querySelector(`#event-start-time`),
+      this.getElement().querySelector(`#event-end-time`),
+      this._eventItem.start,
+      this._eventItem.finish,
+      this._disabledRanges,
+      this._enabledRanges,
+      this._dateRangeChangeHandler
     );
   }
 
   _dateRangeChangeHandler(dateStart, dateFinish) {
     this._eventItem.start = dateStart;
     this._eventItem.finish = dateFinish;
-    setSubmitDisableStatus(this.getElement(), this._eventItem);
+    this._setSubmitDisableStatus();
   }
 
   _getFormElement() {
@@ -442,5 +451,31 @@ export default class EventEditComponent extends AbstractSmartComponent {
       it.disabled = false;
     });
     this._getFormElement().classList.remove(`event--disabled`);
+  }
+
+  _getEnabledRanges(disabledRanges) {
+    const enabledRages = [{
+      from: TimeValue.MIN_DATE,
+      to: TimeValue.MAX_DATE
+    }];
+
+    disabledRanges.forEach((it) => {
+      const lastIndex = enabledRages.length - 1;
+
+      const newRange = {
+        from: it.to,
+        to: enabledRages[lastIndex].to
+      };
+
+      enabledRages[lastIndex].to = it.from;
+
+      enabledRages.push(newRange)
+    });
+
+    return enabledRages;
+  }
+
+  _setSubmitDisableStatus() {
+    this._getFormElement().querySelector(`.event__save-btn`).disabled = !isFormValid(this._eventItem, this._disabledRanges, this._enabledRanges);
   }
 }
