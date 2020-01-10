@@ -44,19 +44,19 @@ export const formatDate = (date1, date2) => {
 
 export const getShortDate = (date) => date ? moment(date).format(`D MMM`) : ``;
 
-export const isDataInRange = (data, range) => {
-  return data > range.from && data <= range.to;
+export const isDateInRange = (data, range) => {
+  return data >= range.from && data <= range.to;
 };
 
-export const isDataInRanges = (data, ranges) => {
-  return ranges.some((it) => isDataInRange(data, it));
+export const isDateInRanges = (ranges, ...data) => {
+  return ranges.some((it) => isDateInRange(data, it));
 };
 
 export const getDataRange = (data, ranges) => {
-  return ranges.find((it) => isDataInRange(data, it));
+  return ranges.find((it) => isDateInRange(data, it));
 };
 
-export const flatDataRanges = (ranges) => {
+export const flatDateRanges = (ranges) => {
   if (!ranges.length) {
     return [];
   }

@@ -1,5 +1,5 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import { isDataInRanges, isRangesEqual, getDataRange } from '../utils/common.js';
+import { isDateInRanges, isRangesEqual, getDataRange } from '../utils/common.js';
 import { EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState, TimeValue } from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 
@@ -31,9 +31,9 @@ const isFormValid = (eventItem, disabledRanges, enabledRanges) => {
       return false;
     case +eventItem.finish <= +eventItem.start:
       return false;
-    case isDataInRanges(eventItem.start, disabledRanges):
+    case isDateInRanges(eventItem.start, disabledRanges):
       return false;
-    case isDataInRanges(eventItem.finish, disabledRanges):
+    case isDateInRanges(eventItem.finish, disabledRanges):
       return false;
     case !isRangesEqual(getDataRange(eventItem.start, enabledRanges), getDataRange(eventItem.finish, enabledRanges)):
       return false;

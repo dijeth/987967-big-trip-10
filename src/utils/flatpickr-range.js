@@ -2,7 +2,7 @@ import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
 import MinMaxTimePlugin from '../../node_modules/flatpickr/dist/plugins/MinMaxTimePlugin.js';
 import moment from 'moment';
-import { isDataInRanges, getDataRange, isRangesEqual } from './common.js';
+import { isDateInRanges, getDataRange, isRangesEqual } from './common.js';
 
 export default class FlatpickrRange {
   constructor(inputStart, inputFinish, dateStart, dateFinish, disabledRanges, enabledRages, dateChangeHandler) {
