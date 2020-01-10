@@ -11,6 +11,16 @@ import API from './api.js';
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 const AUTORIZATION = `Basic Jethro_Tull`;
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`)
+    .then(() => {
+      document.title = `[SW] ${document.title}`
+    }).catch(() => {
+      document.title = `[Not SW] ${document.title}`
+    });
+});
+
 const api = new API(END_POINT, AUTORIZATION);
 
 const tripMainElement = document.querySelector(`.trip-main`);
