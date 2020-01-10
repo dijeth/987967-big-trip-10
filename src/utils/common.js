@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {TimeValue, MIN_EVENT_DURATION} from '../const.js';
+import { TimeValue, MIN_EVENT_DURATION } from '../const.js';
 
 export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
 
@@ -44,8 +44,24 @@ export const formatDate = (date1, date2) => {
 
 export const getShortDate = (date) => date ? moment(date).format(`D MMM`) : ``;
 
-export const isDateInRange = (range, date) => {
-  return date >= range.from && date <= range.to;
+export const isDateInRange = (range, date, strong = false) => {
+  const dateValue = Math.floor(date/TimeValue.MINUTE);
+  const fromValue = Math.floor(range.from/TimeValue.MINUTE);
+  const toValue = Math.floor(range.to/TimeValue.MINUTE);
+
+  if (strong) {
+    return dateValue > fromValue && dateValue < toValue;
+  };
+
+  return dateValue >= fromValue && dateValue <= toValue;
+};
+
+export const getDateRange = (ranges, date, strong = false) => {
+  return ranges.find((range) => isDateInRange(range, date, strong));
+};
+
+export const isDateInRanges = (ranges, date, strong = false) => {
+  return ranges.some((range) => isDateInRange(range, date, strong));
 };
 
 export const isDatesInRange = (range, ...dates) => {
@@ -53,11 +69,11 @@ export const isDatesInRange = (range, ...dates) => {
 };
 
 export const isDatesInRanges = (ranges, ...dates) => {
-  return ranges.some((range) => isDatesInRange(range, [...dates]));
+  return ranges.some((range) => isDatesInRange(range, ...dates));
 };
 
 export const getDatesRange = (ranges, ...dates) => {
-  return ranges.find((range) => isDatesInRange(range, [...dates]));
+  return ranges.find((range) => isDatesInRange(range, ...dates));
 };
 
 export const flatDateRanges = (ranges) => {

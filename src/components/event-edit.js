@@ -1,5 +1,5 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import { isDateInRanges, isRangesEqual, getDatesRange } from '../utils/common.js';
+import { isDateInRanges, isRangesEqual, isDatesInRanges } from '../utils/common.js';
 import { EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState, TimeValue, ValidityError } from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 
@@ -24,6 +24,8 @@ const getFormValidity = (eventItem, disabledRanges, enabledRanges) => {
     case !eventItem.destination: return ValidityError.EMPTY_DESTINATION;
     case !eventItem.start: return ValidityError.EMPTY_START_DATE;
     case !eventItem.finish: return ValidityError.EMPTY_FINISH_DATE;
+    case isDateInRanges(disabledRanges, eventItem.start, true): return ValidityError.DISABLED_DATE;
+    case isDateInRanges(disabledRanges, eventItem.finish, true): return ValidityError.DISABLED_DATE;
     case !isCostValid(eventItem.cost): return ValidityError.WRONG_COST_FORMAT;
     case +eventItem.finish <= +eventItem.start: return ValidityError.NEGATIVE_DATE_RANGE;
     case !isDatesInRanges(enabledRanges, eventItem.start, eventItem.finish): return ValidityError.WRONG_DATE_RANGE;
@@ -419,7 +421,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   _dateRangeChangeHandler(dateStart, dateFinish) {
     this._eventItem.start = dateStart;
     this._eventItem.finish = dateFinish;
-    this._setSubmitDisableStatus();
+    return this._setSubmitDisableStatus();
   }
 
   _getFormElement() {
