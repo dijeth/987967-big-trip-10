@@ -2,7 +2,8 @@ import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
 import MinMaxTimePlugin from '../../node_modules/flatpickr/dist/plugins/MinMaxTimePlugin.js';
 import moment from 'moment';
-import { isDataInRanges, getDataRange, isRangesEqual } from './common.js';
+import { getDateRange, getDateTime } from './common.js';
+import { ValidityError } from '../const.js';
 
 export default class FlatpickrRange {
   constructor(inputStart, inputFinish, dateStart, dateFinish, disabledRanges, enabledRages, dateChangeHandler) {
@@ -81,16 +82,14 @@ export default class FlatpickrRange {
       disable: disabledDates,
       onClose: [changeHandler],
       onChange: () => {
-        if (this._startFlatpickr.selectedDates.length && this._finishFlatpickr.selectedDates.length) {
-          this._dateChangeHandler(this._startFlatpickr.selectedDates[0], this._finishFlatpickr.selectedDates[0])
-        }
+        this._validityMessage = this._dateChangeHandler(this._startFlatpickr.selectedDates[0], this._finishFlatpickr.selectedDates[0])
       }
     };
 
     return flatpickr(inputElement, config);
   }
 
-  _flatpickrChangeHandler(dates, isChangedStart) {
+  _flatpickrChangeHandler(dates, isChangedStart, instance) {
     if (!dates.length) {
       return
     };
@@ -111,50 +110,37 @@ export default class FlatpickrRange {
       dateFinish = dependentDate;
     };
 
-    const enableRange = getDataRange(dates[0], this._enabledRanges);
+    switch (this._validityMessage) {
+      case ValidityError.DISABLED_DATE:
+        const disabledRange = getDateRange(this._disabledRanges, dates[0], true);
+        alert(`${this._validityMessage}: ${getDateTime(disabledRange.from)} - ${getDateTime(disabledRange.to)}`);
+        instance.clear(); 
+        this[changedDate] = null;
+        break;
 
-    if (!enableRange) {
-      const disableRange = getDataRange(dates[0], this._disabledRanges);
+      case ValidityError.NEGATIVE_DATE_RANGE: 
+        alert(this._validityMessage);
+        dependentFlatpickr.clear();
+        this[dependentDate] = null;
+        break;
 
-      alert(`Интервал даты с ${moment(disableRange.from).format(`llll`)} до ${moment(disableRange.to).format(`llll`)} занят другим событием`);
-      changedFlatpickr.clear();
-      this[changedDate] = null;
+      case ValidityError.WRONG_DATE_RANGE: 
+        const enabledRange = getDateRange(this._enabledRanges, dates[0], true);
+        alert(`${this._validityMessage}: ${getDateTime(enabledRange.from)} - ${getDateTime(enabledRange.to)}`);
+        // alert(this._validityMessage);
+        dependentFlatpickr.clear();
+        this[dependentDate] = null;
+        break;
 
-    } else {
-      debugger;
-      this[changedDate] = dates[0];
-
-      if (this[dependentDate]) {
-        const enableRangeDependent = getDataRange(this[dependentDate], this._enabledRanges);
-        let isDateError = false;
-
-        switch (true) {
-          case isRangesEqual(enableRange, enableRangeDependent) === false:
-            alert(`Начало и окончания события должны принадлежать одному доступному интервалу (с ${moment(enableRange.from).format(`llll`)} до ${moment(enableRange.to).format(`llll`)})`);
-            isDateError = true;
-            break;
-
-          case +this[dateFinish] - this[dateStart] <= 0:
-            alert(`Начало события должно быть раньше окончания`);
-            isDateError = true;
-            break;
-        };
-
-        if (isDateError) {
-          dependentFlatpickr.clear();
-          this[dependentDate] = null;
-        };
-      }
-    };
-
-    // this._dateChangeHandler(this._dateStart, this._dateFinish);
+      default: this[changedDate] = dates[0];
+    }
   }
 
-  _finishFlatpickrChangeHandler(dates) {
-    this._flatpickrChangeHandler(dates, false)
+  _finishFlatpickrChangeHandler(dates, dateStr, instance ) {
+    this._flatpickrChangeHandler(dates, false, instance)
   }
 
-  _startFlatpickrChangeHandler(dates) {
-    this._flatpickrChangeHandler(dates, true)
+  _startFlatpickrChangeHandler(dates, dateStr, instance ) {
+    this._flatpickrChangeHandler(dates, true, instance)
   }
 }

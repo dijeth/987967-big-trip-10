@@ -1,6 +1,6 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import { isDataInRanges, isRangesEqual, getDataRange } from '../utils/common.js';
-import { EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState, TimeValue } from '../const.js';
+import { isDateInRanges, isRangesEqual, isDatesInRanges } from '../utils/common.js';
+import { EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState, TimeValue, ValidityError } from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 
 const isCostValid = (value) => {
@@ -19,26 +19,17 @@ const isCostValid = (value) => {
   }
 };
 
-const isFormValid = (eventItem, disabledRanges, enabledRanges) => {
+const getFormValidity = (eventItem, disabledRanges, enabledRanges) => {
   switch (true) {
-    case !eventItem.destination:
-      return false;
-    case !eventItem.start:
-      return false;
-    case !eventItem.finish:
-      return false;
-    case !isCostValid(eventItem.cost):
-      return false;
-    case +eventItem.finish <= +eventItem.start:
-      return false;
-    case isDataInRanges(eventItem.start, disabledRanges):
-      return false;
-    case isDataInRanges(eventItem.finish, disabledRanges):
-      return false;
-    case !isRangesEqual(getDataRange(eventItem.start, enabledRanges), getDataRange(eventItem.finish, enabledRanges)):
-      return false;
-    default:
-      return true;
+    case !eventItem.destination: return ValidityError.EMPTY_DESTINATION;
+    case !eventItem.start: return ValidityError.EMPTY_START_DATE;
+    case !eventItem.finish: return ValidityError.EMPTY_FINISH_DATE;
+    case isDateInRanges(disabledRanges, eventItem.start, true): return ValidityError.DISABLED_DATE;
+    case isDateInRanges(disabledRanges, eventItem.finish, true): return ValidityError.DISABLED_DATE;
+    case !isCostValid(eventItem.cost): return ValidityError.WRONG_COST_FORMAT;
+    case +eventItem.finish <= +eventItem.start: return ValidityError.NEGATIVE_DATE_RANGE;
+    case !isDatesInRanges(enabledRanges, eventItem.start, eventItem.finish): return ValidityError.WRONG_DATE_RANGE;
+    default: return ``;
   }
 };
 
@@ -155,7 +146,7 @@ const createForm = (eventItem, destinations, offers, mode, errorState, disabledR
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination ? eventItem.destination.name : ``;
   const destinationList = destinations.map((item) => `<option value="${item.name}"></option>`).join(`\n`);
-  const disableStatus = isFormValid(eventItem, disabledRanges, enabledRanges) ? `` : ` disabled`;
+  const disableStatus = getFormValidity(eventItem, disabledRanges, enabledRanges) === `` ? `` : ` disabled`;
   const destinationHtml = createDestinationHtml(eventItem.destination);
   const offersHtml = createEventOffers(eventItem.offers, offers[eventItem.type]);
 
@@ -430,7 +421,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   _dateRangeChangeHandler(dateStart, dateFinish) {
     this._eventItem.start = dateStart;
     this._eventItem.finish = dateFinish;
-    this._setSubmitDisableStatus();
+    return this._setSubmitDisableStatus();
   }
 
   _getFormElement() {
@@ -475,6 +466,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   _setSubmitDisableStatus() {
-    this._getFormElement().querySelector(`.event__save-btn`).disabled = !isFormValid(this._eventItem, this._disabledRanges, this._enabledRanges);
+    const validityMessage = getFormValidity(this._eventItem, this._disabledRanges, this._enabledRanges);
+    this._getFormElement().querySelector(`.event__save-btn`).disabled = validityMessage !== ``;
+    return validityMessage;
   }
 }
