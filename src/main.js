@@ -7,21 +7,34 @@ import FilterController from './controllers/filter-controller.js';
 import Events from './models/events.js';
 import TripInfoController from './controllers/trip-info-controller.js';
 import { TripMode, MenuMode } from './const.js';
-import API from './api.js';
+import API from './api/api.js';
+import Store from './api/store.js';
+import Provider from './api/provider.js';
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 const AUTORIZATION = `Basic Jethro_Tull`;
+const LOCAL_STORAGE_KEY = `big-trip-local-storage-key`;
 
-window.addEventListener(`load`, () => {
-  navigator.serviceWorker.register(`/sw.js`)
-    .then(() => {
-      document.title = `[SW] ${document.title}`
-    }).catch(() => {
-      document.title = `[Not SW] ${document.title}`
-    });
+window.addEventListener(`offline`, () => {
+   document.title = `${document.title} [offline]`;
 });
 
+window.addEventListener(`online`, () => {
+   document.title = document.title.replace(` [offline]`, ``);
+});
+
+// window.addEventListener(`load`, () => {
+//   navigator.serviceWorker.register(`/sw.js`)
+//     .then(() => {
+//       document.title = `[SW] ${document.title}`
+//     }).catch(() => {
+//       document.title = `[Not SW] ${document.title}`
+//     });
+// });
+
 const api = new API(END_POINT, AUTORIZATION);
+const store = new Store(LOCAL_STORAGE_KEY, localStorage);
+const provider = new Provider(api, store);
 
 const tripMainElement = document.querySelector(`.trip-main`);
 const tripEventsElement = document.querySelector(`.trip-events`);
@@ -33,7 +46,7 @@ const tripInfoController = new TripInfoController(tripMainElement, events);
 tripInfoController.init();
 const filterController = new FilterController(tripControlElements[1], events);
 
-const tripController = new TripController(tripEventsElement, events, api);
+const tripController = new TripController(tripEventsElement, events, provider);
 tripController.setModeChangeHandler((mode) => {
   createEventElement.disabled = mode === TripMode.ADDING;
 });
@@ -72,7 +85,7 @@ createEventElement.addEventListener(`click`, () => {
 
 statisticsComponent.hide();
 
-api.getData().then((data) => {
+provider.getData().then((data) => {
   tripController.setDestinations(data.destinations);
   tripController.setOffers(data.offers);
   events.set(data.events);
