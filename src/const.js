@@ -196,3 +196,13 @@ export const ProcessingState = {
   DELETING: `Deleting...`,
   CHANGING_FAVORITE: `Changing favorite`
 };
+
+
+export const ValidityError = {
+  EMPTY_DESTINATION: `Необходимо выбрать пункт назначения`,
+  EMPTY_START_DATE: `Необходимо выбрать дату начала события`,
+  EMPTY_FINISH_DATE: `Необходимо выбрать дату окончания события`,
+  WRONG_COST_FORMAT: `Стоимость должна быть целым числом`,
+  NEGATIVE_DATE_RANGE: `Дата начала события должна быть раньше даты окончания события`,
+  WRONG_DATE_RANGE: `Даты начала и окончания события должны находиться внутри одного допустимого интервала`
+}
