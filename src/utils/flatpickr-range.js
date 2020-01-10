@@ -116,12 +116,12 @@ export default class FlatpickrRange {
     if (!enableRange) {
       const disableRange = getDataRange(dates[0], this._disabledRanges);
 
-      alert(`Интервал даты с ${moment(disableRange.from).format(`LLL`)} до ${moment(disableRange.to).format(`LLL`)} занят другим событием`);
+      alert(`Интервал даты с ${moment(disableRange.from).format(`llll`)} до ${moment(disableRange.to).format(`llll`)} занят другим событием`);
       changedFlatpickr.clear();
       this[changedDate] = null;
 
     } else {
-
+      debugger;
       this[changedDate] = dates[0];
 
       if (this[dependentDate]) {
@@ -130,7 +130,7 @@ export default class FlatpickrRange {
 
         switch (true) {
           case isRangesEqual(enableRange, enableRangeDependent) === false:
-            alert(`Начало и окончания события должны принадлежать одному доступному интервалу (с ${moment(enableRange.from).format(`LLL`)} до ${moment(enableRange.to).format(`LLL`)})`);
+            alert(`Начало и окончания события должны принадлежать одному доступному интервалу (с ${moment(enableRange.from).format(`llll`)} до ${moment(enableRange.to).format(`llll`)})`);
             isDateError = true;
             break;
 
@@ -147,7 +147,7 @@ export default class FlatpickrRange {
       }
     };
 
-    this._dateChangeHandler(this._dateStart, this._dateFinish);
+    // this._dateChangeHandler(this._dateStart, this._dateFinish);
   }
 
   _finishFlatpickrChangeHandler(dates) {
