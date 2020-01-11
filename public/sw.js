@@ -36,7 +36,6 @@ self.addEventListener(`activate`, (evt) => {
     .then(
       // Перебираем их и составляем набор промисов на удаление
       (keys) => {
-        console.log(keys);
         Promise.all(
           keys.map(
             (key) => {
