@@ -4,14 +4,22 @@ import nanoid from "nanoid";
 const OFFERS_KEY = `offers`;
 const DESTINATIONS_KEY = `destinations`;
 
+const getSyncedEvents = (data) => {
+  return data.filter((it) => it.success).map((it) => payload.point);
+}
+
 export default class Provider {
   constructor(api, store) {
     this._api = api;
     this._store = store;
-    this._isSynchronized = true;
+    this._isSynced = true;
   }
 
-  getData() {
+  getSynchronize() {
+    return this._isSynced;
+  }  
+
+  getData() {debugger;
     if (this._isOnLine()) {
       return this._api.getData().then((response) => {
         this._store.clear();
@@ -24,7 +32,7 @@ export default class Provider {
       });
     }
 
-    this._isSynchronized = false;
+    this._isSynced = false;
 
     const store = this._store.getAll();
     const offers = store[OFFERS_KEY];
@@ -51,11 +59,11 @@ export default class Provider {
         })
     };
 
-    this._isSynchronized = false;
+    this._isSynced = false;
 
     const newID = nanoid();
-    const newEvent = Object.assign({}, data.toRAW(), {id: newID});
-    this._store.setItem(newID, Object.assign({}, newEvent, {offline: true}));
+    const newEvent = Object.assign({}, data.toRAW(), { id: newID });
+    this._store.setItem(newID, Object.assign({}, newEvent, { offline: true }));
 
     return Promise.resolve(new EventModel(newEvent));
   }
@@ -69,9 +77,9 @@ export default class Provider {
         })
     };
 
-    this._isSynchronized = false;
+    this._isSynced = false;
 
-    this._store.setItem(id, Object.assign({}, data.toRAW(), {offline: true}));
+    this._store.setItem(id, Object.assign({}, data.toRAW(), { offline: true }));
 
     return Promise.resolve(data);
   }
@@ -84,11 +92,40 @@ export default class Provider {
         })
     };
 
-    this._isSynchronized = false;
+    this._isSynced = false;
 
     this._store.deleteItem(id);
-    
+
     return Promise.resolve();
+  }
+
+  sync() {
+    if (this._isOnLine()) {
+      const store = this._store.getAll();
+
+      delete store[OFFERS_KEY];
+      delete store[DESTINATIONS_KEY];
+
+      return this._api.sync(Object.values(store))
+        .then((response) => {
+          store.filter((item) => item.offline).forEach((item) => {
+            this._store.removeItem(item.id);
+          });
+
+          const createdEvents = getSyncedEvents(response.created);
+          const updatedEvents = getSyncedEvents(response.updated);
+
+          [...createdEvents, ...updatedEvents].forEach((item) => {
+            this._store.setItem(item.id, item);
+          });
+
+          this._isSynced = true;
+
+          return Promise.resolve();
+        });
+    }
+
+    return Promise.reject(new Error(`Sync data failed`));
   }
 
   _isOnLine() {

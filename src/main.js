@@ -12,16 +12,8 @@ import Store from './api/store.js';
 import Provider from './api/provider.js';
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
-const AUTORIZATION = `Basic Jethro_Tull`;
+const AUTORIZATION = `Basic JethroTull`;
 const LOCAL_STORAGE_KEY = `big-trip-local-storage-key`;
-
-window.addEventListener(`offline`, () => {
-   document.title = `${document.title} [offline]`;
-});
-
-window.addEventListener(`online`, () => {
-   document.title = document.title.replace(` [offline]`, ``);
-});
 
 // window.addEventListener(`load`, () => {
 //   navigator.serviceWorker.register(`/sw.js`)
@@ -89,4 +81,22 @@ provider.getData().then((data) => {
   tripController.setDestinations(data.destinations);
   tripController.setOffers(data.offers);
   events.set(data.events);
+});
+
+window.addEventListener(`offline`, () => {
+  document.title = `${document.title} [offline]`;
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+
+  if (!provider.getSynchronize()) {
+    provider.sync()
+      .then(() => {
+        // Действие, в случае успешной синхронизации
+      })
+      .catch(() => {
+        // Действие, в случае ошибки синхронизации
+      });
+  }
 });
