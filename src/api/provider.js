@@ -5,8 +5,8 @@ const OFFERS_KEY = `offers`;
 const DESTINATIONS_KEY = `destinations`;
 
 const getSyncedEvents = (data) => {
-  return data.filter((it) => it.success).map((it) => payload.point);
-}
+  return data.filter((it) => it.success).map((it) => it.payload.point);
+};
 
 export default class Provider {
   constructor(api, store) {
@@ -17,16 +17,16 @@ export default class Provider {
 
   getSynchronize() {
     return this._isSynced;
-  }  
+  }
 
-  getData() {debugger;
+  getData() {
     if (this._isOnLine()) {
       return this._api.getData().then((response) => {
         this._store.clear();
 
         this._store.setItem(OFFERS_KEY, response.offers);
         this._store.setItem(DESTINATIONS_KEY, response.destinations);
-        response.events.forEach((it) => this._store.setItem(it.id, it.toRAW()))
+        response.events.forEach((it) => this._store.setItem(it.id, it.toRAW()));
 
         return response;
       });
@@ -41,13 +41,13 @@ export default class Provider {
     delete store[OFFERS_KEY];
     delete store[DESTINATIONS_KEY];
 
-    const events = EventModel.parseEvents(Object.values(store))
+    const events = EventModel.parseEvents(Object.values(store));
 
     return Promise.resolve({
       offers,
       destinations,
       events
-    })
+    });
   }
 
   createEvent(data) {
@@ -55,15 +55,15 @@ export default class Provider {
       return this._api.createEvent(data)
         .then((response) => {
           this._store.setItem(response.id, response.toRAW());
-          return response
-        })
-    };
+          return response;
+        });
+    }
 
     this._isSynced = false;
 
     const newID = nanoid();
-    const newEvent = Object.assign({}, data.toRAW(), { id: newID });
-    this._store.setItem(newID, Object.assign({}, newEvent, { offline: true }));
+    const newEvent = Object.assign({}, data.toRAW(), {id: newID});
+    this._store.setItem(newID, Object.assign({}, newEvent, {offline: true}));
 
     return Promise.resolve(new EventModel(newEvent));
   }
@@ -73,13 +73,13 @@ export default class Provider {
       return this._api.updateEvent(id, data)
         .then((response) => {
           this._store.setItem(response.id, response.toRAW());
-          return response
-        })
-    };
+          return response;
+        });
+    }
 
     this._isSynced = false;
 
-    this._store.setItem(id, Object.assign({}, data.toRAW(), { offline: true }));
+    this._store.setItem(id, Object.assign({}, data.toRAW(), {offline: true}));
 
     return Promise.resolve(data);
   }
@@ -89,8 +89,8 @@ export default class Provider {
       return this._api.deleteEvent(id)
         .then(() => {
           this._store.deleteItem(id);
-        })
-    };
+        });
+    }
 
     this._isSynced = false;
 

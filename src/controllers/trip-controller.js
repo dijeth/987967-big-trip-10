@@ -18,7 +18,7 @@ export default class TripController {
     this._sortComponent = null;
     this._dayListComponent = null;
     this._editingEvent = null;
-    this._mode = null;//TripMode.EMPTY;
+    this._mode = null;// TripMode.EMPTY;
 
     this._activeSortType = SortType.DEFAULT;
 

@@ -1,4 +1,4 @@
-import { RenderPosition, renderComponent, removeComponent } from './utils/render.js';
+import {RenderPosition, renderComponent} from './utils/render.js';
 import NoPointsController from './controllers/no-points-controller.js';
 import MenuComponent from './components/menu.js';
 import StatisticComponent from './components/stats.js';
@@ -6,7 +6,7 @@ import TripController from './controllers/trip-controller.js';
 import FilterController from './controllers/filter-controller.js';
 import Events from './models/events.js';
 import TripInfoController from './controllers/trip-info-controller.js';
-import { TripMode, MenuMode } from './const.js';
+import {TripMode, MenuMode} from './const.js';
 import API from './api/api.js';
 import Store from './api/store.js';
 import Provider from './api/provider.js';

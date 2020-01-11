@@ -1,6 +1,6 @@
-import { renderComponent, RenderPosition, replaceComponent, removeComponent } from '../utils/render.js';
+import {renderComponent, RenderPosition, replaceComponent, removeComponent} from '../utils/render.js';
 import NoPointsComponent from '../components/no-points.js';
-import{TripMode} from '../const.js';
+import {TripMode} from '../const.js';
 
 class NoPointsController {
   constructor(container, tripController) {
@@ -11,7 +11,7 @@ class NoPointsController {
 
     this._tripModeChangeHandler = this._tripModeChangeHandler.bind(this);
 
-    this._tripController.setModeChangeHandler(this._tripModeChangeHandler)
+    this._tripController.setModeChangeHandler(this._tripModeChangeHandler);
   }
 
   render() {
@@ -32,8 +32,8 @@ class NoPointsController {
 
   _tripModeChangeHandler(mode) {
     if (mode === TripMode.EMPTY) {
-    	this.setNoPointsMessage();
-    	this.render();
+      this.setNoPointsMessage();
+      this.render();
     } else {
       removeComponent(this._noPointsComponent);
       this._noPointsComponent = null;

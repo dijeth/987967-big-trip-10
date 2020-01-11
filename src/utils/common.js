@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { TimeValue, MIN_EVENT_DURATION } from '../const.js';
+import {TimeValue, MIN_EVENT_DURATION} from '../const.js';
 
 export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
 
@@ -45,13 +45,13 @@ export const formatDate = (date1, date2) => {
 export const getShortDate = (date) => date ? moment(date).format(`D MMM`) : ``;
 
 export const isDateInRange = (range, date, strong = false) => {
-  const dateValue = Math.floor(date/TimeValue.MINUTE);
-  const fromValue = Math.floor(range.from/TimeValue.MINUTE);
-  const toValue = Math.floor(range.to/TimeValue.MINUTE);
+  const dateValue = Math.floor(date / TimeValue.MINUTE);
+  const fromValue = Math.floor(range.from / TimeValue.MINUTE);
+  const toValue = Math.floor(range.to / TimeValue.MINUTE);
 
   if (strong) {
     return dateValue > fromValue && dateValue < toValue;
-  };
+  }
 
   return dateValue >= fromValue && dateValue <= toValue;
 };
@@ -100,7 +100,7 @@ export const flatDateRanges = (ranges) => {
 };
 
 export const isRangesEqual = (...ranges) => {
-  return ranges.every((it) => ranges[0].from === it.from && ranges[0].to === it.to)
+  return ranges.every((it) => ranges[0].from === it.from && ranges[0].to === it.to);
 };
 
 export const toSentenceCase = (string) => {

@@ -10,7 +10,7 @@ class FilterController {
 
     this.render = this.render.bind(this);
 
-    this._eventsModel.setDataChangeHandler(this.render)
+    this._eventsModel.setDataChangeHandler(this.render);
   }
 
   render() {
@@ -22,7 +22,7 @@ class FilterController {
         type,
         name: options.name,
         checked: checkedFilterType === type,
-        disabled: this._eventsModel.get().filter((it) => options.check(it)).length === 0
+        disabled: this._eventsModel.get().filter((item) => options.check(item)).length === 0
       };
     });
 
