@@ -1,5 +1,5 @@
 import {RenderPosition, renderComponent, replaceComponent, removeComponent} from '../utils/render.js';
-import {flatDataRanges} from '../utils/common.js';
+import {flatDateRanges} from '../utils/common.js';
 import {SortOptions, SortType} from '../utils/sort.js';
 import DayListComponent from '../components/day-list.js';
 import SortComponent from '../components/sort.js';
@@ -18,7 +18,7 @@ export default class TripController {
     this._sortComponent = null;
     this._dayListComponent = null;
     this._editingEvent = null;
-    this._mode = TripMode.DEFAULT;
+    this._mode = null;// TripMode.EMPTY;
 
     this._activeSortType = SortType.DEFAULT;
 
@@ -57,7 +57,7 @@ export default class TripController {
         container,
         this._dataChangeHandler,
         this._viewChangeHandler,
-        flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null)),
+        flatDateRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null)),
         this._destinations,
         this._offers
     );
@@ -154,7 +154,7 @@ export default class TripController {
           container,
           this._dataChangeHandler,
           this._viewChangeHandler,
-          flatDataRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
+          flatDateRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
           this._destinations,
           this._offers
       ).render(it, mode, this._editingEvent);

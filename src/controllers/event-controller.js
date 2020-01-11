@@ -101,7 +101,7 @@ export default class EventController {
         return;
       }
 
-      const keepInEditing = eventEditComponent.getData();
+      const keepInEditing = eventEditComponent.getData().clone();
 
       const newEventData = eventData.clone();
       newEventData.isFavorite = !eventData.isFavorite;

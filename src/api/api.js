@@ -1,5 +1,5 @@
-import Offers from './models/offers.js';
-import EventModel from './models/event.js';
+import Offers from '../models/offers.js';
+import EventModel from '../models/event.js';
 
 const Method = {
   GET: `GET`,
@@ -22,11 +22,11 @@ export default class API {
     this._authorization = authorization;
   }
 
-  getDestinations() {
+  _getDestinations() {
     return this._load({url: `destinations`}).then((response) => response.json());
   }
 
-  getOffers() {
+  _getOffers() {
     return this._load({url: `offers`})
       .then((response) => response.json())
       .then((offerData) => new Offers(offerData));
@@ -35,8 +35,8 @@ export default class API {
   getData() {
     return Promise.all([
       this._load({url: `points`}).then((response) => response.json()),
-      this.getOffers(),
-      this.getDestinations()
+      this._getOffers(),
+      this._getDestinations()
     ]).then((values) => {
       const [eventList, offerList, destinations] = values;
       return {
@@ -73,6 +73,15 @@ export default class API {
     return this._load({url: `points/${id}`, method: Method.DELETE});
   }
 
+  sync(data) {
+    return this._load({
+      url: `points/sync`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then((response) => response.json());
+  }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);

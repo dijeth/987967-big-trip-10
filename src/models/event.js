@@ -11,16 +11,18 @@ export default class EventModel {
   }
 
   toRAW() {
-    return {
+    const raw = {
       id: this.id,
       [`base_price`]: this.cost,
       [`date_from`]: this.start ? this.start.toISOString() : null,
       [`date_to`]: this.finish ? this.finish.toISOString() : null,
-      destination: this.destination,
+      destination: JSON.parse(JSON.stringify(this.destination)),
       [`is_favorite`]: this.isFavorite,
-      offers: this.offers,
+      offers: JSON.parse(JSON.stringify(this.offers)),
       type: this.type
     };
+
+    return raw;
   }
 
   clone() {

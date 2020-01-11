@@ -154,7 +154,11 @@ export const TimeValue = {
   DAY: 2 * 12 * 60 * 60 * 1000,
   TWO_DAYS: 2 * 2 * 12 * 60 * 60 * 1000,
   WEEK: 7 * 2 * 12 * 60 * 60 * 1000,
-  TWO_WEEKS: 14 * 2 * 12 * 60 * 60 * 1000
+  TWO_WEEKS: 14 * 2 * 12 * 60 * 60 * 1000,
+  MIN_DATE: new Date(0),
+  MAX_DATE: new Date(32535181001646),
+  MIN_TIME: `00:00`,
+  MAX_TIME: `23:59`
 };
 
 export const EVENT_DEFAULT = {
@@ -191,4 +195,15 @@ export const ProcessingState = {
   SAVING: `Saving...`,
   DELETING: `Deleting...`,
   CHANGING_FAVORITE: `Changing favorite`
+};
+
+
+export const ValidityError = {
+  EMPTY_DESTINATION: `Необходимо выбрать пункт назначения`,
+  EMPTY_START_DATE: `Необходимо выбрать дату начала события`,
+  EMPTY_FINISH_DATE: `Необходимо выбрать дату окончания события`,
+  DISABLED_DATE: `Дата начала или окончания события не должны быть внутри другого события`,
+  WRONG_COST_FORMAT: `Стоимость должна быть целым числом`,
+  NEGATIVE_DATE_RANGE: `Дата начала события должна быть раньше даты окончания события`,
+  WRONG_DATE_RANGE: `Даты начала и окончания события должны находиться внутри одного допустимого интервала`
 };
