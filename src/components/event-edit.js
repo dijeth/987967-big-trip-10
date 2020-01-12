@@ -2,6 +2,7 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import {isDateInRanges, isDatesInRanges} from '../utils/common.js';
 import {EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState, TimeValue, ValidityError} from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
+import he from 'he';
 
 const isCostValid = (value) => {
   switch (true) {
@@ -205,7 +206,7 @@ const createForm = (eventItem, destinations, offers, mode, errorState, disabledR
                           <span class="visually-hidden">Price</span>
                           &euro;
                         </label>
-                        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${eventItem.cost}">
+                        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${(he.encode(String(eventItem.cost)))}">
                       </div>
 
                       <button class="event__save-btn  btn  btn--blue" type="submit"${disableStatus}>Save</button>
