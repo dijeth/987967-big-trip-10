@@ -88,8 +88,7 @@ export default class EventController {
     eventEditComponent.setFavoriteClickHandler((evt) => {
       evt.preventDefault();
       this._debounce(this._favoriteClickHandler);
-    }
-    );
+    });
 
     eventEditComponent.setDeleteButtonClickHandler((evt) => {
       evt.preventDefault();

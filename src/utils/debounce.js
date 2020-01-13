@@ -2,13 +2,14 @@ export const createDebounce = (debounceInterval, self, cb) => {
   let lastTimeout = null;
   let start = true;
 
-  return function () {
+  return function (param) {
     if (start) {
       start = false;
       lastTimeout = setTimeout(() => {
         start = true;
       }, debounceInterval);
-      cb.apply(self, arguments);
+
+      cb.call(self, param);
 
       return;
     }

@@ -12,7 +12,9 @@ import Store from './api/store.js';
 import Provider from './api/provider.js';
 import {createDebounce} from './utils/debounce.js';
 
-const debounce = createDebounce(500, null, (func) => {
+const DEBOUNCE_INTERVAL = 500;
+
+const debounce = createDebounce(DEBOUNCE_INTERVAL, null, (func) => {
   func();
 });
 
@@ -20,9 +22,9 @@ const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 const AUTORIZATION = `Basic JethroTull`;
 const LOCAL_STORAGE_KEY = `big-trip-local-storage-key`;
 
-// window.addEventListener(`load`, () => {
-//   navigator.serviceWorker.register(`/sw.js`);
-// });
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
 
 const api = new API(END_POINT, AUTORIZATION);
 const store = new Store(LOCAL_STORAGE_KEY, localStorage);
