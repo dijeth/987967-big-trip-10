@@ -1,6 +1,7 @@
 import AbstractComponent from './abstract-component.js';
 import {getDateTime, getTime, formatDate} from '../utils/common.js';
 import {EventTypeProperties, PlaceholderParticle} from '../const.js';
+import he from 'he';
 
 const createOffersHtml = (offerData) => {
   const selected = offerData.slice(0, 3);
@@ -47,7 +48,7 @@ const createEventHtml = (eventItem) => {
                     </div>
 
                     <p class="event__price">
-                      &euro;&nbsp;<span class="event__price-value">${eventItem.cost}</span>
+                      &euro;&nbsp;<span class="event__price-value">${he.encode(String(eventItem.cost))}</span>
                     </p>
 
                     ${offersHtml}
