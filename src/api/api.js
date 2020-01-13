@@ -22,16 +22,6 @@ export default class API {
     this._authorization = authorization;
   }
 
-  _getDestinations() {
-    return this._load({url: `destinations`}).then((response) => response.json());
-  }
-
-  _getOffers() {
-    return this._load({url: `offers`})
-      .then((response) => response.json())
-      .then((offerData) => new Offers(offerData));
-  }
-
   getData() {
     return Promise.all([
       this._load({url: `points`}).then((response) => response.json()),
@@ -81,6 +71,16 @@ export default class API {
       headers: new Headers({'Content-Type': `application/json`})
     })
       .then((response) => response.json());
+  }
+
+  _getDestinations() {
+    return this._load({url: `destinations`}).then((response) => response.json());
+  }
+
+  _getOffers() {
+    return this._load({url: `offers`})
+      .then((response) => response.json())
+      .then((offerData) => new Offers(offerData));
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

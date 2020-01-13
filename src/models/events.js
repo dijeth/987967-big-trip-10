@@ -21,6 +21,23 @@ export default class Events {
     return this._events.filter((it) => FilterOptions[this._activeFilter].check(it));
   }
 
+  getFilter() {
+    return this._activeFilter;
+  }
+
+  setFilter(filter) {
+    this._activeFilter = filter;
+    this._filterChangeHandlers.forEach((it) => it(this._activeFilter));
+  }
+
+  setDataChangeHandler(handler) {
+    this._dataChangeHandlers.push(handler);
+  }
+
+  setFilterChangeHandler(handler) {
+    this._filterChangeHandlers.push(handler);
+  }
+
   set(eventList) {
     this._events = eventList;
     this._dataChangeHandlers.forEach((it) => it());
@@ -41,22 +58,5 @@ export default class Events {
   create(newEventData) {
     this._events = [newEventData].concat(this._events);
     this._dataChangeHandlers.forEach((it) => it());
-  }
-
-  setFilter(filter) {
-    this._activeFilter = filter;
-    this._filterChangeHandlers.forEach((it) => it(this._activeFilter));
-  }
-
-  getFilter() {
-    return this._activeFilter;
-  }
-
-  setDataChangeHandler(handler) {
-    this._dataChangeHandlers.push(handler);
-  }
-
-  setFilterChangeHandler(handler) {
-    this._filterChangeHandlers.push(handler);
   }
 }

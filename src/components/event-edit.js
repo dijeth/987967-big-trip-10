@@ -247,9 +247,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
     return createForm(this._eventItem, this._destinations, this._offers, this._mode, this._errorState, this._disabledRanges, this._enabledRanges);
   }
 
-  rerender() {
-    super.rerender();
-    this._flatpickrRange = this._createFlatpickrRange();
+  getData() {
+    return this._eventItem;
   }
 
   setRollupButtonClickHandler(handler) {
@@ -289,33 +288,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
     );
   }
 
-  getData() {
-    return this._eventItem;
-  }
-
-  recoveryListeners() {
-    this._addListeners();
-
-    this.setRollupButtonClickHandler();
-    this.setSubmitHandler();
-    this.setFavoriteClickHandler();
-    this.setDeleteButtonClickHandler();
-  }
-
-  removeElement() {
-    if (this._flatpickrRange) {
-      this._flatpickrRange.destroy();
-      this._flatpickrRange = null;
-    }
-
-    super.removeElement();
-  }
-
-  reset(eventItem) {
-    this._eventItem = eventItem.clone();
-    this.rerender();
-  }
-
   setErrorState() {
     this._enableForm();
     this._getFormElement().classList.add(`shake`);
@@ -339,6 +311,34 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._resetErrorState();
     buttonElement.textContent = processingState;
     this._disableForm();
+  }
+
+  rerender() {
+    super.rerender();
+    this._flatpickrRange = this._createFlatpickrRange();
+  }
+
+  recoveryListeners() {
+    this._addListeners();
+
+    this.setRollupButtonClickHandler();
+    this.setSubmitHandler();
+    this.setFavoriteClickHandler();
+    this.setDeleteButtonClickHandler();
+  }
+
+  removeElement() {
+    if (this._flatpickrRange) {
+      this._flatpickrRange.destroy();
+      this._flatpickrRange = null;
+    }
+
+    super.removeElement();
+  }
+
+  reset(eventItem) {
+    this._eventItem = eventItem.clone();
+    this.rerender();
   }
 
   _resetErrorState() {
@@ -419,12 +419,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
     );
   }
 
-  _dateRangeChangeHandler(dateStart, dateFinish) {
-    this._eventItem.start = dateStart;
-    this._eventItem.finish = dateFinish;
-    return this._setSubmitDisableStatus();
-  }
-
   _getFormElement() {
     return this.getElement().tagName === `FORM` ? this.getElement() : this.getElement().querySelector(`form`);
   }
@@ -437,7 +431,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   _enableForm() {
-    // this.rerender()
     Array.from(this._getFormElement().elements).forEach((it) => {
       it.disabled = false;
     });
@@ -470,5 +463,11 @@ export default class EventEditComponent extends AbstractSmartComponent {
     const validityMessage = getFormValidity(this._eventItem, this._disabledRanges, this._enabledRanges);
     this._getFormElement().querySelector(`.event__save-btn`).disabled = validityMessage !== ``;
     return validityMessage;
+  }
+
+  _dateRangeChangeHandler(dateStart, dateFinish) {
+    this._eventItem.start = dateStart;
+    this._eventItem.finish = dateFinish;
+    return this._setSubmitDisableStatus();
   }
 }

@@ -1,4 +1,4 @@
-export const OfferType = {
+const OfferType = {
   LUGGAGE: `luggage`,
   COMFORT: `comfort`,
   MEAL: `meal`,
@@ -6,7 +6,7 @@ export const OfferType = {
   TRAIN: `train`
 };
 
-export const OfferTypeOptions = {
+const OfferTypeOptions = {
   [OfferType.LUGGAGE]: {
     name: `Add luggage`
   },
@@ -28,17 +28,17 @@ export const OfferTypeOptions = {
   }
 };
 
-export const MovingType = {
+const MovingType = {
   MOVING: `Moving`,
   STAYING: `Staying`
 };
 
-export const PlaceholderParticle = {
+const PlaceholderParticle = {
   [MovingType.MOVING]: `to`,
   [MovingType.STAYING]: `in`
 };
 
-export const EventType = {
+const EventType = {
   'TAXI': `taxi`,
   'BUS': `bus`,
   'TRAIN': `train`,
@@ -51,7 +51,7 @@ export const EventType = {
   'RESTAURANT': `restaurant`
 };
 
-export const EventTypeProperties = {
+const EventTypeProperties = {
   [EventType.TAXI]: {
     name: `Taxi`,
     icon: `taxi.png`,
@@ -146,7 +146,7 @@ export const EventTypeProperties = {
   }
 };
 
-export const TimeValue = {
+const TimeValue = {
   MINUTE: 60 * 1000,
   HOUR: 60 * 60 * 1000,
   TWO_HOURS: 2 * 60 * 60 * 1000,
@@ -161,7 +161,7 @@ export const TimeValue = {
   MAX_TIME: `23:59`
 };
 
-export const EVENT_DEFAULT = {
+const EVENT_DEFAULT = {
   id: null,
   type: EventType.FLIGHT,
   [`date_from`]: null,
@@ -172,33 +172,33 @@ export const EVENT_DEFAULT = {
   offers: []
 };
 
-export const EventMode = {
+const EventMode = {
   DEFAULT: `event-preview`,
   EDITING: `event-edit`,
   ADDING: `event-adding`
 };
 
-export const TripMode = {
+const TripMode = {
   DEFAULT: `trip-default`,
   ADDING: `trip-append`,
   EMPTY: `trip-empty`
 };
 
-export const MenuMode = {
+const MenuMode = {
   TABLE: `table`,
   STATS: `stats`
 };
 
-export const MIN_EVENT_DURATION = TimeValue.HOUR;
+const MIN_EVENT_DURATION = TimeValue.HOUR;
 
-export const ProcessingState = {
+const ProcessingState = {
   SAVING: `Saving...`,
   DELETING: `Deleting...`,
   CHANGING_FAVORITE: `Changing favorite`
 };
 
 
-export const ValidityError = {
+const ValidityError = {
   EMPTY_DESTINATION: `Необходимо выбрать пункт назначения`,
   EMPTY_START_DATE: `Необходимо выбрать дату начала события`,
   EMPTY_FINISH_DATE: `Необходимо выбрать дату окончания события`,
@@ -207,3 +207,20 @@ export const ValidityError = {
   NEGATIVE_DATE_RANGE: `Дата начала события должна быть раньше даты окончания события`,
   WRONG_DATE_RANGE: `Даты начала и окончания события должны находиться внутри одного допустимого интервала`
 };
+
+export {
+  OfferType,
+  OfferTypeOptions,
+  MovingType,
+  PlaceholderParticle,
+  EventType,
+  EventTypeProperties,
+  TimeValue,
+  EVENT_DEFAULT,
+  EventMode,
+  TripMode,
+  MenuMode,
+  MIN_EVENT_DURATION,
+  ProcessingState,
+  ValidityError
+}
