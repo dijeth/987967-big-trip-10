@@ -21,7 +21,7 @@ const AUTORIZATION = `Basic JethroTull`;
 const LOCAL_STORAGE_KEY = `big-trip-local-storage-key`;
 
 window.addEventListener(`load`, () => {
-  navigator.serviceWorker.register(`/sw.js`)
+  navigator.serviceWorker.register(`/sw.js`);
 });
 
 const api = new API(END_POINT, AUTORIZATION);
