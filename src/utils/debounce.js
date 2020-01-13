@@ -8,7 +8,7 @@ export const createDebounce = (debounceInterval, self, cb) => {
       lastTimeout = setTimeout(() => {
         start = true;
       }, debounceInterval);
-      cb.apply(self);
+      cb.apply(self, arguments);
 
       return;
     }
