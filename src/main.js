@@ -10,9 +10,11 @@ import {TripMode, MenuMode} from './const.js';
 import API from './api/api.js';
 import Store from './api/store.js';
 import Provider from './api/provider.js';
-import { createDebounce } from './utils/debounce.js';
+import {createDebounce} from './utils/debounce.js';
 
-const debounce = createDebounce(500, null, (func) => { func() });
+const debounce = createDebounce(500, null, (func) => {
+  func();
+});
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
 const AUTORIZATION = `Basic JethroTull`;

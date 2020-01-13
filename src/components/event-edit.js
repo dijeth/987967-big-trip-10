@@ -356,7 +356,9 @@ export default class EventEditComponent extends AbstractSmartComponent {
     }
 
     if (this[handlerKeeperName]) {
-      element.addEventListener(eventName, (evt) => {this[handlerKeeperName](evt)});
+      element.addEventListener(eventName, (evt) => {
+        this[handlerKeeperName](evt);
+      });
     }
   }
 

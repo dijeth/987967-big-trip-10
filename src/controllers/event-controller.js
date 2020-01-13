@@ -1,7 +1,7 @@
-import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
+import {RenderPosition, renderComponent, replaceComponent, removeComponent} from '../utils/render.js';
 import EventComponent from '../components/event.js';
 import EventEditComponent from '../components/event-edit.js';
-import { EventMode } from '../const.js';
+import {EventMode} from '../const.js';
 
 export default class EventController {
   constructor(container, dataChangeHandler, viewChangeHandler, disabledRanges, destinations, offers, debounce) {
@@ -63,11 +63,11 @@ export default class EventController {
 
     const eventComponent = new EventComponent(eventData.clone());
     const eventEditComponent = new EventEditComponent(
-      editEventData,
-      this._disabledRanges,
-      this._destinations,
-      this._offers,
-      mode
+        editEventData,
+        this._disabledRanges,
+        this._destinations,
+        this._offers,
+        mode
     );
 
     eventComponent.setRollupButtonClickHandler(() => {
@@ -86,9 +86,9 @@ export default class EventController {
     });
 
     eventEditComponent.setFavoriteClickHandler((evt) => {
-        evt.preventDefault();
-        this._debounce(this._favoriteClickHandler)
-      }
+      evt.preventDefault();
+      this._debounce(this._favoriteClickHandler);
+    }
     );
 
     eventEditComponent.setDeleteButtonClickHandler((evt) => {

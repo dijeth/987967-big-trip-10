@@ -223,4 +223,4 @@ export {
   MIN_EVENT_DURATION,
   ProcessingState,
   ValidityError
-}
+};

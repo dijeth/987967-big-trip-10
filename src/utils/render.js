@@ -53,4 +53,4 @@ export {
   createElement,
   replaceComponent,
   removeComponent
-}
+};
