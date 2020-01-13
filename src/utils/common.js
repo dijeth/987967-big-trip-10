@@ -1,11 +1,11 @@
 import moment from 'moment';
 import {TimeValue, MIN_EVENT_DURATION} from '../const.js';
 
-export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
+const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
 
-export const getRandomElement = (array) => array[getRandomNumber(array.length - 1)];
+const getRandomElement = (array) => array[getRandomNumber(array.length - 1)];
 
-export const getRandomBoolean = () => {
+const getRandomBoolean = () => {
   return Math.random() > 0.5 ? true : false;
 };
 
@@ -18,23 +18,23 @@ const getRandomDate = (dateStart, during) => {
   return date;
 };
 
-export const getRandomHour = (dateStart) => getRandomDate(dateStart, TimeValue.HOUR);
-export const getRandomTwoHours = (dateStart) => getRandomDate(dateStart, TimeValue.TWO_HOURS);
-export const getRandomHalfDay = (dateStart) => getRandomDate(dateStart, TimeValue.HALF_DAY);
-export const getRandomDay = (dateStart) => getRandomDate(dateStart, TimeValue.DAY);
-export const getRandomTwoDays = (dateStart) => getRandomDate(dateStart, TimeValue.TWO_DAYS);
-export const getRandomWeek = (dateStart) => getRandomDate(dateStart, TimeValue.WEEK);
-export const getRandom2Week = (dateStart) => getRandomDate(dateStart, TimeValue.TWO_WEEKS);
+const getRandomHour = (dateStart) => getRandomDate(dateStart, TimeValue.HOUR);
+const getRandomTwoHours = (dateStart) => getRandomDate(dateStart, TimeValue.TWO_HOURS);
+const getRandomHalfDay = (dateStart) => getRandomDate(dateStart, TimeValue.HALF_DAY);
+const getRandomDay = (dateStart) => getRandomDate(dateStart, TimeValue.DAY);
+const getRandomTwoDays = (dateStart) => getRandomDate(dateStart, TimeValue.TWO_DAYS);
+const getRandomWeek = (dateStart) => getRandomDate(dateStart, TimeValue.WEEK);
+const getRandom2Week = (dateStart) => getRandomDate(dateStart, TimeValue.TWO_WEEKS);
 
-export const getDaysCount = (dateMin, dateMax) => {
+const getDaysCount = (dateMin, dateMax) => {
   return Math.floor(moment.duration(+dateMax - moment(dateMin).startOf(`day`).toDate()).asDays());
 };
 
-export const getDate = (date, separator = `-`) => date ? moment(date).format(`YY${separator}MM${separator}D`) : ``;
-export const getTime = (date) => date ? moment(date).format(`HH:mm`) : ``;
-export const getDateTime = (date) => date ? moment(date).format(`YYYY-MM-D[T]HH:mm`) : ``;
+const getDate = (date, separator = `-`) => date ? moment(date).format(`YY${separator}MM${separator}D`) : ``;
+const getTime = (date) => date ? moment(date).format(`HH:mm`) : ``;
+const getDateTime = (date) => date ? moment(date).format(`YYYY-MM-D[T]HH:mm`) : ``;
 
-export const formatDate = (date1, date2) => {
+const formatDate = (date1, date2) => {
   const ms = Math.abs(+date1 - date2);
   const daysCount = Math.floor(moment.duration(ms).asDays());
   const time = moment(new Date(ms)).utc().format(`H[H] mm[M]`);
@@ -42,9 +42,9 @@ export const formatDate = (date1, date2) => {
   return `${daysCount > 0 ? `${daysCount}D ` : ``}${time}`;
 };
 
-export const getShortDate = (date) => date ? moment(date).format(`D MMM`) : ``;
+const getShortDate = (date) => date ? moment(date).format(`D MMM`) : ``;
 
-export const isDateInRange = (range, date, strong = false) => {
+const isDateInRange = (range, date, strong = false) => {
   const dateValue = Math.floor(date / TimeValue.MINUTE);
   const fromValue = Math.floor(range.from / TimeValue.MINUTE);
   const toValue = Math.floor(range.to / TimeValue.MINUTE);
@@ -56,27 +56,27 @@ export const isDateInRange = (range, date, strong = false) => {
   return dateValue >= fromValue && dateValue <= toValue;
 };
 
-export const getDateRange = (ranges, date, strong = false) => {
+const getDateRange = (ranges, date, strong = false) => {
   return ranges.find((range) => isDateInRange(range, date, strong));
 };
 
-export const isDateInRanges = (ranges, date, strong = false) => {
+const isDateInRanges = (ranges, date, strong = false) => {
   return ranges.some((range) => isDateInRange(range, date, strong));
 };
 
-export const isDatesInRange = (range, ...dates) => {
+const isDatesInRange = (range, ...dates) => {
   return dates.every((date) => isDateInRange(range, date));
 };
 
-export const isDatesInRanges = (ranges, ...dates) => {
+const isDatesInRanges = (ranges, ...dates) => {
   return ranges.some((range) => isDatesInRange(range, ...dates));
 };
 
-export const getDatesRange = (ranges, ...dates) => {
+const getDatesRange = (ranges, ...dates) => {
   return ranges.find((range) => isDatesInRange(range, ...dates));
 };
 
-export const flatDateRanges = (ranges) => {
+const flatDateRanges = (ranges) => {
   if (!ranges.length) {
     return [];
   }
@@ -99,10 +99,38 @@ export const flatDateRanges = (ranges) => {
   return flatedRanges;
 };
 
-export const isRangesEqual = (...ranges) => {
+const isRangesEqual = (...ranges) => {
   return ranges.every((it) => ranges[0].from === it.from && ranges[0].to === it.to);
 };
 
-export const toSentenceCase = (string) => {
+const toSentenceCase = (string) => {
   return string.substr(0, 1).toUpperCase() + string.substr(1);
+};
+
+export {
+  getRandomNumber,
+  getRandomElement,
+  getRandomBoolean,
+  getRandomHour,
+  getRandomTwoHours,
+  getRandomHalfDay,
+  getRandomDay,
+  getRandomTwoDays,
+  getRandomWeek,
+  getRandom2Week,
+  getDaysCount,
+  getDate,
+  getTime,
+  getDateTime,
+  formatDate,
+  getShortDate,
+  isDateInRange,
+  getDateRange,
+  isDateInRanges,
+  isDatesInRange,
+  isDatesInRanges,
+  getDatesRange,
+  flatDateRanges,
+  isRangesEqual,
+  toSentenceCase
 };

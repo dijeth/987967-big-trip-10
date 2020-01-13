@@ -2,7 +2,7 @@ import {renderComponent, RenderPosition, replaceComponent, removeComponent} from
 import NoPointsComponent from '../components/no-points.js';
 import {TripMode} from '../const.js';
 
-class NoPointsController {
+export default class NoPointsController {
   constructor(container, tripController) {
     this._container = container;
     this._tripController = tripController;
@@ -12,6 +12,10 @@ class NoPointsController {
     this._tripModeChangeHandler = this._tripModeChangeHandler.bind(this);
 
     this._tripController.setModeChangeHandler(this._tripModeChangeHandler);
+  }
+
+  setNoPointsMessage() {
+    this._title = `Click New Event to create your first point`;
   }
 
   render() {
@@ -26,10 +30,6 @@ class NoPointsController {
     this._noPointsComponent = noPointsComponent;
   }
 
-  setNoPointsMessage() {
-    this._title = `Click New Event to create your first point`;
-  }
-
   _tripModeChangeHandler(mode) {
     if (mode === TripMode.EMPTY) {
       this.setNoPointsMessage();
@@ -40,5 +40,3 @@ class NoPointsController {
     }
   }
 }
-
-export default NoPointsController;

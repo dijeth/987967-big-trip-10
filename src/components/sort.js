@@ -47,6 +47,4 @@ export default class SortComponent extends AbstractComponent {
       }
     });
   }
-
-
 }

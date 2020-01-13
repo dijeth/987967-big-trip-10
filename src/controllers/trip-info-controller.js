@@ -2,7 +2,7 @@ import TripInfoComponent from '../components/trip-info.js';
 import {getShortDate} from '../utils/common.js';
 import {replaceComponent, renderComponent, RenderPosition} from '../utils/render.js';
 
-class TripInfoController {
+export default class TripInfoController {
   constructor(container, eventsModel) {
     this._container = container;
     this._eventsModel = eventsModel;
@@ -30,10 +30,6 @@ class TripInfoController {
     }
 
     this._tripInfoComponent = tripInfoComponent;
-  }
-
-  _dataChangeHandler() {
-    this._render();
   }
 
   _getDateTitle(eventList) {
@@ -67,6 +63,8 @@ class TripInfoController {
 
     return eventList.reduce((accum, current) => accum + current.cost + sumOffers(current.offers), 0);
   }
-}
 
-export default TripInfoController;
+  _dataChangeHandler() {
+    this._render();
+  }
+}

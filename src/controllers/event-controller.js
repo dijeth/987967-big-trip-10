@@ -4,13 +4,14 @@ import EventEditComponent from '../components/event-edit.js';
 import {EventMode} from '../const.js';
 
 export default class EventController {
-  constructor(container, dataChangeHandler, viewChangeHandler, disabledRanges, destinations, offers) {
+  constructor(container, dataChangeHandler, viewChangeHandler, disabledRanges, destinations, offers, debounce) {
     this._container = container;
     this._dataChangeHandler = dataChangeHandler;
     this._viewChangeHandler = viewChangeHandler;
     this._disabledRanges = disabledRanges;
     this._destinations = destinations;
     this._offers = offers;
+    this._debounce = debounce;
 
     this._eventComponent = null;
     this._eventEditComponent = null;
@@ -18,36 +19,8 @@ export default class EventController {
     this._documentKeyDownHandler = this._documentKeyDownHandler.bind(this);
 
     this._mode = EventMode.DEFAULT;
-  }
 
-  _eventToEdit() {
-    this._viewChangeHandler();
-
-    this._mode = EventMode.EDITING;
-    replaceComponent(this._eventEditComponent, this._eventComponent);
-
-    document.addEventListener(`keydown`, this._documentKeyDownHandler);
-  }
-
-  _editToEvent() {
-    document.removeEventListener(`keydown`, this._documentKeyDownHandler);
-
-    this._mode = EventMode.DEFAULT;
-
-    replaceComponent(this._eventComponent, this._eventEditComponent);
-    this._eventEditComponent.reset(this._eventItem);
-  }
-
-  _documentKeyDownHandler(evt) {
-    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-
-    if (isEscKey) {
-      if (this._mode === EventMode.ADDING) {
-        this._eventCancelHandler();
-      } else {
-        this._editToEvent();
-      }
-    }
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   setDefaultView() {
@@ -59,6 +32,22 @@ export default class EventController {
       case EventMode.EDITING:
         this._editToEvent();
     }
+  }
+
+  setDestroyHandler(handler) {
+    this._destroyHandler = handler;
+  }
+
+  setEventCancelHandler(handler) {
+    this._eventCancelHandler = handler;
+  }
+
+  setErrorState() {
+    this._eventEditComponent.setErrorState();
+  }
+
+  setState(processingState) {
+    this._eventEditComponent.setState(processingState);
   }
 
   render(eventData, mode = EventMode.DEFAULT, cachedEventData) {
@@ -96,18 +85,11 @@ export default class EventController {
       this._dataChangeHandler(this, eventData.id, eventEditComponent.getData());
     });
 
-    eventEditComponent.setInputFavoriteChangeHandler(() => {
-      if (this._mode === EventMode.ADDING) {
-        return;
-      }
-
-      const keepInEditing = eventEditComponent.getData().clone();
-
-      const newEventData = eventData.clone();
-      newEventData.isFavorite = !eventData.isFavorite;
-
-      this._dataChangeHandler(this, newEventData.id, newEventData, keepInEditing);
-    });
+    eventEditComponent.setFavoriteClickHandler((evt) => {
+      evt.preventDefault();
+      this._debounce(this._favoriteClickHandler);
+    }
+    );
 
     eventEditComponent.setDeleteButtonClickHandler((evt) => {
       evt.preventDefault();
@@ -172,14 +154,6 @@ export default class EventController {
     return this;
   }
 
-  setDestroyHandler(handler) {
-    this._destroyHandler = handler;
-  }
-
-  setEventCancelHandler(handler) {
-    this._eventCancelHandler = handler;
-  }
-
   destroy() {
     if (this._destroyHandler) {
       this._destroyHandler();
@@ -190,11 +164,46 @@ export default class EventController {
     document.removeEventListener(`keydown`, this._documentKeyDownHandler);
   }
 
-  setErrorState() {
-    this._eventEditComponent.setErrorState();
+  _favoriteClickHandler() {
+    if (this._mode === EventMode.ADDING) {
+      return;
+    }
+
+    const keepInEditing = this._eventEditComponent.getData().clone();
+
+    const newEventData = this._eventItem.clone();
+    newEventData.isFavorite = !this._eventItem.isFavorite;
+
+    this._dataChangeHandler(this, newEventData.id, newEventData, keepInEditing);
   }
 
-  setState(processingState) {
-    this._eventEditComponent.setState(processingState);
+  _eventToEdit() {
+    this._viewChangeHandler();
+
+    this._mode = EventMode.EDITING;
+    replaceComponent(this._eventEditComponent, this._eventComponent);
+
+    document.addEventListener(`keydown`, this._documentKeyDownHandler);
+  }
+
+  _editToEvent() {
+    document.removeEventListener(`keydown`, this._documentKeyDownHandler);
+
+    this._mode = EventMode.DEFAULT;
+
+    replaceComponent(this._eventComponent, this._eventEditComponent);
+    this._eventEditComponent.reset(this._eventItem);
+  }
+
+  _documentKeyDownHandler(evt) {
+    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+    if (isEscKey) {
+      if (this._mode === EventMode.ADDING) {
+        this._eventCancelHandler();
+      } else {
+        this._editToEvent();
+      }
+    }
   }
 }

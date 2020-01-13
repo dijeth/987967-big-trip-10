@@ -10,15 +10,17 @@ import {EventMode, EVENT_DEFAULT, TripMode, ProcessingState} from '../const.js';
 import EventModel from './../models/event.js';
 
 export default class TripController {
-  constructor(container, eventsModel, api) {
+  constructor(container, eventsModel, api, debounce) {
     this._container = container;
     this._eventsModel = eventsModel;
     this._api = api;
+    this._debounce = debounce;
+
     this._noPointsComponent = null;
     this._sortComponent = null;
     this._dayListComponent = null;
     this._editingEvent = null;
-    this._mode = null;// TripMode.EMPTY;
+    this._mode = null; // TripMode.EMPTY;
 
     this._activeSortType = SortType.DEFAULT;
 
@@ -43,6 +45,18 @@ export default class TripController {
     this._renderSort(this._activeSortType);
   }
 
+  setDestinations(destinations) {
+    this._destinations = destinations;
+  }
+
+  setOffers(offers) {
+    this._offers = offers;
+  }
+
+  setModeChangeHandler(handler) {
+    this._modeChangeHandlers.push(handler);
+  }
+
   render() {
     this._showenEvents = this._eventsModel.get().slice();
 
@@ -59,7 +73,8 @@ export default class TripController {
         this._viewChangeHandler,
         flatDateRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null)),
         this._destinations,
-        this._offers
+        this._offers,
+        this._debounce
     );
 
     newEvent.setDestroyHandler(this._eventDestroyHandler);
@@ -72,24 +87,12 @@ export default class TripController {
     this._setMode(TripMode.ADDING);
   }
 
-  setModeChangeHandler(handler) {
-    this._modeChangeHandlers.push(handler);
-  }
-
   hide() {
     this._container.classList.add(`visually-hidden`);
   }
 
   show() {
     this._container.classList.remove(`visually-hidden`);
-  }
-
-  setDestinations(destinations) {
-    this._destinations = destinations;
-  }
-
-  setOffers(offers) {
-    this._offers = offers;
   }
 
   _renderSort(activeSortType) {
@@ -156,7 +159,8 @@ export default class TripController {
           this._viewChangeHandler,
           flatDateRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
           this._destinations,
-          this._offers
+          this._offers,
+          this._debounce
       ).render(it, mode, this._editingEvent);
     });
   }
@@ -175,6 +179,28 @@ export default class TripController {
     });
 
     return eventControllers;
+  }
+
+  _setMode(mode) {
+    if (this._mode !== mode) {
+      this._mode = mode;
+      this._modeChangeHandlers.forEach((it) => it(this._mode));
+    }
+  }
+
+  _getDisabledRanges(eventList, eventStart) {
+    const rangers = [];
+
+    eventList.forEach((it) => {
+      if (it.start !== eventStart) {
+        rangers.push({
+          from: it.start,
+          to: it.finish
+        });
+      }
+    });
+
+    return rangers;
   }
 
   _dataChangeHandler(eventController, id, newEventData, keepInEditMode) {
@@ -245,27 +271,5 @@ export default class TripController {
   _newEventCancelHandler() {
     this._eventControllers[this._eventControllers.length - 1].destroy();
     this._eventControllers.pop();
-  }
-
-  _setMode(mode) {
-    if (this._mode !== mode) {
-      this._mode = mode;
-      this._modeChangeHandlers.forEach((it) => it(this._mode));
-    }
-  }
-
-  _getDisabledRanges(eventList, eventStart) {
-    const rangers = [];
-
-    eventList.forEach((it) => {
-      if (it.start !== eventStart) {
-        rangers.push({
-          from: it.start,
-          to: it.finish
-        });
-      }
-    });
-
-    return rangers;
   }
 }

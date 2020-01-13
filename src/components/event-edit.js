@@ -2,6 +2,7 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import {isDateInRanges, isDatesInRanges} from '../utils/common.js';
 import {EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState, TimeValue, ValidityError} from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
+import he from 'he';
 
 const isCostValid = (value) => {
   switch (true) {
@@ -205,7 +206,7 @@ const createForm = (eventItem, destinations, offers, mode, errorState, disabledR
                           <span class="visually-hidden">Price</span>
                           &euro;
                         </label>
-                        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${eventItem.cost}">
+                        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${(he.encode(String(eventItem.cost)))}">
                       </div>
 
                       <button class="event__save-btn  btn  btn--blue" type="submit"${disableStatus}>Save</button>
@@ -246,9 +247,8 @@ export default class EventEditComponent extends AbstractSmartComponent {
     return createForm(this._eventItem, this._destinations, this._offers, this._mode, this._errorState, this._disabledRanges, this._enabledRanges);
   }
 
-  rerender() {
-    super.rerender();
-    this._flatpickrRange = this._createFlatpickrRange();
+  getData() {
+    return this._eventItem;
   }
 
   setRollupButtonClickHandler(handler) {
@@ -270,12 +270,12 @@ export default class EventEditComponent extends AbstractSmartComponent {
     );
   }
 
-  setInputFavoriteChangeHandler(handler) {
+  setFavoriteClickHandler(handler) {
     this._setHandler(
         handler,
         this.getElement().querySelector(`.event__favorite-checkbox`),
         `_inputFavoriteChangeHandler`,
-        `change`
+        `click`
     );
   }
 
@@ -286,33 +286,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
         `_deleteButtonClickHandler`,
         `click`
     );
-  }
-
-  getData() {
-    return this._eventItem;
-  }
-
-  recoveryListeners() {
-    this._addListeners();
-
-    this.setRollupButtonClickHandler();
-    this.setSubmitHandler();
-    this.setInputFavoriteChangeHandler();
-    this.setDeleteButtonClickHandler();
-  }
-
-  removeElement() {
-    if (this._flatpickrRange) {
-      this._flatpickrRange.destroy();
-      this._flatpickrRange = null;
-    }
-
-    super.removeElement();
-  }
-
-  reset(eventItem) {
-    this._eventItem = eventItem.clone();
-    this.rerender();
   }
 
   setErrorState() {
@@ -340,6 +313,34 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._disableForm();
   }
 
+  rerender() {
+    super.rerender();
+    this._flatpickrRange = this._createFlatpickrRange();
+  }
+
+  recoveryListeners() {
+    this._addListeners();
+
+    this.setRollupButtonClickHandler();
+    this.setSubmitHandler();
+    this.setFavoriteClickHandler();
+    this.setDeleteButtonClickHandler();
+  }
+
+  removeElement() {
+    if (this._flatpickrRange) {
+      this._flatpickrRange.destroy();
+      this._flatpickrRange = null;
+    }
+
+    super.removeElement();
+  }
+
+  reset(eventItem) {
+    this._eventItem = eventItem.clone();
+    this.rerender();
+  }
+
   _resetErrorState() {
     this._errorState = false;
     this._getFormElement().classList.remove(`event--error`);
@@ -355,7 +356,9 @@ export default class EventEditComponent extends AbstractSmartComponent {
     }
 
     if (this[handlerKeeperName]) {
-      element.addEventListener(eventName, this[handlerKeeperName]);
+      element.addEventListener(eventName, (evt) => {
+        this[handlerKeeperName](evt);
+      });
     }
   }
 
@@ -418,12 +421,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
     );
   }
 
-  _dateRangeChangeHandler(dateStart, dateFinish) {
-    this._eventItem.start = dateStart;
-    this._eventItem.finish = dateFinish;
-    return this._setSubmitDisableStatus();
-  }
-
   _getFormElement() {
     return this.getElement().tagName === `FORM` ? this.getElement() : this.getElement().querySelector(`form`);
   }
@@ -436,7 +433,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   _enableForm() {
-    // this.rerender()
     Array.from(this._getFormElement().elements).forEach((it) => {
       it.disabled = false;
     });
@@ -469,5 +465,11 @@ export default class EventEditComponent extends AbstractSmartComponent {
     const validityMessage = getFormValidity(this._eventItem, this._disabledRanges, this._enabledRanges);
     this._getFormElement().querySelector(`.event__save-btn`).disabled = validityMessage !== ``;
     return validityMessage;
+  }
+
+  _dateRangeChangeHandler(dateStart, dateFinish) {
+    this._eventItem.start = dateStart;
+    this._eventItem.finish = dateFinish;
+    return this._setSubmitDisableStatus();
   }
 }

@@ -163,7 +163,7 @@ const getTransportData = (eventList) => {
   return {data, labels, legends};
 };
 
-class StatisticsComponent extends AbstractSmartComponent {
+export default class StatisticsComponent extends AbstractSmartComponent {
   constructor() {
     super();
 
@@ -215,6 +215,8 @@ class StatisticsComponent extends AbstractSmartComponent {
 
     this.needRerender = false;
   }
+
+  recoveryListeners() {}
 
   _renderMoneyChart() {
     const moneyCanvas = this.getElement().querySelector(`.statistics__chart--money`);
@@ -275,11 +277,7 @@ class StatisticsComponent extends AbstractSmartComponent {
     }
   }
 
-  recoveryListeners() {}
-
   dataChangeHandler() {
     this.needRerender = true;
   }
 }
-
-export default StatisticsComponent;
