@@ -276,7 +276,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
         handler,
         this.getElement().querySelector(`.event__favorite-checkbox`),
         `_inputFavoriteChangeHandler`,
-        `change`
+        `click`
     );
   }
 
@@ -356,7 +356,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     }
 
     if (this[handlerKeeperName]) {
-      element.addEventListener(eventName, this[handlerKeeperName]);
+      element.addEventListener(eventName, (evt) => {this[handlerKeeperName](evt)});
     }
   }
 

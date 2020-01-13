@@ -1,24 +1,26 @@
-import {RenderPosition, renderComponent, replaceComponent, removeComponent} from '../utils/render.js';
-import {flatDateRanges} from '../utils/common.js';
-import {SortOptions, SortType} from '../utils/sort.js';
+import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
+import { flatDateRanges } from '../utils/common.js';
+import { SortOptions, SortType } from '../utils/sort.js';
 import DayListComponent from '../components/day-list.js';
 import SortComponent from '../components/sort.js';
 import DayComponent from '../components/day.js';
 import EventListComponent from '../components/event-list.js';
 import EventController from './event-controller.js';
-import {EventMode, EVENT_DEFAULT, TripMode, ProcessingState} from '../const.js';
+import { EventMode, EVENT_DEFAULT, TripMode, ProcessingState } from '../const.js';
 import EventModel from './../models/event.js';
 
 export default class TripController {
-  constructor(container, eventsModel, api) {
+  constructor(container, eventsModel, api, debounce) {
     this._container = container;
     this._eventsModel = eventsModel;
     this._api = api;
+    this._debounce = debounce;
+
     this._noPointsComponent = null;
     this._sortComponent = null;
     this._dayListComponent = null;
     this._editingEvent = null;
-    this._mode = null;// TripMode.EMPTY;
+    this._mode = null; // TripMode.EMPTY;
 
     this._activeSortType = SortType.DEFAULT;
 
@@ -54,12 +56,13 @@ export default class TripController {
     const container = this._sortComponent === null ? this._container.children[0] : this._sortComponent.getElement();
 
     const newEvent = new EventController(
-        container,
-        this._dataChangeHandler,
-        this._viewChangeHandler,
-        flatDateRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null)),
-        this._destinations,
-        this._offers
+      container,
+      this._dataChangeHandler,
+      this._viewChangeHandler,
+      flatDateRanges(this._getDisabledRanges(this._eventsModel.get().slice(), null)),
+      this._destinations,
+      this._offers,
+      this._debounce
     );
 
     newEvent.setDestroyHandler(this._eventDestroyHandler);
@@ -95,8 +98,8 @@ export default class TripController {
   _renderSort(activeSortType) {
     const sortItems = Object.entries(SortOptions).map((it) => {
       const [type, options] = it;
-      const {name, showDirection} = options;
-      return {type, name, showDirection, checked: type === activeSortType};
+      const { name, showDirection } = options;
+      return { type, name, showDirection, checked: type === activeSortType };
     });
 
     const sortComponent = new SortComponent(sortItems);
@@ -151,12 +154,13 @@ export default class TripController {
       const isEventEditing = this._editingEvent !== null && it.id === this._editingEvent.id;
       const mode = isEventEditing ? EventMode.EDITING : EventMode.DEFAULT;
       return new EventController(
-          container,
-          this._dataChangeHandler,
-          this._viewChangeHandler,
-          flatDateRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
-          this._destinations,
-          this._offers
+        container,
+        this._dataChangeHandler,
+        this._viewChangeHandler,
+        flatDateRanges(this._getDisabledRanges(this._eventsModel.get().slice(), it.start)),
+        this._destinations,
+        this._offers,
+        this._debounce
       ).render(it, mode, this._editingEvent);
     });
   }

@@ -1,16 +1,17 @@
-import {RenderPosition, renderComponent, replaceComponent, removeComponent} from '../utils/render.js';
+import { RenderPosition, renderComponent, replaceComponent, removeComponent } from '../utils/render.js';
 import EventComponent from '../components/event.js';
 import EventEditComponent from '../components/event-edit.js';
-import {EventMode} from '../const.js';
+import { EventMode } from '../const.js';
 
 export default class EventController {
-  constructor(container, dataChangeHandler, viewChangeHandler, disabledRanges, destinations, offers) {
+  constructor(container, dataChangeHandler, viewChangeHandler, disabledRanges, destinations, offers, debounce) {
     this._container = container;
     this._dataChangeHandler = dataChangeHandler;
     this._viewChangeHandler = viewChangeHandler;
     this._disabledRanges = disabledRanges;
     this._destinations = destinations;
     this._offers = offers;
+    this._debounce = debounce;
 
     this._eventComponent = null;
     this._eventEditComponent = null;
@@ -18,6 +19,21 @@ export default class EventController {
     this._documentKeyDownHandler = this._documentKeyDownHandler.bind(this);
 
     this._mode = EventMode.DEFAULT;
+
+    this._debounceTry = this._debounceTry.bind(this);
+  }
+
+  _debounceTry() {
+    if (this._mode === EventMode.ADDING) {
+      return;
+    }
+
+    const keepInEditing = this._eventEditComponent.getData().clone();
+
+    const newEventData = this._eventItem.clone();
+    newEventData.isFavorite = !this._eventItem.isFavorite;
+
+    this._dataChangeHandler(this, newEventData.id, newEventData, keepInEditing);
   }
 
   _eventToEdit() {
@@ -74,11 +90,11 @@ export default class EventController {
 
     const eventComponent = new EventComponent(eventData.clone());
     const eventEditComponent = new EventEditComponent(
-        editEventData,
-        this._disabledRanges,
-        this._destinations,
-        this._offers,
-        mode
+      editEventData,
+      this._disabledRanges,
+      this._destinations,
+      this._offers,
+      mode
     );
 
     eventComponent.setRollupButtonClickHandler(() => {
@@ -96,18 +112,24 @@ export default class EventController {
       this._dataChangeHandler(this, eventData.id, eventEditComponent.getData());
     });
 
-    eventEditComponent.setInputFavoriteChangeHandler(() => {
-      if (this._mode === EventMode.ADDING) {
-        return;
+    eventEditComponent.setInputFavoriteChangeHandler((evt) => {
+      // debugger;
+        evt.preventDefault();
+        this._debounce(this._debounceTry)
       }
+      // () => {
+      // if (this._mode === EventMode.ADDING) {
+      //   return;
+      // }
 
-      const keepInEditing = eventEditComponent.getData().clone();
+      // const keepInEditing = eventEditComponent.getData().clone();
 
-      const newEventData = eventData.clone();
-      newEventData.isFavorite = !eventData.isFavorite;
+      // const newEventData = eventData.clone();
+      // newEventData.isFavorite = !eventData.isFavorite;
 
-      this._dataChangeHandler(this, newEventData.id, newEventData, keepInEditing);
-    });
+      // this._dataChangeHandler(this, newEventData.id, newEventData, keepInEditing);
+      // }
+    );
 
     eventEditComponent.setDeleteButtonClickHandler((evt) => {
       evt.preventDefault();

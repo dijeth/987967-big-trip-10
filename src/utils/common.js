@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {TimeValue, MIN_EVENT_DURATION} from '../const.js';
+import { TimeValue, MIN_EVENT_DURATION } from '../const.js';
 
 export const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max - min));
 
