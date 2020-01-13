@@ -20,10 +20,10 @@ export default class EventController {
 
     this._mode = EventMode.DEFAULT;
 
-    this._debounceTry = this._debounceTry.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
-  _debounceTry() {
+  _favoriteClickHandler() {
     if (this._mode === EventMode.ADDING) {
       return;
     }
@@ -112,23 +112,10 @@ export default class EventController {
       this._dataChangeHandler(this, eventData.id, eventEditComponent.getData());
     });
 
-    eventEditComponent.setInputFavoriteChangeHandler((evt) => {
-      // debugger;
+    eventEditComponent.setFavoriteClickHandler((evt) => {
         evt.preventDefault();
-        this._debounce(this._debounceTry)
+        this._debounce(this._favoriteClickHandler)
       }
-      // () => {
-      // if (this._mode === EventMode.ADDING) {
-      //   return;
-      // }
-
-      // const keepInEditing = eventEditComponent.getData().clone();
-
-      // const newEventData = eventData.clone();
-      // newEventData.isFavorite = !eventData.isFavorite;
-
-      // this._dataChangeHandler(this, newEventData.id, newEventData, keepInEditing);
-      // }
     );
 
     eventEditComponent.setDeleteButtonClickHandler((evt) => {

@@ -271,7 +271,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     );
   }
 
-  setInputFavoriteChangeHandler(handler) {
+  setFavoriteClickHandler(handler) {
     this._setHandler(
         handler,
         this.getElement().querySelector(`.event__favorite-checkbox`),
@@ -298,7 +298,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
     this.setRollupButtonClickHandler();
     this.setSubmitHandler();
-    this.setInputFavoriteChangeHandler();
+    this.setFavoriteClickHandler();
     this.setDeleteButtonClickHandler();
   }
 

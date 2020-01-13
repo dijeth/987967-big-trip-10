@@ -3,7 +3,6 @@ export const createDebounce = (debounceInterval, self, cb) => {
   let start = true;
 
   return function() {
-  debugger;
     if (start) {
       start = false;
       lastTimeout = setTimeout(() => {start = true}, debounceInterval);
