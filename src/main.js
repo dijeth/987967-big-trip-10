@@ -20,11 +20,6 @@ const LOCAL_STORAGE_KEY = `big-trip-local-storage-key`;
 
 // window.addEventListener(`load`, () => {
 //   navigator.serviceWorker.register(`/sw.js`)
-//     .then(() => {
-//       document.title = `[SW] ${document.title}`
-//     }).catch(() => {
-//       document.title = `[Not SW] ${document.title}`
-//     });
 // });
 
 const api = new API(END_POINT, AUTORIZATION);
