@@ -17,6 +17,7 @@ const getChartConfig = (labels, data, title, generatorLabel) => {
       labels,
       datasets: [{
         data,
+        minBarLength: 70,
         backgroundColor: `#ffffff`
       }]
     },
