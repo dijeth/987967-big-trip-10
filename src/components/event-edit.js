@@ -21,54 +21,76 @@ const isCostValid = (value) => {
   }
 };
 
+const getDataRangeValidity = (dateStart, dateFinish, disabledRanges, enabledRanges) => {
+  switch (true) {
+    case !dateStart:
+       return ValidityError.EMPTY_START_DATE;
+
+    case isDateInRanges(disabledRanges, dateStart, true):
+       return ValidityError.DISABLED_START_DATE;
+
+    case !dateFinish:
+       return ValidityError.EMPTY_FINISH_DATE;
+
+    case isDateInRanges(disabledRanges, dateFinish, true):
+       return ValidityError.DISABLED_FINISH_DATE;
+
+    case +dateFinish <= +dateStart:
+       return ValidityError.NEGATIVE_DATE_RANGE;
+
+    case !isDatesInRanges(enabledRanges, dateStart, dateFinish):
+       return ValidityError.WRONG_DATE_RANGE;
+
+    default: return ``
+  };
+}
+
 const getFormValidity = (eventItem, disabledRanges, enabledRanges) => {
+  const dateMessages = getDataRangeValidity(eventItem.start, eventItem.finish, disabledRanges, enabledRanges);
+  const messages = [];
+
+  if (dateMessages) {
+    messages.push(dateMessages)
+  };
+
   switch (true) {
     case !eventItem.destination:
-      return ValidityError.EMPTY_DESTINATION;
-    case !eventItem.start:
-      return ValidityError.EMPTY_START_DATE;
-    case !eventItem.finish:
-      return ValidityError.EMPTY_FINISH_DATE;
-    case isDateInRanges(disabledRanges, eventItem.start, true):
-      return ValidityError.DISABLED_DATE;
-    case isDateInRanges(disabledRanges, eventItem.finish, true):
-      return ValidityError.DISABLED_DATE;
+      messages.push(ValidityError.EMPTY_DESTINATION);
+
     case !isCostValid(eventItem.cost):
-      return ValidityError.WRONG_COST_FORMAT;
-    case +eventItem.finish <= +eventItem.start:
-      return ValidityError.NEGATIVE_DATE_RANGE;
-    case !isDatesInRanges(enabledRanges, eventItem.start, eventItem.finish):
-      return ValidityError.WRONG_DATE_RANGE;
-    default:
-      return ``;
-  }
+      messages.push(ValidityError.WRONG_COST_FORMAT);
+  };
+
+  return messages;
 };
 
-const showFormErrorMessage = (form, message) => {
-  switch (message) {
-    case ValidityError.EMPTY_DESTINATION:
-      showErrorMessage(message, form.querySelector(`.event__field-group--destination`));
-      break;
+const showFormValidity = (form, messages) => {
+  showErrorMessage(``, form.querySelector(`.event__field-group--destination`));
+  showErrorMessage(``, form.querySelector(`.event__field-group--time`));
+  showErrorMessage(``, form.querySelector(`.event__field-group--price`));
 
-    case ValidityError.EMPTY_START_DATE:
-    case ValidityError.EMPTY_FINISH_DATE:
-    case ValidityError.DISABLED_DATE:
-    case ValidityError.DISABLED_DATE:
-    case ValidityError.NEGATIVE_DATE_RANGE:
-    case ValidityError.WRONG_DATE_RANGE:
-      showErrorMessage(message, form.querySelector(`.event__field-group--time`));
-      break;
+  form.querySelector(`.event__save-btn`).disabled = messages.length > 0;
 
-    case ValidityError.WRONG_COST_FORMAT:
-      showErrorMessage(message, form.querySelector(`.event__field-group--price`));
-      break;
+  messages.forEach((message) => {
+    switch (message) {
+      case ValidityError.EMPTY_DESTINATION:
+        showErrorMessage(message, form.querySelector(`.event__field-group--destination`));
+        break;
 
-    default:
-      form.querySelectorAll(`.error-message`).forEach((it) => {
-        it.remove();
-      })
+      case ValidityError.EMPTY_START_DATE:
+      case ValidityError.EMPTY_FINISH_DATE:
+      case ValidityError.DISABLED_START_DATE:
+      case ValidityError.DISABLED_FINISH_DATE:
+      case ValidityError.NEGATIVE_DATE_RANGE:
+      case ValidityError.WRONG_DATE_RANGE:
+        showErrorMessage(message, form.querySelector(`.event__field-group--time`));
+        break;
 
-  }
+      case ValidityError.WRONG_COST_FORMAT:
+        showErrorMessage(message, form.querySelector(`.event__field-group--price`));
+        break;
+    }
+  })
 };
 
 const createEventTypeItem = (eventType, checked) => {
@@ -184,7 +206,6 @@ const createForm = (eventItem, destinations, offers, mode, errorState, disabledR
   const title = `${eventProperty.name} ${PlaceholderParticle[eventProperty.movingType]}`;
   const destination = eventItem.destination ? eventItem.destination.name : ``;
   const destinationList = destinations.map((item) => `<option value="${item.name}"></option>`).join(`\n`);
-  const disableStatus = getFormValidity(eventItem, disabledRanges, enabledRanges) === `` ? `` : ` disabled`;
   const destinationHtml = createDestinationHtml(eventItem.destination);
   const offersHtml = createEventOffers(eventItem.offers, offers[eventItem.type]);
 
@@ -246,7 +267,7 @@ const createForm = (eventItem, destinations, offers, mode, errorState, disabledR
                         <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${(he.encode(String(eventItem.cost)))}">
                       </div>
 
-                      <button class="event__save-btn  btn  btn--blue" type="submit"${disableStatus}>Save</button>
+                      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
                       <button class="event__reset-btn" type="reset">${isNewEvent ? `Cancel` : `Delete`}</button>
                       ${isNewEvent ? `` : editFormButtons}
                     </header>
@@ -286,7 +307,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   getElement() {
     const element = super.getElement();
-    showFormErrorMessage(element, getFormValidity(this._eventItem, this._disabledRanges, this._enabledRanges));
+    showFormValidity(element, getFormValidity(this._eventItem, this._disabledRanges, this._enabledRanges));
     return element;
   }
 
@@ -459,7 +480,6 @@ export default class EventEditComponent extends AbstractSmartComponent {
       this._eventItem.start,
       this._eventItem.finish,
       this._disabledRanges,
-      this._enabledRanges,
       this._dateRangeChangeHandler
     );
   }
@@ -505,9 +525,9 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   _setSubmitDisableStatus() {
-    const validityMessage = getFormValidity(this._eventItem, this._disabledRanges, this._enabledRanges);
-    this._getFormElement().querySelector(`.event__save-btn`).disabled = validityMessage !== ``;
-    return validityMessage;
+    const validityMessages = getFormValidity(this._eventItem, this._disabledRanges, this._enabledRanges);
+    showFormValidity(this._element, validityMessages);
+    return validityMessages;
   }
 
   _dateRangeChangeHandler(dateStart, dateFinish) {
