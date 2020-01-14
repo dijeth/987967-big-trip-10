@@ -1,12 +1,9 @@
 import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
 import moment from 'moment';
-import {getDateRange, getDateTime} from './common.js';
-import {ValidityError} from '../const.js';
-
-const showMessage = (message) => {
-  return message;
-};
+import { getDateRange, getDateTime } from './common.js';
+import { showErrorMessage } from './render.js';
+import { ValidityError } from '../const.js';
 
 export default class FlatpickrRange {
   constructor(inputStart, inputFinish, dateStart, dateFinish, disabledRanges, enabledRages, dateChangeHandler) {
@@ -25,17 +22,17 @@ export default class FlatpickrRange {
     this._disabledDates = this._getDisabledDates(disabledRanges);
 
     this._startFlatpickr = this._createFlatpickr(
-        this._inputStart,
-        this._dateStart,
-        this._disabledDates,
-        this._startFlatpickrChangeHandler
+      this._inputStart,
+      this._dateStart,
+      this._disabledDates,
+      this._startFlatpickrChangeHandler
     );
 
     this._finishFlatpickr = this._createFlatpickr(
-        this._inputFinish,
-        this._dateFinish,
-        this._disabledDates,
-        this._finishFlatpickrChangeHandler
+      this._inputFinish,
+      this._dateFinish,
+      this._disabledDates,
+      this._finishFlatpickrChangeHandler
     );
   }
 
@@ -107,30 +104,31 @@ export default class FlatpickrRange {
       changedDate = `_dateStart`;
       dependentFlatpickr = this._finishFlatpickr;
       dependentDate = `_dateFinish`;
-    }
+    };
 
     switch (this._validityMessage) {
       case ValidityError.DISABLED_DATE:
         const disabledRange = getDateRange(this._disabledRanges, dates[0], true);
-        showMessage(`${this._validityMessage}: ${getDateTime(disabledRange.from)} - ${getDateTime(disabledRange.to)}`);
+        showMessage(`${this._validityMessage}: ${getDateTime(disabledRange.from)} - ${getDateTime(disabledRange.to)}`, this._inputStart.parentElement);
         instance.clear();
         this[changedDate] = null;
         break;
 
       case ValidityError.NEGATIVE_DATE_RANGE:
-        showMessage(this._validityMessage);
+        showMessage(this._validityMessage, this._inputStart.parentElement);
         dependentFlatpickr.clear();
         this[dependentDate] = null;
         break;
 
       case ValidityError.WRONG_DATE_RANGE:
         const enabledRange = getDateRange(this._enabledRanges, dates[0], true);
-        showMessage(`${this._validityMessage}: ${getDateTime(enabledRange.from)} - ${getDateTime(enabledRange.to)}`);
+        showMessage(`${this._validityMessage}: ${getDateTime(enabledRange.from)} - ${getDateTime(enabledRange.to)}`, this._inputStart.parentElement);
         dependentFlatpickr.clear();
         this[dependentDate] = null;
         break;
 
-      default: this[changedDate] = dates[0];
+      default:
+        this[changedDate] = dates[0];
     }
   }
 

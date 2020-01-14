@@ -1220,3 +1220,20 @@ main {
 .trip-filters__filter--disabled {
   opacity: .5;
 }
+
+.error-message {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 110%;
+  font-size: 9px;
+  line-height: 1.2;
+  font-style: italic;
+  color: red;
+}
+
+.event__field-group--destination,
+.event__field-group--price,
+.event__field-group--time {
+  position: relative;
+}

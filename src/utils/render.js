@@ -5,9 +5,7 @@ const RenderPosition = {
   AFTER_END: `afterend`
 };
 
-const renderComponent = (container, position, ...components) => {
-  const elements = components.map((it) => it.getElement());
-
+const renderElement = (container, position, ...elements) => {
   switch (position) {
     case RenderPosition.BEFORE_BEGIN:
       container.before(...elements);
@@ -25,6 +23,12 @@ const renderComponent = (container, position, ...components) => {
       container.after(...elements);
       break;
   }
+};
+
+const renderComponent = (container, position, ...components) => {
+  const elements = components.map((it) => it.getElement());
+
+  renderElement(container, position, ...elements);
 };
 
 const createElement = (template) => {
@@ -47,10 +51,31 @@ const removeComponent = (component) => {
   component.removeElement();
 };
 
+const showErrorMessage = (message, container) => {
+  let messageElement = container.querySelector(`.error-message`);
+
+  if (!message) {
+    if (messageElement) {
+      messageElement.remove()
+    };
+    return
+  };
+
+  if (!messageElement) {
+    messageElement = createElement(`<div class="error-message">${message}</div>`);
+    renderElement(container, RenderPosition.BEFORE_END, messageElement);
+  } else {
+    messageElement.textContent = message;
+  };
+};
+
+
 export {
   RenderPosition,
   renderComponent,
   createElement,
   replaceComponent,
-  removeComponent
+  removeComponent,
+  renderElement,
+  showErrorMessage
 };
