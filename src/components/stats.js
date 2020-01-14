@@ -2,8 +2,8 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {EventTypeProperties, PlaceholderParticle, MovingType} from '../const.js';
-import {toSentenceCase} from './../utils/common.js';
+import { EventTypeProperties, PlaceholderParticle, MovingType } from '../const.js';
+import { toSentenceCase } from './../utils/common.js';
 
 const BAR_HEIGHT = 50;
 const MIN_HEIGHT = 3;
@@ -96,7 +96,7 @@ const getChartConfig = (labels, data, title, generatorLabel) => {
 
 const getTimeSpendData = (eventList) => {
   const eventListSorted = eventList.slice().sort((a, b) => +a.start - b.start);
-  const data = eventListSorted.map((it) => Math.floor(moment.duration(+it.finish - it.start).asHours()));
+  const data = eventListSorted.map((it) => +it.finish - it.start);
 
   const legends = data.map((it) => {
     let duration = Math.floor(moment.duration(it).asHours());
@@ -111,14 +111,14 @@ const getTimeSpendData = (eventList) => {
   });
 
   const labels = eventListSorted.map((it) => {
-    const movingType = EventTypeProperties[it.type].movingType;
-    const particle = PlaceholderParticle[movingType];
+    const movingType = EventTypeProperties[it.type].name;
+    const particle = PlaceholderParticle[EventTypeProperties[it.type].movingType];
     const destination = it.destination.name;
 
     return [movingType, particle, destination].join(` `);
   });
 
-  return {data, labels, legends};
+  return { data, labels, legends };
 };
 
 const getMoneyData = (eventList) => {
@@ -137,7 +137,7 @@ const getMoneyData = (eventList) => {
   const data = Object.values(dictionary);
   const legends = data.map((it) => `€ ${it}`);
 
-  return {data, labels, legends};
+  return { data, labels, legends };
 };
 
 const getTransportData = (eventList) => {
@@ -160,7 +160,7 @@ const getTransportData = (eventList) => {
   const data = Object.values(dictionary);
   const legends = data.map((it) => `x ${it}`);
 
-  return {data, labels, legends};
+  return { data, labels, legends };
 };
 
 export default class StatisticsComponent extends AbstractSmartComponent {
@@ -224,12 +224,12 @@ export default class StatisticsComponent extends AbstractSmartComponent {
 
 
     return new Chart(
-        moneyCanvas.getContext(`2d`),
-        getChartConfig(
-            this._moneyData.labels,
-            this._moneyData.data,
-            `MONEY`,
-            (value) => `€ ${value}`));
+      moneyCanvas.getContext(`2d`),
+      getChartConfig(
+        this._moneyData.labels,
+        this._moneyData.data,
+        `MONEY`,
+        (value) => `€ ${value}`));
   }
 
   _renderTransportChart() {
@@ -238,12 +238,12 @@ export default class StatisticsComponent extends AbstractSmartComponent {
 
 
     return new Chart(
-        transportCanvas.getContext(`2d`),
-        getChartConfig(
-            this._transportData.labels,
-            this._transportData.data,
-            `TRANSPORT`,
-            (value) => `x${value}`));
+      transportCanvas.getContext(`2d`),
+      getChartConfig(
+        this._transportData.labels,
+        this._transportData.data,
+        `TRANSPORT`,
+        (value) => `x${value}`));
   }
 
   _renderTimeSpendChart() {
@@ -252,12 +252,18 @@ export default class StatisticsComponent extends AbstractSmartComponent {
 
 
     return new Chart(
-        timeSpentCanvas.getContext(`2d`),
-        getChartConfig(
-            this._timeSpentData.labels,
-            this._timeSpentData.data,
-            `TIME SPEND`,
-            (value) => `${value}H`));
+      timeSpentCanvas.getContext(`2d`),
+      getChartConfig(
+        this._timeSpentData.labels,
+        this._timeSpentData.data,
+        `TIME SPEND`,
+        (value) => {
+          const hours = Math.floor(moment.duration(value).asHours());
+          const minutes = Math.floor(moment.duration(value).asMinutes());
+          const time = hours ? `${hours}H` : `${minutes}M`;
+
+          return time;
+        }));
   }
 
   _resetCharts() {

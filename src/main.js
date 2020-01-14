@@ -19,7 +19,7 @@ const debounce = createDebounce(DEBOUNCE_INTERVAL, null, (func) => {
 });
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
-const AUTORIZATION = `Basic Jethro_Tull`;
+const AUTORIZATION = `Basic 123JethroTull`;
 const LOCAL_STORAGE_KEY = `big-trip-local-storage-key`;
 
 // window.addEventListener(`load`, () => {
