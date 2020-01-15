@@ -56,17 +56,17 @@ const showErrorMessage = (message, container) => {
 
   if (!message) {
     if (messageElement) {
-      messageElement.remove()
-    };
-    return
-  };
+      messageElement.remove();
+    }
+    return;
+  }
 
   if (!messageElement) {
     messageElement = createElement(`<div class="error-message">${message}</div>`);
     renderElement(container, RenderPosition.BEFORE_END, messageElement);
   } else {
     messageElement.textContent = message;
-  };
+  }
 };
 
 

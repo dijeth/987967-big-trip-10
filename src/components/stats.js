@@ -2,8 +2,8 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { EventTypeProperties, PlaceholderParticle, MovingType } from '../const.js';
-import { toSentenceCase } from './../utils/common.js';
+import {EventTypeProperties, PlaceholderParticle, MovingType} from '../const.js';
+import {toSentenceCase} from './../utils/common.js';
 
 const BAR_HEIGHT = 50;
 const MIN_HEIGHT = 3;
@@ -119,7 +119,7 @@ const getTimeSpendData = (eventList) => {
     return [movingType, particle, destination].join(` `);
   });
 
-  return { data, labels, legends };
+  return {data, labels, legends};
 };
 
 const getMoneyData = (eventList) => {
@@ -138,7 +138,7 @@ const getMoneyData = (eventList) => {
   const data = Object.values(dictionary);
   const legends = data.map((it) => `€ ${it}`);
 
-  return { data, labels, legends };
+  return {data, labels, legends};
 };
 
 const getTransportData = (eventList) => {
@@ -161,7 +161,7 @@ const getTransportData = (eventList) => {
   const data = Object.values(dictionary);
   const legends = data.map((it) => `x ${it}`);
 
-  return { data, labels, legends };
+  return {data, labels, legends};
 };
 
 export default class StatisticsComponent extends AbstractSmartComponent {
@@ -225,12 +225,12 @@ export default class StatisticsComponent extends AbstractSmartComponent {
 
 
     return new Chart(
-      moneyCanvas.getContext(`2d`),
-      getChartConfig(
-        this._moneyData.labels,
-        this._moneyData.data,
-        `MONEY`,
-        (value) => `€ ${value}`));
+        moneyCanvas.getContext(`2d`),
+        getChartConfig(
+            this._moneyData.labels,
+            this._moneyData.data,
+            `MONEY`,
+            (value) => `€ ${value}`));
   }
 
   _renderTransportChart() {
@@ -239,12 +239,12 @@ export default class StatisticsComponent extends AbstractSmartComponent {
 
 
     return new Chart(
-      transportCanvas.getContext(`2d`),
-      getChartConfig(
-        this._transportData.labels,
-        this._transportData.data,
-        `TRANSPORT`,
-        (value) => `x${value}`));
+        transportCanvas.getContext(`2d`),
+        getChartConfig(
+            this._transportData.labels,
+            this._transportData.data,
+            `TRANSPORT`,
+            (value) => `x${value}`));
   }
 
   _renderTimeSpendChart() {
@@ -253,18 +253,18 @@ export default class StatisticsComponent extends AbstractSmartComponent {
 
 
     return new Chart(
-      timeSpentCanvas.getContext(`2d`),
-      getChartConfig(
-        this._timeSpentData.labels,
-        this._timeSpentData.data,
-        `TIME SPEND`,
-        (value) => {
-          const hours = Math.floor(moment.duration(value).asHours());
-          const minutes = Math.floor(moment.duration(value).asMinutes());
-          const time = hours ? `${hours}H` : `${minutes}M`;
+        timeSpentCanvas.getContext(`2d`),
+        getChartConfig(
+            this._timeSpentData.labels,
+            this._timeSpentData.data,
+            `TIME SPEND`,
+            (value) => {
+              const hours = Math.floor(moment.duration(value).asHours());
+              const minutes = Math.floor(moment.duration(value).asMinutes());
+              const time = hours ? `${hours}H` : `${minutes}M`;
 
-          return time;
-        }));
+              return time;
+            }));
   }
 
   _resetCharts() {

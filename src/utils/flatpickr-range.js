@@ -1,9 +1,6 @@
 import '../../node_modules/flatpickr/dist/flatpickr.css';
 import flatpickr from 'flatpickr';
 import moment from 'moment';
-import { getDateRange, getDateTime } from './common.js';
-import { showErrorMessage } from './render.js';
-import { ValidityError } from '../const.js';
 
 export default class FlatpickrRange {
   constructor(inputStart, inputFinish, dateStart, dateFinish, disabledRanges, dateChangeHandler) {
@@ -18,15 +15,15 @@ export default class FlatpickrRange {
     this._disabledDates = this._getDisabledDates(disabledRanges);
 
     this._startFlatpickr = this._createFlatpickr(
-      this._inputStart,
-      this._dateStart,
-      this._disabledDates
+        this._inputStart,
+        this._dateStart,
+        this._disabledDates
     );
 
     this._finishFlatpickr = this._createFlatpickr(
-      this._inputFinish,
-      this._dateFinish,
-      this._disabledDates
+        this._inputFinish,
+        this._dateFinish,
+        this._disabledDates
     );
   }
 

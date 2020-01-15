@@ -1,7 +1,7 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
-import { isDateInRanges, isDatesInRanges } from '../utils/common.js';
-import { showErrorMessage } from '../utils/render.js';
-import { EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState, TimeValue, ValidityError } from '../const.js';
+import {isDateInRanges, isDatesInRanges} from '../utils/common.js';
+import {showErrorMessage} from '../utils/render.js';
+import {EventTypeProperties, MovingType, PlaceholderParticle, EventMode, ProcessingState, TimeValue, ValidityError} from '../const.js';
 import FlatpickrRange from '../utils/flatpickr-range.js';
 import he from 'he';
 
@@ -24,42 +24,43 @@ const isCostValid = (value) => {
 const getDataRangeValidity = (dateStart, dateFinish, disabledRanges, enabledRanges) => {
   switch (true) {
     case !dateStart:
-       return ValidityError.EMPTY_START_DATE;
+      return ValidityError.EMPTY_START_DATE;
 
     case isDateInRanges(disabledRanges, dateStart, true):
-       return ValidityError.DISABLED_START_DATE;
+      return ValidityError.DISABLED_START_DATE;
 
     case !dateFinish:
-       return ValidityError.EMPTY_FINISH_DATE;
+      return ValidityError.EMPTY_FINISH_DATE;
 
     case isDateInRanges(disabledRanges, dateFinish, true):
-       return ValidityError.DISABLED_FINISH_DATE;
+      return ValidityError.DISABLED_FINISH_DATE;
 
     case +dateFinish <= +dateStart:
-       return ValidityError.NEGATIVE_DATE_RANGE;
+      return ValidityError.NEGATIVE_DATE_RANGE;
 
     case !isDatesInRanges(enabledRanges, dateStart, dateFinish):
-       return ValidityError.WRONG_DATE_RANGE;
+      return ValidityError.WRONG_DATE_RANGE;
 
-    default: return ``
-  };
-}
+    default:
+      return ``;
+  }
+};
 
 const getFormValidity = (eventItem, disabledRanges, enabledRanges) => {
   const dateMessages = getDataRangeValidity(eventItem.start, eventItem.finish, disabledRanges, enabledRanges);
   const messages = [];
 
   if (dateMessages) {
-    messages.push(dateMessages)
-  };
+    messages.push(dateMessages);
+  }
 
-  switch (true) {
-    case !eventItem.destination:
-      messages.push(ValidityError.EMPTY_DESTINATION);
+  if (!eventItem.destination) {
+    messages.push(ValidityError.EMPTY_DESTINATION);
+  }
 
-    case !isCostValid(eventItem.cost):
-      messages.push(ValidityError.WRONG_COST_FORMAT);
-  };
+  if (!isCostValid(eventItem.cost)) {
+    messages.push(ValidityError.WRONG_COST_FORMAT);
+  }
 
   return messages;
 };
@@ -90,7 +91,7 @@ const showFormValidity = (form, messages) => {
         showErrorMessage(message, form.querySelector(`.event__field-group--price`));
         break;
     }
-  })
+  });
 };
 
 const createEventTypeItem = (eventType, checked) => {
@@ -198,7 +199,7 @@ const createDestinationHtml = (destination) => {
                       </section>`;
 };
 
-const createForm = (eventItem, destinations, offers, mode, errorState, disabledRanges, enabledRanges) => {
+const createForm = (eventItem, destinations, offers, mode, errorState) => {
   const isNewEvent = mode === EventMode.ADDING;
 
   const eventProperty = EventTypeProperties[eventItem.type];
@@ -302,7 +303,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   }
 
   getTemplate() {
-    return createForm(this._eventItem, this._destinations, this._offers, this._mode, this._errorState, this._disabledRanges, this._enabledRanges);
+    return createForm(this._eventItem, this._destinations, this._offers, this._mode, this._errorState);
   }
 
   getElement() {
@@ -317,38 +318,38 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   setRollupButtonClickHandler(handler) {
     this._setHandler(
-      handler,
-      this.getElement().querySelector(`.event__rollup-btn`),
-      `_rollupButtonClickHandler`,
-      `click`
+        handler,
+        this.getElement().querySelector(`.event__rollup-btn`),
+        `_rollupButtonClickHandler`,
+        `click`
     );
   }
 
   setSubmitHandler(handler) {
     const form = this._getFormElement();
     this._setHandler(
-      handler,
-      form,
-      `_submitHandler`,
-      `submit`
+        handler,
+        form,
+        `_submitHandler`,
+        `submit`
     );
   }
 
   setFavoriteClickHandler(handler) {
     this._setHandler(
-      handler,
-      this.getElement().querySelector(`.event__favorite-checkbox`),
-      `_inputFavoriteChangeHandler`,
-      `click`
+        handler,
+        this.getElement().querySelector(`.event__favorite-checkbox`),
+        `_inputFavoriteChangeHandler`,
+        `click`
     );
   }
 
   setDeleteButtonClickHandler(handler) {
     this._setHandler(
-      handler,
-      this.getElement().querySelector(`.event__reset-btn`),
-      `_deleteButtonClickHandler`,
-      `click`
+        handler,
+        this.getElement().querySelector(`.event__reset-btn`),
+        `_deleteButtonClickHandler`,
+        `click`
     );
   }
 
@@ -465,7 +466,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
         const offerIndex = this._eventItem.offers.findIndex((it) => it.title === offerTitle && it.price === offerPrice);
 
         if (offerIndex === -1) {
-          this._eventItem.offers.push({ title: offerTitle, price: offerPrice });
+          this._eventItem.offers.push({title: offerTitle, price: offerPrice});
         } else {
           this._eventItem.offers = this._eventItem.offers.filter((it) => it.title !== offerTitle && it.price !== offerPrice);
         }
@@ -475,12 +476,12 @@ export default class EventEditComponent extends AbstractSmartComponent {
 
   _createFlatpickrRange() {
     return new FlatpickrRange(
-      this.getElement().querySelector(`#event-start-time`),
-      this.getElement().querySelector(`#event-end-time`),
-      this._eventItem.start,
-      this._eventItem.finish,
-      this._disabledRanges,
-      this._dateRangeChangeHandler
+        this.getElement().querySelector(`#event-start-time`),
+        this.getElement().querySelector(`#event-end-time`),
+        this._eventItem.start,
+        this._eventItem.finish,
+        this._disabledRanges,
+        this._dateRangeChangeHandler
     );
   }
 
