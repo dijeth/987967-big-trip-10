@@ -106,10 +106,12 @@ export default class Provider {
       delete store[OFFERS_KEY];
       delete store[DESTINATIONS_KEY];
 
-      return this._api.sync(Object.values(store))
+      const data = Object.values(store);
+
+      return this._api.sync(data)
         .then((response) => {
-          store.filter((item) => item.offline).forEach((item) => {
-            this._store.removeItem(item.id);
+          data.filter((item) => item.offline).forEach((item) => {
+            this._store.deleteItem(item.id);
           });
 
           const createdEvents = getSyncedEvents(response.created);
