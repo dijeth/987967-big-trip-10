@@ -62,8 +62,8 @@ export default class Provider {
     this._isSynced = false;
 
     const newID = nanoid();
-    const newEvent = Object.assign({}, data.toRAW(), {id: newID});
-    this._store.setItem(newID, Object.assign({}, newEvent, {offline: true}));
+    const newEvent = Object.assign({}, data.toRAW(), { id: newID });
+    this._store.setItem(newID, Object.assign({}, newEvent, { offline: true }));
 
     return Promise.resolve(new EventModel(newEvent));
   }
@@ -79,7 +79,7 @@ export default class Provider {
 
     this._isSynced = false;
 
-    this._store.setItem(id, Object.assign({}, data.toRAW(), {offline: true}));
+    this._store.setItem(id, Object.assign({}, data.toRAW(), { offline: true }));
 
     return Promise.resolve(data);
   }
@@ -110,22 +110,30 @@ export default class Provider {
 
       return this._api.sync(data)
         .then((response) => {
+          const synchronizeIDs = {};
+
           data.filter((item) => item.offline).forEach((item) => {
+            synchronizeIDs[item.date_from] = { oldID: item.id };
+
             this._store.deleteItem(item.id);
           });
 
-          const createdEvents = getSyncedEvents(response.created);
+          const createdEvents = response.created;
           const updatedEvents = getSyncedEvents(response.updated);
 
           [...createdEvents, ...updatedEvents].forEach((item) => {
             this._store.setItem(item.id, item);
+
+            if (synchronizeIDs[item.date_from]) {
+              synchronizeIDs[item.date_from].newID = item.id
+            };
           });
 
           this._isSynced = true;
 
-          return Promise.resolve();
+          return Promise.resolve(synchronizeIDs);
         });
-    }
+    };
 
     return Promise.reject(new Error(`Sync data failed`));
   }
