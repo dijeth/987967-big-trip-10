@@ -378,6 +378,10 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._disableForm();
   }
 
+  setID(newID) {
+    this._eventItem.id = newID;
+  }
+
   rerender() {
     super.rerender();
     this._flatpickrRange = this._createFlatpickrRange();

@@ -95,6 +95,14 @@ export default class TripController {
     this._container.classList.remove(`visually-hidden`);
   }
 
+  synchronizeID(synchronizeIDs) {
+    synchronizeIDs.forEach((syncID) => {
+      this._eventControllers
+        .find((eventController) => eventController.getID() === syncID.oldID)
+        .setID(syncID.newID);
+    });
+  }
+
   _renderSort(activeSortType) {
     const sortItems = Object.entries(SortOptions).map((it) => {
       const [type, options] = it;

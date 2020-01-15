@@ -59,4 +59,10 @@ export default class Events {
     this._events = [newEventData].concat(this._events);
     this._dataChangeHandlers.forEach((it) => it());
   }
+
+  synchronizeID(synchronizeIDs) {
+    synchronizeIDs.forEach((syncID) => {
+      this._events.find((it) => it.id === syncID.oldID).id = syncID.newID;
+    });
+  }
 }

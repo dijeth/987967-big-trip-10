@@ -74,4 +74,8 @@ export default class EventComponent extends AbstractComponent {
     const rollupButton = this.getElement().querySelector(`.event__rollup-btn`);
     rollupButton.addEventListener(`click`, handler);
   }
+
+  setID(newID) {
+    this._eventItem.id = newID;
+  }
 }

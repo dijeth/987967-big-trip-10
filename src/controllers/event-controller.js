@@ -23,6 +23,10 @@ export default class EventController {
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
+  getID() {
+    return this._eventItem.id;
+  }
+
   setDefaultView() {
     switch (this._mode) {
       case EventMode.ADDING:
@@ -51,7 +55,7 @@ export default class EventController {
   }
 
   render(eventData, mode = EventMode.DEFAULT, cachedEventData) {
-    this._eventItem = eventData;
+    this._eventItem = eventData.clone();
 
     let editEventData = cachedEventData;
 
@@ -161,6 +165,12 @@ export default class EventController {
     removeComponent(this._eventComponent);
     removeComponent(this._eventEditComponent);
     document.removeEventListener(`keydown`, this._documentKeyDownHandler);
+  }
+
+  setID(newID) {
+    this._eventItem.id = newID;
+    this._eventComponent.setID(newID);
+    this._eventEditComponent.setID(newID);
   }
 
   _favoriteClickHandler() {

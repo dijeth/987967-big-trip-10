@@ -19,7 +19,7 @@ const debounce = createDebounce(DEBOUNCE_INTERVAL, null, (func) => {
 });
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/big-trip`;
-const AUTORIZATION = `Basic 123JethroTull`;
+const AUTORIZATION = `Basic Jethro_Tull`;
 const LOCAL_STORAGE_KEY = `big-trip-local-storage-key`;
 
 window.addEventListener(`load`, () => {
@@ -94,11 +94,12 @@ window.addEventListener(`online`, () => {
 
   if (!provider.getSynchronize()) {
     provider.sync()
-      .then(() => {
-        // Действие, в случае успешной синхронизации
+      .then((synchronizeIDs) => {
+        events.synchronizeID(synchronizeIDs);
+        tripController.synchronizeID(synchronizeIDs);
       })
       .catch(() => {
-        // Действие, в случае ошибки синхронизации
+        // alert(err);
       });
   }
 });
