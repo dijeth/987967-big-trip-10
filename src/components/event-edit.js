@@ -242,7 +242,7 @@ const createForm = (eventItem, destinations, offers, mode, errorState) => {
                         <label class="event__label  event__type-output" for="event-destination-1">
                           ${title}
                         </label>
-                        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
+                        <input class="event__input  event__input--destination" id="event-destination-1" name="event-destination" value="${destination}" list="destination-list-1">
                         <datalist id="destination-list-1">
                           ${destinationList}
                         </datalist>
@@ -434,7 +434,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
   _addListeners() {
     const element = this.getElement();
 
-    element.querySelector(`.event__input--destination`).addEventListener(`input`, (evt) => {
+    element.querySelector(`.event__input--destination`).addEventListener(`change`, (evt) => {
       const destination = this._destinations.find((it) => it.name === evt.target.value);
       this._eventItem.destination = destination || this._eventItem.destination;
 
