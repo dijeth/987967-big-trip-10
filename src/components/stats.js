@@ -7,6 +7,17 @@ import {toSentenceCase} from './../utils/common.js';
 
 const BAR_HEIGHT = 50;
 const MIN_HEIGHT = 3;
+const MIN_BAR_LENGTH = 70;
+const BAR_PADDING = {
+  left: 35,
+  right: 0,
+  top: 0,
+  bottom: 0
+};
+const Y_AXES_PADDING = {
+  bottom: 80
+};
+const Y_TICKS_PADDING = 20;
 
 const getChartConfig = (labels, data, title, generatorLabel) => {
   return {
@@ -17,19 +28,14 @@ const getChartConfig = (labels, data, title, generatorLabel) => {
       labels,
       datasets: [{
         data,
-        minBarLength: 70,
+        minBarLength: MIN_BAR_LENGTH,
         backgroundColor: `#ffffff`
       }]
     },
 
     options: {
       layout: {
-        padding: {
-          left: 35,
-          right: 0,
-          top: 0,
-          bottom: 0
-        }
+        padding: BAR_PADDING
       },
 
       tooltips: {
@@ -69,9 +75,7 @@ const getChartConfig = (labels, data, title, generatorLabel) => {
 
         yAxes: [{
           scaleLabel: {
-            padding: {
-              bottom: 80
-            },
+            padding: Y_AXES_PADDING,
             labelString: title,
             display: true,
             fontSize: 20,
@@ -80,7 +84,7 @@ const getChartConfig = (labels, data, title, generatorLabel) => {
 
           ticks: {
             beginAtZero: true,
-            padding: 20,
+            padding: Y_TICKS_PADDING,
             fontSize: 15,
             fontColor: `#000000`,
           },

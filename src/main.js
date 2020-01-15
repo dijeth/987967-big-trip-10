@@ -97,9 +97,6 @@ window.addEventListener(`online`, () => {
       .then((synchronizeIDs) => {
         events.synchronizeID(synchronizeIDs);
         tripController.synchronizeID(synchronizeIDs);
-      })
-      .catch(() => {
-        // alert(err);
       });
   }
 });
