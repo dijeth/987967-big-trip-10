@@ -81,18 +81,22 @@ const flatDateRanges = (ranges) => {
     return [];
   }
 
-  let sortedRanges = ranges.slice().sort((a, b) => +a.from - b.from);
-  let range = sortedRanges[0];
+  const sortedRanges = ranges.slice().sort((a, b) => +a.from - b.from);
   const flatedRanges = [];
+  let range = sortedRanges[0];
 
-  for (let i = 1; i < sortedRanges.length; i++) {
-    if (+sortedRanges[i].from - range.to < MIN_EVENT_DURATION) {
-      range.to = sortedRanges[i].to;
+  sortedRanges.forEach((sortedRange, index) => {
+    if (index === 0) {
+      return;
+    };
+
+    if (+sortedRange.from - range.to < MIN_EVENT_DURATION) {
+      range.to = sortedRange.to;
     } else {
       flatedRanges.push(range);
-      range = sortedRanges[i];
+      range = sortedRange;
     }
-  }
+  });
 
   flatedRanges.push(range);
 

@@ -18,19 +18,23 @@ const SortOptions = {
       let dayDate = events[0].start;
       let dayEvents = [events[0]];
 
-      for (let i = 1; i < events.length; i++) {
-        const daysCount = getDaysCount(dayDate, events[i].start);
+      events.forEach((event, index) => {
+        if (index === 0) {
+          return;
+        };
+
+        const daysCount = getDaysCount(dayDate, event.start);
 
         if (daysCount === 0) {
-          dayEvents.push(events[i]);
-          continue;
+          dayEvents.push(event);
+          return;
         }
 
         days.push({dayDate, dayCounter, dayEvents});
         dayCounter += daysCount;
-        dayDate = events[i].start;
-        dayEvents = [events[i]];
-      }
+        dayDate = event.start;
+        dayEvents = [event];
+      });
 
       if (dayEvents.length) {
         days.push({dayDate, dayCounter, dayEvents});
