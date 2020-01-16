@@ -21,7 +21,7 @@ const SortOptions = {
       events.forEach((event, index) => {
         if (index === 0) {
           return;
-        };
+        }
 
         const daysCount = getDaysCount(dayDate, event.start);
 

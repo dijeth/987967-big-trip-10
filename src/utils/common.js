@@ -88,7 +88,7 @@ const flatDateRanges = (ranges) => {
   sortedRanges.forEach((sortedRange, index) => {
     if (index === 0) {
       return;
-    };
+    }
 
     if (+sortedRange.from - range.to < MIN_EVENT_DURATION) {
       range.to = sortedRange.to;
