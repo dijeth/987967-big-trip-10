@@ -5,6 +5,8 @@ import {EventTypeProperties, MovingType, PlaceholderParticle, EventMode, Process
 import FlatpickrRange from '../utils/flatpickr-range.js';
 import he from 'he';
 
+const ANIMATION_LENGTH = 600;
+
 const isCostValid = (value) => {
   switch (true) {
     case isNaN(value):
@@ -357,7 +359,7 @@ export default class EventEditComponent extends AbstractSmartComponent {
     this._enableForm();
     this._getFormElement().classList.add(`shake`);
     this._errorState = true;
-    setTimeout(this.rerender.bind(this), 600);
+    setTimeout(this.rerender.bind(this), ANIMATION_LENGTH);
   }
 
   setState(processingState) {

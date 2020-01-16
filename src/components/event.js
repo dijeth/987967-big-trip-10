@@ -3,8 +3,10 @@ import {getDateTime, getTime, formatDate} from '../utils/common.js';
 import {EventTypeProperties, PlaceholderParticle} from '../const.js';
 import he from 'he';
 
+const OFFER_PREVIEW_COUNT = 3;
+
 const createOffersHtml = (offerData) => {
-  const selected = offerData.slice(0, 3);
+  const selected = offerData.slice(0, OFFER_PREVIEW_COUNT);
   if (!selected.length) {
     return ``;
   }

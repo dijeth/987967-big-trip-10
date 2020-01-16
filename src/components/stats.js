@@ -2,40 +2,60 @@ import AbstractSmartComponent from './abstract-smart-component.js';
 import moment from 'moment';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {EventTypeProperties, PlaceholderParticle, MovingType} from '../const.js';
-import {toSentenceCase} from './../utils/common.js';
+import { EventTypeProperties, PlaceholderParticle, MovingType } from '../const.js';
+import { toSentenceCase } from './../utils/common.js';
 
-const BAR_HEIGHT = 50;
+const BarParameter = {
+  HEIGHT: 50,
+  MIN_LENGTH: 70,
+  BACKGROUND_COLOR: `#ffffff`,
+  TYPE: `horizontalBar`,
+  PADDING: {
+    left: 35,
+    right: 0,
+    top: 0,
+    bottom: 0
+  }
+};
+
+const YAxesParameter = {
+  AXES_PADDING: {
+    bottom: 80
+  },
+  TICKS_PADDING: 20,
+  AXES_FONT_SIZE: 20,
+  TICKS_FONT_SIZE: 15,
+  AXES_FONT_COLOR: `#000000`,
+  TICKS_FONT_COLOR: `#000000`
+};
+
+const DataLabelsParameter = {
+  FONT_SIZE: 15,
+  COLOR: `#000000`,
+  OFFSET: 10,
+  ANCHOR: `end`,
+  ALIGN: `left`
+}
+
 const MIN_HEIGHT = 3;
-const MIN_BAR_LENGTH = 70;
-const BAR_PADDING = {
-  left: 35,
-  right: 0,
-  top: 0,
-  bottom: 0
-};
-const Y_AXES_PADDING = {
-  bottom: 80
-};
-const Y_TICKS_PADDING = 20;
 
 const getChartConfig = (labels, data, title, generatorLabel) => {
   return {
     maintainAspectRatio: false,
     plugins: [ChartDataLabels],
-    type: `horizontalBar`,
+    type: BarParameter.TYPE,
     data: {
       labels,
       datasets: [{
         data,
-        minBarLength: MIN_BAR_LENGTH,
-        backgroundColor: `#ffffff`
+        minBarLength: BarParameter.MIN_LENGTH,
+        backgroundColor: BarParameter.BACKGROUND_COLOR
       }]
     },
 
     options: {
       layout: {
-        padding: BAR_PADDING
+        padding: BarParameter.PADDING
       },
 
       tooltips: {
@@ -52,12 +72,12 @@ const getChartConfig = (labels, data, title, generatorLabel) => {
             return generatorLabel(value);
           },
           font: {
-            size: 15
+            size: DataLabelsParameter.FONT_SIZE
           },
-          color: `#000000`,
-          anchor: `end`,
-          offset: 10,
-          align: `left`
+          color: DataLabelsParameter.COLOR,
+          anchor: DataLabelsParameter.ANCHOR,
+          offset: DataLabelsParameter.OFFSET,
+          align: DataLabelsParameter.ALIGN
         }
       },
 
@@ -75,18 +95,18 @@ const getChartConfig = (labels, data, title, generatorLabel) => {
 
         yAxes: [{
           scaleLabel: {
-            padding: Y_AXES_PADDING,
+            padding: YAxesParameter.AXES_PADDING,
             labelString: title,
             display: true,
-            fontSize: 20,
-            fontColor: `#000000`
+            fontSize: YAxesParameter.AXES_FONT_SIZE,
+            fontColor: YAxesParameter.AXES_FONT_COLOR
           },
 
           ticks: {
             beginAtZero: true,
-            padding: Y_TICKS_PADDING,
-            fontSize: 15,
-            fontColor: `#000000`,
+            padding: YAxesParameter.TICKS_PADDING,
+            fontSize: YAxesParameter.TICKS_FONT_SIZE,
+            fontColor: YAxesParameter.TICKS_FONT_COLOR,
           },
           gridLines: {
             display: false,
@@ -123,7 +143,7 @@ const getTimeSpendData = (eventList) => {
     return [movingType, particle, destination].join(` `);
   });
 
-  return {data, labels, legends};
+  return { data, labels, legends };
 };
 
 const getMoneyData = (eventList) => {
@@ -142,7 +162,7 @@ const getMoneyData = (eventList) => {
   const data = Object.values(dictionary);
   const legends = data.map((it) => `€ ${it}`);
 
-  return {data, labels, legends};
+  return { data, labels, legends };
 };
 
 const getTransportData = (eventList) => {
@@ -165,7 +185,7 @@ const getTransportData = (eventList) => {
   const data = Object.values(dictionary);
   const legends = data.map((it) => `x ${it}`);
 
-  return {data, labels, legends};
+  return { data, labels, legends };
 };
 
 export default class StatisticsComponent extends AbstractSmartComponent {
@@ -225,50 +245,50 @@ export default class StatisticsComponent extends AbstractSmartComponent {
 
   _renderMoneyChart() {
     const moneyCanvas = this.getElement().querySelector(`.statistics__chart--money`);
-    moneyCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._moneyData.data.length ? MIN_HEIGHT : this._moneyData.data.length);
+    moneyCanvas.height = BarParameter.HEIGHT * (MIN_HEIGHT > this._moneyData.data.length ? MIN_HEIGHT : this._moneyData.data.length);
 
 
     return new Chart(
-        moneyCanvas.getContext(`2d`),
-        getChartConfig(
-            this._moneyData.labels,
-            this._moneyData.data,
-            `MONEY`,
-            (value) => `€ ${value}`));
+      moneyCanvas.getContext(`2d`),
+      getChartConfig(
+        this._moneyData.labels,
+        this._moneyData.data,
+        `MONEY`,
+        (value) => `€ ${value}`));
   }
 
   _renderTransportChart() {
     const transportCanvas = this.getElement().querySelector(`.statistics__chart--transport`);
-    transportCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._transportData.data.length ? MIN_HEIGHT : this._transportData.data.length);
+    transportCanvas.height = BarParameter.HEIGHT * (MIN_HEIGHT > this._transportData.data.length ? MIN_HEIGHT : this._transportData.data.length);
 
 
     return new Chart(
-        transportCanvas.getContext(`2d`),
-        getChartConfig(
-            this._transportData.labels,
-            this._transportData.data,
-            `TRANSPORT`,
-            (value) => `x${value}`));
+      transportCanvas.getContext(`2d`),
+      getChartConfig(
+        this._transportData.labels,
+        this._transportData.data,
+        `TRANSPORT`,
+        (value) => `x${value}`));
   }
 
   _renderTimeSpendChart() {
     const timeSpentCanvas = this.getElement().querySelector(`.statistics__chart--time`);
-    timeSpentCanvas.height = BAR_HEIGHT * (MIN_HEIGHT > this._timeSpentData.data.length ? MIN_HEIGHT : this._timeSpentData.data.length);
+    timeSpentCanvas.height = BarParameter.HEIGHT * (MIN_HEIGHT > this._timeSpentData.data.length ? MIN_HEIGHT : this._timeSpentData.data.length);
 
 
     return new Chart(
-        timeSpentCanvas.getContext(`2d`),
-        getChartConfig(
-            this._timeSpentData.labels,
-            this._timeSpentData.data,
-            `TIME SPEND`,
-            (value) => {
-              const hours = Math.floor(moment.duration(value).asHours());
-              const minutes = Math.floor(moment.duration(value).asMinutes());
-              const time = hours ? `${hours}H` : `${minutes}M`;
+      timeSpentCanvas.getContext(`2d`),
+      getChartConfig(
+        this._timeSpentData.labels,
+        this._timeSpentData.data,
+        `TIME SPEND`,
+        (value) => {
+          const hours = Math.floor(moment.duration(value).asHours());
+          const minutes = Math.floor(moment.duration(value).asMinutes());
+          const time = hours ? `${hours}H` : `${minutes}M`;
 
-              return time;
-            }));
+          return time;
+        }));
   }
 
   _resetCharts() {

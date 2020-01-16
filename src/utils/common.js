@@ -6,7 +6,7 @@ const getRandomNumber = (max, min = 0) => Math.round(min + Math.random() * (max 
 const getRandomElement = (array) => array[getRandomNumber(array.length - 1)];
 
 const getRandomBoolean = () => {
-  return Math.random() > 0.5 ? true : false;
+  return Math.random() > 0.5;
 };
 
 const getRandomDate = (dateStart, during) => {
